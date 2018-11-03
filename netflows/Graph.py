@@ -7,7 +7,7 @@ import numpy as np
 # In[52]:
 
 class Graph:
-    def __init__(self, adj=0, dist=0, weights=0, cost_func_string = 'linear'):
+    def __init__(self, adj=0, dist=0, weights=0):
         """
         adj: adjacency mat
         cost_func: a string that specifies cost function. support: linear, affine, BRP, MM1
