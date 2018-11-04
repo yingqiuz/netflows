@@ -28,9 +28,8 @@ del sys
 # release data
 # TBC
 
-from Graph import Graph
-from costfuncs import *
-from solvefuncs import *
+from netflows.Graph import Graph
+from netflows.funcs import *
 
 
 
