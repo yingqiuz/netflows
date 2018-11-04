@@ -1,9 +1,10 @@
+from __future__ import absolute_import
+from netflows.funcs.costfuncs import linear_cost, linear_WE_obj, linear_SO_obj
+
 import numpy as np
 import scipy
 
-from netflows.funcs.costfuncs import linear_cost,linear_WE_obj,linear_SO_obj
-
-def WE(G, s, t, tol = 1e-12, maximum_iter = 10000, cutoff = None):
+def WElinearsolve(G, s, t, tol = 1e-12, maximum_iter = 10000, cutoff = None):
     """
     single pair Wardrop Equilibrium flow
     s: source
@@ -11,7 +12,7 @@ def WE(G, s, t, tol = 1e-12, maximum_iter = 10000, cutoff = None):
     tol: tolerance
     gamma: descent speed
     """
-    if cutoff = None:
+    if cutoff == None:
         print("Warning: cutoff not specified. it may take hugh memory to find all paths")
         cutoff = min(G.adj.shape)
 
@@ -19,9 +20,9 @@ def WE(G, s, t, tol = 1e-12, maximum_iter = 10000, cutoff = None):
     if allpaths == []:
         allpaths = G.findallpaths(s, t, cutoff)
 
-    return _WE(G, s, t, tol, maximum_iter, allpaths)
+    return _WElinearsolve(G, s, t, tol, maximum_iter, allpaths)
 
-def SO(G, s, t, tol=1e-12, maximum_iter = 10000, cutoff = None):
+def SOlinearsolve(G, s, t, tol=1e-12, maximum_iter = 10000, cutoff = None):
     """
     :param G:
     :param s:
@@ -31,17 +32,17 @@ def SO(G, s, t, tol=1e-12, maximum_iter = 10000, cutoff = None):
     :param cutoff:
     :return:
     """
-    if cutoff = None:
+    if cutoff == None:
         print("Warning: cutoff not specified. it may take hugh memory to find all paths")
         cutoff = min(G.adj.shape)
 
     allpaths = G.allpaths[s][t]
-    if allpaths = []:
+    if allpaths == []:
         allpaths = G.findallpaths(s, t, cutoff)
 
-    return _SO(G, s, t, tol, maximum_iter, allpaths)
+    return _SOlinearsolve(G, s, t, tol, maximum_iter, allpaths)
 
-def _WE(G, s, t, tol, maximum_iter, allpaths):
+def _WElinearsolve(G, s, t, tol, maximum_iter, allpaths):
 
     num_variables = len(allpaths) # the number of paths from s to t
 
@@ -128,7 +129,7 @@ def _WE(G, s, t, tol, maximum_iter, allpaths):
     print('global minimum not found')
     return
 
-def _SO(G, s, t, tol, maximum_iter, allpaths):
+def _SOlinearsolve(G, s, t, tol, maximum_iter, allpaths):
     """
     single pair System Optimal flow
     s: source

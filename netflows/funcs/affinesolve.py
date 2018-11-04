@@ -1,9 +1,11 @@
+from __future__ import absolute_import
+from netflows.funcs.costfuncs import affine_cost,affine_SO_obj,affine_WE_obj
+
 import numpy as np
 import scipy
 
-from netflows.funcs.costfuncs import affine_cost,affine_SO_obj,affine_WE_obj
 
-def WE(G, s, t, tol = 1e-12, maximum_iter = 10000, cutoff = None, a = None, a0 = None):
+def WEaffinesolve(G, s, t, tol = 1e-12, maximum_iter = 10000, cutoff = None, a = None, a0 = None):
     """
     single pair Wardrop Equilibrium flow
     s: source
@@ -11,7 +13,7 @@ def WE(G, s, t, tol = 1e-12, maximum_iter = 10000, cutoff = None, a = None, a0 =
     tol: tolerance
     gamma: descent speed
     """
-    if cutoff = None:
+    if cutoff == None:
         print("Warning: cutoff not specified. it may take hugh memory to find all paths")
         cutoff = min(G.adj.shape)
 
@@ -25,9 +27,9 @@ def WE(G, s, t, tol = 1e-12, maximum_iter = 10000, cutoff = None, a = None, a0 =
     if a0 == None:
         a0 = G.adj_weights
 
-    return _WE(G, s, t, tol, maximum_iter, allpaths, a, a0)
+    return _WEaffinesolve(G, s, t, tol, maximum_iter, allpaths, a, a0)
 
-def SO(G, s, t, tol=1e-12, maximum_iter = 10000, cutoff = None, a = None, a0 = None):
+def SOaffinesolve(G, s, t, tol=1e-12, maximum_iter = 10000, cutoff = None, a = None, a0 = None):
     """
     :param G:
     :param s:
@@ -37,12 +39,12 @@ def SO(G, s, t, tol=1e-12, maximum_iter = 10000, cutoff = None, a = None, a0 = N
     :param cutoff:
     :return:
     """
-    if cutoff = None:
+    if cutoff == None:
         print("Warning: cutoff not specified. it may take hugh memory to find all paths")
         cutoff = min(G.adj.shape)
 
     allpaths = G.allpaths[s][t]
-    if allpaths = []:
+    if allpaths == []:
         allpaths = G.findallpaths(s, t, cutoff)
 
     if a == None:
@@ -51,9 +53,9 @@ def SO(G, s, t, tol=1e-12, maximum_iter = 10000, cutoff = None, a = None, a0 = N
     if a0 == None:
         a0 = G.adj_weights
 
-    return _SO(G, s, t, tol, maximum_iter, allpaths, a, a0)
+    return _SOaffinesolve(G, s, t, tol, maximum_iter, allpaths, a, a0)
 
-def _WE(G, s, t, tol, maximum_iter, allpaths, a, a0):
+def _WEaffinesolve(G, s, t, tol, maximum_iter, allpaths, a, a0):
     """
     :param G:
     :param s:
@@ -153,7 +155,7 @@ def _WE(G, s, t, tol, maximum_iter, allpaths, a, a0):
     print('global minimum not found')
     return
 
-def _SO(G, s, t, tol, maximum_iter, allpaths, a, a0):
+def _SOaffinesolve(G, s, t, tol, maximum_iter, allpaths, a, a0):
     """
     single pair System Optimal flow, affine cost function
     s: source

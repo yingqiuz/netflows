@@ -1,9 +1,10 @@
+from __future__ import absolute_import
+from netflows.funcs.costfuncs import BPR_cost, BPR_WE_obj, BPR_SO_obj
+
 import numpy as np
 import scipy
 
-from netflows.funcs.costfuncs import *
-
-def WE(G, s, t, tol = 1e-12, maximum_iter = 10000, cutoff = None, t = None, u = None):
+def WEbprsolve(G, s, t, tol = 1e-12, maximum_iter = 10000, cutoff = None, a = None, u = None):
     """
     single pair Wardrop Equilibrium flow
     s: source
@@ -11,7 +12,7 @@ def WE(G, s, t, tol = 1e-12, maximum_iter = 10000, cutoff = None, t = None, u = 
     tol: tolerance
     gamma: descent speed
     """
-    if cutoff = None:
+    if cutoff == None:
         print("Warning: cutoff not specified. it may take hugh memory to find all paths")
         cutoff = min(G.adj.shape)
 
@@ -19,15 +20,15 @@ def WE(G, s, t, tol = 1e-12, maximum_iter = 10000, cutoff = None, t = None, u = 
     if allpaths == []:
         allpaths = G.findallpaths(s, t, cutoff)
 
-    if t == None:
-        t = G.adj_dist
+    if a == None:
+        a = G.adj_dist
 
     if u == None:
         u = G.adj_weights
 
-    return _WE(G, s, t, tol, maximum_iter, allpaths, t, u)
+    return _WEbprsolve(G, s, t, tol, maximum_iter, allpaths, a, u)
 
-def SO(G, s, t, tol=1e-12, maximum_iter = 10000, cutoff = None, t = None, u = None):
+def SObprsolve(G, s, t, tol=1e-12, maximum_iter = 10000, cutoff = None, a = None, u = None):
     """
     :param G:
     :param s:
@@ -37,23 +38,23 @@ def SO(G, s, t, tol=1e-12, maximum_iter = 10000, cutoff = None, t = None, u = No
     :param cutoff:
     :return:
     """
-    if cutoff = None:
+    if cutoff == None:
         print("Warning: cutoff not specified. it may take hugh memory to find all paths")
         cutoff = min(G.adj.shape)
 
     allpaths = G.allpaths[s][t]
-    if allpaths = []:
+    if allpaths == []:
         allpaths = G.findallpaths(s, t, cutoff)
 
-    if t == None:
-        t = G.adj_dist
+    if a == None:
+        a = G.adj_dist
 
     if u == None:
         u = G.adj_weights
 
-    return _SO(G, s, t, tol, maximum_iter, allpaths, t, u)
+    return _SObprsolve(G, s, t, tol, maximum_iter, allpaths, t, u)
 
-def _WE(G, s, t, tol, maximum_iter, t, u):
+def _WEbprsolve(G, s, t, tol, maximum_iter, a, u):
     """
     single pair Wardrop Equilibrium flow, BPR cost function
     s: source
@@ -82,16 +83,16 @@ def _WE(G, s, t, tol, maximum_iter, t, u):
     # element (i, j) is the total flow on edge (i,j)    
     allflows = np.sum(path_arrays * x.reshape(num_variables, 1, 1), axis=0)
 
-    obj_fun = np.sum(BPR_WE_obj(allflows, t, weights))
+    obj_fun = np.sum(BPR_WE_obj(allflows, a, weights))
     # obj_fun = np.sum(G.WE_obj(allflows), axis = None)
-    total_cost = np.sum(allflows * BPR_cost(allflows, t, weights))
+    total_cost = np.sum(allflows * BPR_cost(allflows, a, weights))
     #total_traveltime = np.sum( BPR_cost(allflows, G.adj_dist, weights))
     print('initial cost is %f' % total_cost)
     print('initial flows are', x)
     print('------solve the Wardrop Equilibrium------')
     
     gradients = np.array(
-        [np.sum(BPR_cost(allflows, t, weights) * (
+        [np.sum(BPR_cost(allflows, a, weights) * (
                     path_arrays[k] * np.where(path_arrays[-1] == 0, 1, 0) - np.where(path_arrays[k] == 0, 1, 0) *
                     path_arrays[-1]))
          for k in range(num_variables - 1)]
@@ -126,9 +127,9 @@ def _WE(G, s, t, tol, maximum_iter, t, u):
         #    return prev_total_cost, prev_total_traveltime, prev_x
 
         allflows = np.sum(path_arrays * x.reshape(num_variables, 1, 1), axis=0)
-        obj_fun = np.sum( BPR_WE_obj(allflows, t, weights), axis = None)
+        obj_fun = np.sum( BPR_WE_obj(allflows, a, weights), axis = None)
         diff_value = obj_fun - prev_obj_fun
-        total_cost = np.sum(allflows *  BPR_cost(allflows, t, weights), axis=None)
+        total_cost = np.sum(allflows *  BPR_cost(allflows, a, weights), axis=None)
 
         if np.abs(diff_value / prev_obj_fun) < tol:
             print('Wardrop equilibrium found. total cost %f' % total_cost)
@@ -143,7 +144,7 @@ def _WE(G, s, t, tol, maximum_iter, t, u):
 
         # new gradients
         gradients = np.array(
-            [np.sum( BPR_cost(allflows, t, weights) * (
+            [np.sum( BPR_cost(allflows, a, weights) * (
                         path_arrays[k] * np.where(path_arrays[-1] == 0, 1, 0) - np.where(path_arrays[k] == 0, 1,
                                                                                          0) * path_arrays[-1]))
              for k in range(num_variables - 1)]
@@ -156,7 +157,7 @@ def _WE(G, s, t, tol, maximum_iter, t, u):
     return
 
 
-def _SO(G, s, t, tol, maximum_iter, allpaths, t, u):
+def _SObprsolve(G, s, t, tol, maximum_iter, allpaths, a, u):
     """
     :param G:
     :param s:
@@ -186,9 +187,9 @@ def _SO(G, s, t, tol, maximum_iter, allpaths, t, u):
     # element (i, j) is the total flow on edge (i,j)    
     allflows = np.sum(path_arrays * x.reshape(num_variables, 1, 1), axis=0)
 
-    obj_fun = np.sum(  BPR_SO_obj(allflows, t, weights))
+    obj_fun = np.sum(  BPR_SO_obj(allflows, a, weights))
     # total_cost = np.sum(allflows *   linear_cost(allflows,   G.adj_dist))
-    total_traveltime = np.sum(  BPR_cost(allflows,  t, weights))
+    total_traveltime = np.sum(  BPR_cost(allflows,  a, weights))
     #print(
     #'The initial cost is %f, the initial travel time is %f, and the initial flow is ' % (obj_fun, total_traveltime), x)
     print('initial cost is %f' % obj_fun)
@@ -196,12 +197,12 @@ def _SO(G, s, t, tol, maximum_iter, allpaths, t, u):
     print('------solve the system optimal flow------')
 
     gradients = np.array(
-        [np.sum(  BPR_cost(allflows, t, weights) * (
+        [np.sum(  BPR_cost(allflows, a, weights) * (
                     path_arrays[k] * np.where(path_arrays[-1] == 0, 1, 0) - np.where(path_arrays[k] == 0, 1, 0) *
                     path_arrays[-1]))
          for k in range(num_variables - 1)]
     ) + np.array(
-        [np.sum(allflows * t * (0.6 * (allflows / weights) ** 3 / weights) * (
+        [np.sum(allflows * a * (0.6 * (allflows / weights) ** 3 / weights) * (
                     path_arrays[k] * np.where(path_arrays[-1] == 0, 1, 0) - np.where(path_arrays[k] == 0, 1, 0) *
                     path_arrays[-1]))
          for k in range(num_variables - 1)]
@@ -247,7 +248,7 @@ def _SO(G, s, t, tol, maximum_iter, allpaths, t, u):
         #    return prev_obj_fun, prev_total_traveltime, prev_x
 
         allflows = np.sum(path_arrays * x.reshape(num_variables, 1, 1), axis=0)
-        obj_fun = np.sum(  BPR_SO_obj(allflows, t, weights), axis=None)
+        obj_fun = np.sum(  BPR_SO_obj(allflows, a, weights), axis=None)
         diff_value = obj_fun - prev_obj_fun
         #total_traveltime = np.sum(  BPR_cost(allflows,   G.adj_dist, weights), axis=None)
         #print('Iteration %d: The total cost is %f, the total travel time is %f, and the flow is ' % (
@@ -263,12 +264,12 @@ def _SO(G, s, t, tol, maximum_iter, allpaths, t, u):
 
         #prev_gradients = np.copy(gradients)
         gradients = np.array(
-            [np.sum(  BPR_cost(allflows, t, weights) * (
+            [np.sum(  BPR_cost(allflows, a, weights) * (
                         path_arrays[k] * np.where(path_arrays[-1] == 0, 1, 0) - np.where(path_arrays[k] == 0, 1, 0) *
                         path_arrays[-1]))
              for k in range(num_variables - 1)]
         ) + np.array(
-            [np.sum(allflows * t * (0.6 * (allflows / weights) ** 3 / weights) * (
+            [np.sum(allflows * a * (0.6 * (allflows / weights) ** 3 / weights) * (
                         path_arrays[k] * np.where(path_arrays[-1] == 0, 1, 0) - np.where(path_arrays[k] == 0, 1, 0) *
                         path_arrays[-1]))
              for k in range(num_variables - 1)]
@@ -277,8 +278,6 @@ def _SO(G, s, t, tol, maximum_iter, allpaths, t, u):
         # gamma = np.inner(x[:-1] - prev_x[:-1], gradients - prev_gradients) / np.inner(gradients - prev_gradients,
                                                                                      # gradients - prev_gradients)
         # convergence?
-        if np.abs(diff_value / prev_obj_fun) < tol:
-
 
     print('global minimum not found')
     return
