@@ -16,20 +16,21 @@ class Graph:
         self.adj = np.array(adj).T
         self.adj = np.where(self.adj != 0, 1, 0) # binary matrix
         self.adj_weights = np.array(weights, dtype=np.float).T # weighted matrix
+        self.adj_weights = self.adj * self.adj_weights
         # distance matrix
         self.dist = np.array(dist, dtype=np.float).T
         self.adj_dist = self.dist * self.adj
-
-        self.weights = np.array(weights, dtype=np.float).T
-
         # wiring cost
-        self.wiring_cost = np.zero(self.adj.shape)
-        self.wiring_cost[self.adj==1] = self.dist[self.adj==1] * self.weights[self.adj==1]
+        # self.wiring_cost = np.zeros(self.adj.shape)
+        self.wiring_cost = self.dist * self.adj_weights
+
+        self.rpl_weights = np.array(weights, dtype=np.float).T
+
         # distance weight ratio
-        self.weights[self.weights == 0] = np.inf
-        self.dist_weight_ratio = self.dist / self.weights
-        self.dist_weight_ratio[self.adj == 0 ] = 0
-        self.adj_dist = np.array(dist, dtype=np.float) * self.adj
+        self.rpl_weights[self.rpl_weights == 0] = np.inf
+        self.rpl_weights = 1 / self.rpl_weights
+        self.dist_weight_ratio = self.adj_dist * self.rpl_weights
+        #self.dist_weight_ratio[self.adj == 0 ] = 0
         #self.dist_weight_ratio = np.copy(self.adj_dist)
         self.allpaths = [[[] for k in range(self.adj.shape[1])] for kk in range(self.adj.shape[0])] # store all paths in a 3D list
         self.WEflowsLinear, self.WEflowsAffine, self.WEflowsBPR = [ [[[] for k in range(self.adj.shape[1])] for kk in range(self.adj.shape[0])] ] * 3

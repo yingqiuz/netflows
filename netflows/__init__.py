@@ -10,7 +10,7 @@ Source::
     
 Simple example
 ---------------------
-YBC
+TBC
 
 License
 ---------------------
@@ -29,7 +29,6 @@ del sys
 # TBC
 
 from netflows.Graph import Graph
-from netflows.funcs import *
-
+import netflows.funcs
 
 

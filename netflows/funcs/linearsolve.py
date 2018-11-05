@@ -4,7 +4,7 @@ from netflows.funcs.costfuncs import linear_cost, linear_WE_obj, linear_SO_obj
 import numpy as np
 import scipy
 
-def WElinearsolve(G, s, t, tol = 1e-12, maximum_iter = 10000, cutoff = None):
+def WElinearsolve(G, s, t, tol = 1e-12, maximum_iter = 10000, cutoff = None, a = None):
     """
     single pair Wardrop Equilibrium flow
     s: source
@@ -20,9 +20,12 @@ def WElinearsolve(G, s, t, tol = 1e-12, maximum_iter = 10000, cutoff = None):
     if allpaths == []:
         allpaths = G.findallpaths(s, t, cutoff)
 
-    return _WElinearsolve(G, s, t, tol, maximum_iter, allpaths)
+    if a == None:
+        a = G.dist_weight_ratio
 
-def SOlinearsolve(G, s, t, tol=1e-12, maximum_iter = 10000, cutoff = None):
+    return _WElinearsolve(G, s, t, tol, maximum_iter, allpaths, a)
+
+def SOlinearsolve(G, s, t, tol=1e-12, maximum_iter = 10000, cutoff = None, a = None):
     """
     :param G:
     :param s:
@@ -40,9 +43,12 @@ def SOlinearsolve(G, s, t, tol=1e-12, maximum_iter = 10000, cutoff = None):
     if allpaths == []:
         allpaths = G.findallpaths(s, t, cutoff)
 
-    return _SOlinearsolve(G, s, t, tol, maximum_iter, allpaths)
+    if a == None:
+        a = G.dist_weight_ratio
 
-def _WElinearsolve(G, s, t, tol, maximum_iter, allpaths):
+    return _SOlinearsolve(G, s, t, tol, maximum_iter, allpaths, a)
+
+def _WElinearsolve(G, s, t, tol, maximum_iter, allpaths, a):
 
     num_variables = len(allpaths) # the number of paths from s to t
 
@@ -63,16 +69,16 @@ def _WElinearsolve(G, s, t, tol, maximum_iter, allpaths):
     # element (i, j) is the total flow on edge (i,j)
     allflows = np.sum(path_arrays * x.reshape(num_variables, 1, 1), axis = 0)
 
-    obj_fun = np.sum(linear_WE_obj(allflows, G.dist_weight_ratio))
+    obj_fun = np.sum(linear_WE_obj(allflows, a))
     # obj_fun = np.sum(self.WE_obj(allflows), axis = None)
-    total_cost = np.sum(allflows * linear_cost(allflows, G.dist_weight_ratio))
+    total_cost = np.sum(allflows * linear_cost(allflows, a))
     # total_traveltime = np.sum(linear_cost(allflows, G.adj_dist))
     print('initial cost %f' % total_cost)
     print('initial flows are', x)
     print('------solve the Wardrop Equilibrium------')
 
     gradients = np.array(
-            [np.sum( linear_cost(allflows, G.dist_weight_ratio) * (path_arrays[k] * np.where(path_arrays[-1]==0, 1, 0) -
+            [np.sum( linear_cost(allflows, a) * (path_arrays[k] * np.where(path_arrays[-1]==0, 1, 0) -
                                                                    np.where(path_arrays[k]==0, 1, 0) * path_arrays[-1]) )
              for k in range(num_variables - 1)]
         )
@@ -81,10 +87,6 @@ def _WElinearsolve(G, s, t, tol, maximum_iter, allpaths):
 
         prev_obj_fun = np.copy(obj_fun)
         prev_x = np.copy(x)
-        #prev_allflows = np.copy(allflows)
-        #prev_total_cost = np.copy(total_cost)
-        #prev_total_traveltime = np.copy(total_traveltime)
-        #prev_gradients = np.copy(gradients)
 
         # update x
         result = scipy.optimize.linprog(gradients, bounds=(0, 1), options={'maxiter': 1000, 'disp': False, 'tol': 1e-12, 'bland': True} )
@@ -101,13 +103,14 @@ def _WElinearsolve(G, s, t, tol, maximum_iter, allpaths):
 
         # update the obj funcs
         allflows = np.sum(path_arrays * x.reshape(num_variables, 1, 1), axis = 0) # element (i, j) is the flow on edge (i, j)
-        obj_fun = np.sum(linear_WE_obj(allflows, G.dist_weight_ratio), axis = None)
+        obj_fun = np.sum(linear_WE_obj(allflows, a), axis = None)
         diff_value = obj_fun - prev_obj_fun
-        total_cost = np.sum(allflows * linear_cost(allflows, G.dist_weight_ratio), axis = None)
+        diff_value_x = x - prev_x
+        total_cost = np.sum(allflows * linear_cost(allflows, a), axis = None)
         #total_traveltime = np.sum(linear_cost(allflows, G.adj_dist), axis = None)
         #print('Iteration %d: The total cost is %f, the total travel time is %f, and the flow is ' % (k, total_cost, total_traveltime), x)
 
-        if np.abs(diff_value/prev_obj_fun) < tol:
+        if np.abs(diff_value) < np.abs(prev_obj_fun * tol) and np.abs(diff_value_x) < np.abs( tol * prev_x):
             print('Wardrop equilibrium found: total cost %f' % total_cost)
             print('flows (path formulation) are', x)
             G.WEflowsLinear[s][t] = x # x is path formulation
@@ -117,7 +120,7 @@ def _WElinearsolve(G, s, t, tol, maximum_iter, allpaths):
 
         # new gradients
         gradients = np.array(
-            [np.sum( linear_cost(allflows, G.dist_weight_ratio) * (path_arrays[k] * np.where(path_arrays[-1]==0, 1, 0) - np.where(path_arrays[k]==0, 1, 0) * path_arrays[-1]) )
+            [np.sum( linear_cost(allflows, a) * (path_arrays[k] * np.where(path_arrays[-1]==0, 1, 0) - np.where(path_arrays[k]==0, 1, 0) * path_arrays[-1]) )
              for k in range(num_variables - 1)]
         )
 
@@ -129,7 +132,7 @@ def _WElinearsolve(G, s, t, tol, maximum_iter, allpaths):
     print('global minimum not found')
     return
 
-def _SOlinearsolve(G, s, t, tol, maximum_iter, allpaths):
+def _SOlinearsolve(G, s, t, tol, maximum_iter, allpaths, a):
     """
     single pair System Optimal flow
     s: source
@@ -155,7 +158,7 @@ def _SOlinearsolve(G, s, t, tol, maximum_iter, allpaths):
     # element (i, j) is the total flow on edge (i,j)
     allflows = np.sum(path_arrays * x.reshape(num_variables, 1, 1), axis=0)
 
-    obj_fun = np.sum(linear_SO_obj(allflows, G.dist_weight_ratio)) # obj_fun is total cost
+    obj_fun = np.sum(linear_SO_obj(allflows, a)) # obj_fun is total cost
     # total_cost = np.sum(allflows * cost_funcs.linear_cost(allflows, self.adj_dist))
     # total_traveltime = np.sum(cost_funcs.linear_cost(allflows, self.dist_weight_ratio)) useless.....
     print('initial cost is %f' % obj_fun)
@@ -163,12 +166,12 @@ def _SOlinearsolve(G, s, t, tol, maximum_iter, allpaths):
     print('------solve the system optimal flow------')
 
     gradients = np.array(
-        [np.sum(linear_cost(allflows, G.dist_weight_ratio) * (
+        [np.sum(linear_cost(allflows, a) * (
                     path_arrays[k] * np.where(path_arrays[-1] == 0, 1, 0) - np.where(path_arrays[k] == 0, 1, 0) *
                     path_arrays[-1]))
          for k in range(num_variables - 1)]
     ) + np.array(
-        [np.sum(allflows * G.dist_weight_ratio * (
+        [np.sum(allflows * a * (
                     path_arrays[k] * np.where(path_arrays[-1] == 0, 1, 0) - np.where(path_arrays[k] == 0, 1, 0) *
                     path_arrays[-1]))
          for k in range(num_variables - 1)]
@@ -200,11 +203,12 @@ def _SOlinearsolve(G, s, t, tol, maximum_iter, allpaths):
             #return prev_obj_fun, prev_total_traveltime, prev_x
 
         allflows = np.sum(path_arrays * x.reshape(num_variables, 1, 1), axis=0)
-        obj_fun = np.sum(linear_SO_obj(allflows, G.dist_weight_ratio), axis = None)
+        obj_fun = np.sum(linear_SO_obj(allflows, a), axis = None)
         diff_value = obj_fun - prev_obj_fun
-        # total_traveltime = np.sum(linear_cost(allflows, G.dist_weight_ratio), axis=None)
+        diff_value_x = x - prev_x
+        # total_traveltime = np.sum(linear_cost(allflows, a), axis=None)
 
-        if np.abs(diff_value / prev_obj_fun) < tol:
+        if np.abs(diff_value) < np.abs(prev_obj_fun * tol) and np.abs(diff_value_x) < np.abs( tol * prev_x):
             print('System Optimum found: total cost %d' % obj_fun)
             print('flows (path formulation) are', x)
             G.SOflowsLinear[s][t] = x
@@ -214,12 +218,12 @@ def _SOlinearsolve(G, s, t, tol, maximum_iter, allpaths):
 
         # new gradients
         gradients = np.array(
-            [np.sum(linear_cost(allflows, G.dist_weight_ratio) * (
+            [np.sum(linear_cost(allflows, a) * (
                         path_arrays[k] * np.where(path_arrays[-1] == 0, 1, 0) - np.where(path_arrays[k] == 0, 1,
                                                                                          0) * path_arrays[-1]))
              for k in range(num_variables - 1)]
         ) + np.array(
-            [np.sum(allflows * G.dist_weight_ratio * (
+            [np.sum(allflows * a * (
                         path_arrays[k] * np.where(path_arrays[-1] == 0, 1, 0) - np.where(path_arrays[k] == 0, 1,
                                                                                          0) * path_arrays[-1]))
              for k in range(num_variables - 1)]
