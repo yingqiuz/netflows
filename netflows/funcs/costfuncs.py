@@ -36,12 +36,12 @@ def affine_SO_obj(flow_mat, weight_mat, a0_mat = 0):
     return np.sum(flow_mat * affine_cost(flow_mat, weight_mat, a0_mat))
 
 def affine_we_obj_search(x, a, a0, path_arrays, num_variables):
-    allflows = np.sum(path_arrays * x.reshape(num_variables, 1, 1), axis=0)
+    allflows = np.sum(path_arrays * np.append(x, 1 - np.sum(x)).reshape(num_variables, 1, 1), axis=0)
     my_vec_integration = np.vectorize(affine_integration)
     return np.sum(my_vec_integration(allflows, a, a0))
 
 def affine_so_obj_search(x, a, a0, path_arrays, num_variables):
-    allflows = np.sum(path_arrays * x.reshape(num_variables, 1, 1), axis=0)
+    allflows = np.sum(path_arrays * np.append(x, 1 - np.sum(x)).reshape(num_variables, 1, 1), axis=0)
     return np.sum(allflows * affine_cost(allflows, a, a0))
 
 ##### BPR cost #####

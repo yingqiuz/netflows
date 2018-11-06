@@ -114,18 +114,18 @@ def _WEaffinesolve(G, s, t, tol, maximum_iter, allpaths, a, a0):
         prev_obj_fun = np.copy(obj_fun)
         prev_x = np.copy(x)
 
-        result = scipy.optimize.linprog(gradients, A_eq = np.ones((1, gradients.shape[0])), b_eq = 1,  bounds=(0, 1),
+        result = scipy.optimize.linprog(gradients, A_ub = np.ones((1, gradients.shape[0])), b_ub = 1,  bounds=(0, 1),
                                         options={'maxiter': 1000, 'disp': False, 'tol': 1e-12, 'bland': True})
 
         # step size determination
-        gamma = 2 / (k + 3) # or
-        #gamma = scipy.optimize.line_search(affine_we_obj_search, we_affine_grad, x, (result.x - x), amax = 1,
-        #                                   args = (a, a0, path_arrays, num_variables),gfk=gradients,
-        #                                   old_fval=prev_obj_fun, maxiter= 1000)
+        #gamma = 2 / (k + 3) # or
+        gamma = scipy.optimize.line_search(affine_we_obj_search, we_affine_grad, x[:-1], (result.x - x[:-1]), amax = 1,
+                                           args = (a, a0, path_arrays, num_variables),gfk=gradients,
+                                           old_fval=prev_obj_fun, maxiter= 1000)
         # update x
-        #x[:-1] = prev_x[:-1] + gamma[0] * (result.x - x[:-1])
-        #x[-1] = 1 - np.sum(x[:-1])  # the flow in the last path
-        x = prev_x + gamma * (result.x - x)
+        x[:-1] = prev_x[:-1] + gamma[0] * (result.x - x[:-1])
+        x[-1] = 1 - np.sum(x[:-1])  # the flow in the last path
+        #x = prev_x + gamma * (result.x - x)
 
         #if np.sum(np.where(x < 0, 1, 0)) > 0:  # flow in at least one path is negtive
         #    print('Iteration %d: The total cost is %f, the total travel time is %f, and the flow is ' % (
@@ -221,17 +221,17 @@ def _SOaffinesolve(G, s, t, tol, maximum_iter, allpaths, a, a0):
         prev_obj_fun = np.copy(obj_fun)
         prev_x = np.copy(x)
         # FW algorithm
-        result = scipy.optimize.linprog(gradients, A_eq=np.ones((1, gradients.shape[0])), b_eq=1, bounds=(0, 1),
+        result = scipy.optimize.linprog(gradients, A_ub=np.ones((1, gradients.shape[0])), b_ub=1, bounds=(0, 1),
                                         options={'maxiter': 1000, 'disp': False, 'tol': 1e-12, 'bland': True})
         # step size determination
-        gamma = 2 / (k + 1 + 2)
-        #gamma = scipy.optimize.line_search(affine_so_obj_search, so_affine_grad, x, (result.x - x),
-        #                                   args=(a, a0, path_arrays, num_variables), amax=1, gfk=gradients,
-        #                                   old_fval=prev_obj_fun, maxiter=1000)
+        #gamma = 2 / (k + 1 + 2)
+        gamma = scipy.optimize.line_search(affine_so_obj_search, so_affine_grad, x[:-1], (result.x - x[:-1]),
+                                           args=(a, a0, path_arrays, num_variables), amax=1, gfk=gradients,
+                                           old_fval=prev_obj_fun, maxiter=1000)
         # update x
-        #x[:-1] = prev_x[:-1] + gamma[0] * (result.x - x[:-1])
-        #x[-1] = 1 - np.sum(x[:-1])  # the flow in the last path
-        x = prev_x + gamma * (result.x - x)
+        x[:-1] = prev_x[:-1] + gamma[0] * (result.x - x[:-1])
+        x[-1] = 1 - np.sum(x[:-1])  # the flow in the last path
+        #x = prev_x + gamma * (result.x - x)
         # update
         allflows = np.sum(path_arrays * x.reshape(num_variables, 1, 1), axis=0)
 
