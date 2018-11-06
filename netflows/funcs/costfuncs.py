@@ -21,33 +21,33 @@ def linear_SO_obj(flow_mat, weight_mat):
     return flow_mat * linear_cost(flow_mat, weight_mat)
 
 ##### Affine cost #####
-def affine_cost(flow, weight, a0=0):
+def affine_cost(flow, weight, a0):
     """affine cost function"""
     return flow * weight + a0
 
-def affine_integration(flow, weight, a0=0):
+def affine_integration(flow, weight, a0):
     return quad(lambda x: affine_cost(x, weight, a0), 0, flow)[0]
 
-def affine_WE_obj(flow_mat, weight_mat, a0_mat = 0):
+def affine_WE_obj(flow_mat, weight_mat, a0_mat):
     my_vec_integration = np.vectorize(affine_integration)
     return my_vec_integration(flow_mat, weight_mat, a0_mat)
 
-def affine_SO_obj(flow_mat, weight_mat, a0_mat = 0):
+def affine_SO_obj(flow_mat, weight_mat, a0_mat):
     return flow_mat * affine_cost(flow_mat, weight_mat, a0_mat)
 
 ##### BPR cost #####
-def BPR_cost(flow, weight, u = 1):
+def BPR_cost(flow, weight, u):
     """BPR cost function"""
-    return weight * (1 + 0.15 * (flow / u) ** 4)
+    return weight * (1 + 0.15 * (flow * u) ** 4)
 
-def BPR_integration(flow, weight, u=1):
+def BPR_integration(flow, weight, u):
     return quad(lambda x: BPR_cost(x, weight, u), 0, flow)[0]
 
-def BPR_WE_obj(flow_mat, weight_mat, u_mat = 1):
+def BPR_WE_obj(flow_mat, weight_mat, u_mat ):
     my_vec_integration = np.vectorize(BPR_integration)
     return my_vec_integration(flow_mat, weight_mat, u_mat)
 
-def BPR_SO_obj(flow_mat, weight_mat, u_mat = 1):
+def BPR_SO_obj(flow_mat, weight_mat, u_mat ):
     return flow_mat * BPR_cost(flow_mat, weight_mat, u_mat)
 
 ##### MM1 cost #####

@@ -14,23 +14,26 @@ class Graph:
         """
         # weighted adj matrix
         self.adj = np.array(adj).T
-        self.adj = np.where(self.adj != 0, 1, 0) # binary matrix
-        self.adj_weights = np.array(weights, dtype=np.float).T # weighted matrix
+        self.adj = np.where(self.adj != 0, 1, 0) # adjacency matrix
+
+        self.weights = np.array(weights, dtype=np.float).T
+        self.adj_weights = np.array(weights, dtype=np.float).T * self.adj# weighted matrix * self
+
         # distance matrix
         self.dist = np.array(dist, dtype=np.float).T
         self.adj_dist = self.dist * self.adj
 
-        self.weights = np.array(weights, dtype=np.float).T
-
         # wiring cost
-        self.wiring_cost = np.zero(self.adj.shape)
-        self.wiring_cost[self.adj==1] = self.dist[self.adj==1] * self.weights[self.adj==1]
+        self.wiring_cost = self.adj_dist * self.adj_weights
+
+        # reciprocal of weights
+        self.rpl_weights = np.zeros(self.adj.shape)
+        self.rpl_weights[self.weights!=0] = 1 / self.weights[self.weights!=0]
+
         # distance weight ratio
-        self.weights[self.weights == 0] = np.inf
-        self.dist_weight_ratio = self.dist / self.weights
-        self.dist_weight_ratio[self.adj == 0 ] = 0
-        self.adj_dist = np.array(dist, dtype=np.float) * self.adj
-        #self.dist_weight_ratio = np.copy(self.adj_dist)
+        self.dist_weight_ratio = self.adj_dist * self.rpl_weights
+
+        # initialize arrays to store flows and costs
         self.allpaths = [[[] for k in range(self.adj.shape[1])] for kk in range(self.adj.shape[0])] # store all paths in a 3D list
         self.WEflowsLinear, self.WEflowsAffine, self.WEflowsBPR = [ [[[] for k in range(self.adj.shape[1])] for kk in range(self.adj.shape[0])] ] * 3
         self.WEflowsLinear_edge, self.WEflowsAffine_edge, self.WEflowsBPR_edge = [ [[[] for k in range(self.adj.shape[1])] for kk in range(self.adj.shape[0])] ] * 3        
@@ -38,8 +41,7 @@ class Graph:
         self.SOflowsLinear_edge, self.SOflowsAffine_edge, self.SOflowsBPR_edge = [ [[[] for k in range(self.adj.shape[1])] for kk in range(self.adj.shape[0])] ] * 3        
         self.WEcostsLinear, self.WEcostsAffine, self.WEcostsBPR = [ [[[] for k in range(self.adj.shape[1])] for kk in range(self.adj.shape[0])] ] * 3
         self.SOcostsLinear, self.SOcostsAffine, self.SOcostsBPR = [ [[[] for k in range(self.adj.shape[1])] for kk in range(self.adj.shape[0])] ] * 3
-        #self.cost_func_string = cost_func_string
-        
+
     def _findallpath_recursive(self, v, u, visited, path, allpaths, cutoff):
         """
         adj: adj matrix
