@@ -29,7 +29,7 @@ def WEaffinesolve(G, s, t, tol = 1e-12, maximum_iter = 10000, cutoff = None, a =
     a0[G.adj == 0] = 0
 
     if a is None:
-        a = np.copy(G.adj_weights)
+        a = np.copy(G.rpl_weights)
         #a[G.adj_weights == 0] = np.inf
         #a = 1 / a
 
@@ -58,9 +58,7 @@ def SOaffinesolve(G, s, t, tol=1e-12, maximum_iter = 10000, cutoff = None, a = N
     a0[G.adj == 0] = 0
 
     if a is None:
-        a = np.copy(G.adj_weights)
-        a[G.adj_weights == 0] = np.inf
-        a = 1 / a
+        a = np.copy(G.rpl_weights)
 
     return _SOaffinesolve(G, s, t, tol, maximum_iter, allpaths, a, a0)
 
@@ -94,36 +92,40 @@ def _WEaffinesolve(G, s, t, tol, maximum_iter, allpaths, a, a0):
     # element (i, j) is the total flow on edge (i,j)
     allflows = np.sum(path_arrays * x.reshape(num_variables, 1, 1), axis=0)
 
-    obj_fun = np.sum(affine_WE_obj(allflows, a, a0_mat=a0))
+    obj_fun = affine_WE_obj(allflows, a, a0)
     # obj_fun = np.sum(self.WE_obj(allflows), axis = None)
-    total_cost = np.sum(allflows * affine_cost(allflows, a, a0=a0))
+    total_cost = np.sum(allflows * affine_cost(allflows, a, a0))
 
     #total_traveltime = np.sum(cost_funcs.affine_cost(allflows, a, a0=a0)) --- useless
     print('initial cost %f' % total_cost)
     print('initial flow', x)
     print('------solve the Wardrop Equilibrium------')
 
-    gradients = np.array(
-        [np.sum(affine_cost(allflows, a, a0=a0) * (
-                    path_arrays[k] * np.where(path_arrays[-1] == 0, 1, 0) - np.where(path_arrays[k] == 0, 1, 0) *
-                    path_arrays[-1]))
-         for k in range(num_variables - 1)]
-    )
+    #gradients = np.array(
+    #    [np.sum( affine_cost(allflows, a, a0=a0) * (
+    #                path_arrays[k] * np.where(path_arrays[-1] == 0, 1, 0) - np.where(path_arrays[k] == 0, 1, 0) *
+    #                path_arrays[-1]) )
+    #     for k in range(num_variables - 1)]
+    #)
+    gradients = we_affine_grad(x, a, a0, path_arrays, num_variables)
 
     for k in range(maximum_iter):  # maximal iteration 10000
 
         prev_obj_fun = np.copy(obj_fun)
         prev_x = np.copy(x)
 
-        result = scipy.optimize.linprog(gradients, A_ub = np.ones((1, gradients.shape[0])), b_ub=1,  bounds=(0, 1),
+        result = scipy.optimize.linprog(gradients, A_eq = np.ones((1, gradients.shape[0])), b_eq = 1,  bounds=(0, 1),
                                         options={'maxiter': 1000, 'disp': False, 'tol': 1e-12, 'bland': True})
 
         # step size determination
-        #gamma = 2 / (k + 3)
-        gamma = scipy.optimize.line_search(affine_we_obj_search, we_affine_grad, x[:-1], (result.x - x[:-1]),amax = 1, args = (a, a0, path_arrays, num_variables),gfk=gradients, old_fval=prev_obj_fun, maxiter=100)
+        gamma = 2 / (k + 3) # or
+        #gamma = scipy.optimize.line_search(affine_we_obj_search, we_affine_grad, x, (result.x - x), amax = 1,
+        #                                   args = (a, a0, path_arrays, num_variables),gfk=gradients,
+        #                                   old_fval=prev_obj_fun, maxiter= 1000)
         # update x
-        x[:-1] = prev_x[:-1] + gamma[0] * (result.x - x[:-1])
-        x[-1] = 1 - np.sum(x[:-1])  # the flow in the last path
+        #x[:-1] = prev_x[:-1] + gamma[0] * (result.x - x[:-1])
+        #x[-1] = 1 - np.sum(x[:-1])  # the flow in the last path
+        x = prev_x + gamma * (result.x - x)
 
         #if np.sum(np.where(x < 0, 1, 0)) > 0:  # flow in at least one path is negtive
         #    print('Iteration %d: The total cost is %f, the total travel time is %f, and the flow is ' % (
@@ -134,13 +136,16 @@ def _WEaffinesolve(G, s, t, tol, maximum_iter, allpaths, a, a0):
         #    return prev_total_cost, prev_total_traveltime, prev_x
 
         allflows = np.sum(path_arrays * x.reshape(num_variables, 1, 1), axis = 0)
-        obj_fun = np.sum(affine_WE_obj(allflows, a, a0_mat=a0), axis=None)
-        diff_value = obj_fun - prev_obj_fun
+        obj_fun = affine_WE_obj(allflows, a, a0)
+        #diff_value = obj_fun - prev_obj_fun
         #print(diff_value)
-        diff_value_x = x - prev_x
-        total_cost = np.sum(allflows * affine_cost(allflows, a, a0=a0), axis=None)
+        #diff_value_x = x - prev_x
+        total_cost = np.sum(allflows * affine_cost(allflows, a, a0), axis=None)
         #total_traveltime = np.sum(cost_funcs.affine_cost(allflows, self.adj_dist, a0=a0), axis=None)
-        if np.abs(diff_value) < np.abs(prev_obj_fun * tol): #and np.sum(np.where(np.abs(diff_value_x) < np.abs( tol * prev_x), 0, 1)) == 0:
+        # new gradients
+        gradients = we_affine_grad(x, a, a0, path_arrays, num_variables)
+
+        if np.abs(gradients).all() < tol: #and np.sum(np.where(np.abs(diff_value_x) < np.abs( tol * prev_x), 0, 1)) == 0:
             print('Wardrop equilibrium found. total cost %f' % total_cost)
             print('flows (path formulation) are', x)
             G.WEflowsAffine[s][t] = x
@@ -151,12 +156,12 @@ def _WEaffinesolve(G, s, t, tol, maximum_iter, allpaths, a, a0):
         #k, total_cost, total_traveltime), x)
 
         # new gradients
-        gradients = np.array(
-            [np.sum(affine_cost(allflows, a, a0=a0) * (
-                        path_arrays[k] * np.where(path_arrays[-1] == 0, 1, 0) - np.where(path_arrays[k] == 0, 1,
-                                                                                         0) * path_arrays[-1]))
-             for k in range(num_variables - 1)]
-        )
+        #gradients = np.array(
+        #    [np.sum(affine_cost(allflows, a, a0=a0) * (
+        #                path_arrays[k] * np.where(path_arrays[-1] == 0, 1, 0) - np.where(path_arrays[k] == 0, 1,
+        #                                                                                 0) * path_arrays[-1]))
+        #     for k in range(num_variables - 1)]
+        #)
         #gamma = np.inner(x[:-1] - prev_x[:-1], gradients - prev_gradients) / np.inner(gradients - prev_gradients,
                                                                                       #gradients - prev_gradients)
 
@@ -191,7 +196,7 @@ def _SOaffinesolve(G, s, t, tol, maximum_iter, allpaths, a, a0):
     # element (i, j) is the total flow on edge (i,j)
     allflows = np.sum(path_arrays * x.reshape(num_variables, 1, 1), axis=0)
 
-    obj_fun = np.sum(affine_SO_obj(allflows, a, a0_mat=a0)) # obj_fun is the total cost
+    obj_fun = affine_SO_obj(allflows, a, a0) # obj_fun is the total cost
     # total_cost = np.sum(allflows * cost_funcs.linear_cost(allflows, self.adj_dist))
     # total_traveltime = np.sum(cost_funcs.affine_cost(allflows, self.adj_dist, a0=a0))
     print('initial cost %f' % (obj_fun))
@@ -199,44 +204,45 @@ def _SOaffinesolve(G, s, t, tol, maximum_iter, allpaths, a, a0):
     print('------solve the system optimal flow------')
 
     # gradients
-    gradients = np.array(
-        [np.sum(affine_cost(allflows, a, a0=a0) * (
-                    path_arrays[k] * np.where(path_arrays[-1] == 0, 1, 0) - np.where(path_arrays[k] == 0, 1, 0) *
-                    path_arrays[-1]))
-         for k in range(num_variables - 1)]
-    ) + np.array(
-        [np.sum(allflows * a * (
-                    path_arrays[k] * np.where(path_arrays[-1] == 0, 1, 0) - np.where(path_arrays[k] == 0, 1, 0) *
-                    path_arrays[-1]))
-         for k in range(num_variables - 1)]
-    )
-
+    #gradients = np.array(
+    #    [np.sum(affine_cost(allflows, a, a0=a0) * (
+    #                path_arrays[k] * np.where(path_arrays[-1] == 0, 1, 0) - np.where(path_arrays[k] == 0, 1, 0) *
+    #                path_arrays[-1]))
+    #     for k in range(num_variables - 1)]
+    #) + np.array(
+    #    [np.sum(allflows * a * (
+    #                path_arrays[k] * np.where(path_arrays[-1] == 0, 1, 0) - np.where(path_arrays[k] == 0, 1, 0) *
+    #                path_arrays[-1]))
+    #     for k in range(num_variables - 1)]
+    #)
+    gradients = so_affine_grad(x, a, a0, path_arrays, num_variables)
     for k in range(maximum_iter):  # maximal iteration 10000
 
         prev_obj_fun = np.copy(obj_fun)
         prev_x = np.copy(x)
-
         # FW algorithm
-        result = scipy.optimize.linprog(gradients, bounds=(0, 1),
+        result = scipy.optimize.linprog(gradients, A_eq=np.ones((1, gradients.shape[0])), b_eq=1, bounds=(0, 1),
                                         options={'maxiter': 1000, 'disp': False, 'tol': 1e-12, 'bland': True})
-
         # step size determination
-        #gamma = 2 / (k + 1 + 2)
-        gamma = scipy.optimize.line_search(affine_so_obj_search, so_affine_grad, x[:-1], (result.x - x[:-1]),
-                                           args=(a, a0, path_arrays, num_variables), amax=1, gfk=gradients,
-                                           old_fval=prev_obj_fun, maxiter=10000)
+        gamma = 2 / (k + 1 + 2)
+        #gamma = scipy.optimize.line_search(affine_so_obj_search, so_affine_grad, x, (result.x - x),
+        #                                   args=(a, a0, path_arrays, num_variables), amax=1, gfk=gradients,
+        #                                   old_fval=prev_obj_fun, maxiter=1000)
         # update x
-        x[:-1] = prev_x[:-1] + gamma[0] * (result.x - x[:-1])
-        x[-1] = 1 - np.sum(x[:-1])  # the flow in the last path
-
+        #x[:-1] = prev_x[:-1] + gamma[0] * (result.x - x[:-1])
+        #x[-1] = 1 - np.sum(x[:-1])  # the flow in the last path
+        x = prev_x + gamma * (result.x - x)
         # update
         allflows = np.sum(path_arrays * x.reshape(num_variables, 1, 1), axis=0)
-        obj_fun = np.sum(affine_SO_obj(allflows, a, a0_mat=a0), axis=None)
-        diff_value = obj_fun - prev_obj_fun
-        diff_value_x = x - prev_x
-        #total_traveltime = np.sum(cost_funcs.affine_cost(allflows, self.adj_dist, a0=a0), axis=None)
 
-        if np.abs(diff_value) < np.abs(prev_obj_fun * tol) and np.abs(diff_value_x) < np.abs( tol * prev_x):
+        obj_fun = affine_SO_obj(allflows, a, a0)
+        #diff_value = obj_fun - prev_obj_fun
+        #diff_value_x = x - prev_x
+        #total_traveltime = np.sum(cost_funcs.affine_cost(allflows, self.adj_dist, a0=a0), axis=None)
+        # new gradients
+        gradients = so_affine_grad(x, a, a0, path_arrays, num_variables)
+
+        if np.abs(gradients).all() < tol :
             print('system optimum found: total cost %f' % obj_fun)
             print('the flows are (path formulation)', x)
             G.SOflowsAffine[s][t] = x
@@ -248,17 +254,17 @@ def _SOaffinesolve(G, s, t, tol, maximum_iter, allpaths, a, a0):
         #k, obj_fun, total_traveltime), x)
 
         # update gradients
-        gradients = np.array(
-            [np.sum(affine_cost(allflows, a, a0=a0) * (
-                        path_arrays[k] * np.where(path_arrays[-1] == 0, 1, 0) - np.where(path_arrays[k] == 0, 1,
-                                                                                         0) * path_arrays[-1]))
-             for k in range(num_variables - 1)]
-        ) + np.array(
-            [np.sum(allflows * a * (
-                        path_arrays[k] * np.where(path_arrays[-1] == 0, 1, 0) - np.where(path_arrays[k] == 0, 1,
-                                                                                         0) * path_arrays[-1]))
-             for k in range(num_variables - 1)]
-        )
+        #gradients = np.array(
+        #    [np.sum(affine_cost(allflows, a, a0=a0) * (
+        #                path_arrays[k] * np.where(path_arrays[-1] == 0, 1, 0) - np.where(path_arrays[k] == 0, 1,
+        #                                                                                 0) * path_arrays[-1]))
+        #     for k in range(num_variables - 1)]
+        #) + np.array(
+        #    [np.sum(allflows * a * (
+        #                path_arrays[k] * np.where(path_arrays[-1] == 0, 1, 0) - np.where(path_arrays[k] == 0, 1,
+        #                                                                                 0) * path_arrays[-1]))
+        #     for k in range(num_variables - 1)]
+        #)
         #gamma = np.inner(x[:-1] - prev_x[:-1], gradients - prev_gradients) / np.inner(gradients - prev_gradients,
                                                                                       #gradients - prev_gradients)
 

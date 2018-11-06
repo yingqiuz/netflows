@@ -15,6 +15,7 @@ class Graph:
         # weighted adj matrix
         self.adj = np.array(adj).T
         self.adj = np.where(self.adj != 0, 1, 0) # binary matrix
+
         self.adj_weights = np.array(weights, dtype=np.float).T # weighted matrix
         self.adj_weights = self.adj * self.adj_weights
         # distance matrix
@@ -29,6 +30,7 @@ class Graph:
         # distance weight ratio
         self.rpl_weights[self.rpl_weights == 0] = np.inf
         self.rpl_weights = 1 / self.rpl_weights
+
         self.dist_weight_ratio = self.adj_dist * self.rpl_weights
         #self.dist_weight_ratio[self.adj == 0 ] = 0
         #self.dist_weight_ratio = np.copy(self.adj_dist)
