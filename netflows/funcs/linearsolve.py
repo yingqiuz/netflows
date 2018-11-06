@@ -89,7 +89,7 @@ def _WElinearsolve(G, s, t, tol, maximum_iter, allpaths, a):
     # initial step size determination
     gamma1 = np.min(np.abs(x[:-1] / gradients))
     gamma2 = np.min(np.abs((1 - x[:-1]) / gradients))
-    gamma = min(gamma1, gamma2) * 2 / 3
+    gamma = min(gamma1, gamma2)  / 100
 
     for k in range(maximum_iter):  # maximal iteration 10000
 
@@ -193,7 +193,7 @@ def _SOlinearsolve(G, s, t, tol, maximum_iter, allpaths, a):
     # initial step size determination
     gamma1 = np.min( np.abs( x[:-1]/gradients ) )
     gamma2 = np.min( np.abs( (1 - x[:-1])/ gradients ) )
-    gamma = min(gamma1, gamma2) * 2 / 3
+    gamma = min(gamma1, gamma2) / 100
 
     for k in range(maximum_iter):  # maximal iteration 10000
 
