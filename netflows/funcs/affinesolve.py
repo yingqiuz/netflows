@@ -152,8 +152,8 @@ def _WEaffinesolve(G, s, t, tol, maximum_iter, allpaths, a, a0):
             G.WEcostsAffine[s][t] = total_cost
             G.WEflowsAffine_edge[s][t] = allflows
             return total_cost,  x
-        #print('Iteration %d: The total cost is %f, the total travel time is %f, and the flow is ' % (
-        #k, total_cost, total_traveltime), x)
+        print('Iteration %d: The total cost is %f, and the flow is ' % (
+        k, total_cost), x)
 
         # new gradients
         #gradients = np.array(
@@ -251,8 +251,7 @@ def _SOaffinesolve(G, s, t, tol, maximum_iter, allpaths, a, a0):
             G.SOflowsAffine_edge[s][t] = allflows
             return obj_fun, x
 
-        #print('Iteration %d: The total cost is %f, the total travel time is %f, and the flow is ' % (
-        #k, obj_fun, total_traveltime), x)
+        print('Iteration %d: The total cost is %f, and the flow is ' % (k, obj_fun), x)
 
         # update gradients
         #gradients = np.array(
