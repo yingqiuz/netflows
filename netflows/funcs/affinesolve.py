@@ -119,9 +119,9 @@ def _WEaffinesolve(G, s, t, tol, maximum_iter, allpaths, a, a0):
 
         # step size determination
         gamma = 2 / (k + 2) # or
-        #gamma = scipy.optimize.line_search(affine_we_obj_search, we_affine_grad, x[:-1], (result.x - x[:-1]), amax = 1,
-                                           #args = (a, a0, path_arrays, num_variables),gfk=gradients,
-                                           #old_fval=prev_obj_fun, maxiter= 1000)
+        #gamma = scipy.optimize.line_search(affine_we_obj_search, we_affine_grad, x, (result.x - x), amax = 1,
+        #                                   args = (a, a0, path_arrays, num_variables),gfk=gradients,
+        #                                   old_fval=prev_obj_fun, maxiter= 10000)
         # update x
         #x[:-1] = prev_x[:-1] + gamma[0] * (result.x - x[:-1])
         #x[-1] = 1 - np.sum(x[:-1])  # the flow in the last path
@@ -137,7 +137,7 @@ def _WEaffinesolve(G, s, t, tol, maximum_iter, allpaths, a, a0):
 
         allflows = np.sum(path_arrays * x.reshape(num_variables, 1, 1), axis = 0)
         obj_fun = affine_WE_obj(allflows, a, a0)
-        #diff_value = obj_fun - prev_obj_fun
+        diff_value = obj_fun - prev_obj_fun
         #print(diff_value)
         #diff_value_x = x - prev_x
         total_cost = np.sum(allflows * affine_cost(allflows, a, a0), axis=None)
@@ -226,8 +226,8 @@ def _SOaffinesolve(G, s, t, tol, maximum_iter, allpaths, a, a0):
                                         options={'maxiter': 1000, 'disp': False, 'tol': 1e-12, 'bland': True})
         # step size determination
         gamma = 2 / (k + 2)
-        #gamma = scipy.optimize.line_search(affine_so_obj_search, so_affine_grad, x[:-1], (result.x - x[:-1]),
-        #                                   args=(a, a0, path_arrays, num_variables), amax=1, gfk=gradients,
+        #gamma = scipy.optimize.line_search(affine_so_obj_search, so_affine_grad, x, (result.x - x),
+        #                                  args=(a, a0, path_arrays, num_variables), amax=1, gfk=gradients,
         #                                   old_fval=prev_obj_fun, maxiter=1000)
         # update x
         #x[:-1] = prev_x[:-1] + gamma[0] * (result.x - x[:-1])
@@ -237,13 +237,13 @@ def _SOaffinesolve(G, s, t, tol, maximum_iter, allpaths, a, a0):
         allflows = np.sum(path_arrays * x.reshape(num_variables, 1, 1), axis=0)
 
         obj_fun = affine_SO_obj(allflows, a, a0)
-        #diff_value = obj_fun - prev_obj_fun
-        #diff_value_x = x - prev_x
+        diff_value = obj_fun - prev_obj_fun
+        diff_value_x = x - prev_x
         #total_traveltime = np.sum(cost_funcs.affine_cost(allflows, self.adj_dist, a0=a0), axis=None)
         # new gradients
         gradients = so_affine_grad(x, a, a0, path_arrays, num_variables)
 
-        if np.abs(gradients).all() < tol :
+        if np.abs(diff_value_x).all() < tol * np.abs(prev_x).all() :
             print('system optimum found: total cost %f' % obj_fun)
             print('the flows are (path formulation)', x)
             G.SOflowsAffine[s][t] = x
