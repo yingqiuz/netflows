@@ -72,7 +72,7 @@ def _WElinearsolve(G, s, t, tol, maximum_iter, allpaths, a):
     # obj_fun = np.sum(G.WE_obj(allflows), axis = None)
     total_cost = np.sum(allflows *  linear_cost(allflows, a))
     #total_traveltime = np.sum( linear_cost(allflows, a))
-    print('The initial cost is %f, and the initial flow is ' % (total_cost),x)
+    print('The initial cost is %f, and the initial flow is ' % (total_cost), x)
     print('------solve the Wardrop Equilibrium------')
 
     gradients = np.array(
@@ -106,6 +106,7 @@ def _WElinearsolve(G, s, t, tol, maximum_iter, allpaths, a):
         x[-1] = 1 - np.sum(x[:-1])  # the flow in the last path
 
         if np.sum(np.where(x < 0, 1, 0)) > 0:  # flow in at least one path is negtive
+            print('One of the flows reaches zero')
             print('Iteration %d: The total cost is %f, and the flow is ' % (k, total_cost), prev_x)
             # store flow and cost
             G.WEflowsLinear[s][t] = prev_x
@@ -174,8 +175,7 @@ def _SOlinearsolve(G, s, t, tol, maximum_iter, allpaths, a):
     obj_fun = np.sum( linear_SO_obj(allflows, a))
     # total_cost = np.sum(allflows *  linear_cost(allflows, G.adj_dist))
     #total_traveltime = np.sum( linear_cost(allflows, G.dist_weight_ratio))
-    print(
-    'The initial cost is %f, and the initial flow is ' % (obj_fun), x)
+    print('The initial cost is %f, and the initial flow is ' % (obj_fun), x)
     print('------solve the system optimal flow------')
 
     gradients = np.array(
@@ -208,8 +208,8 @@ def _SOlinearsolve(G, s, t, tol, maximum_iter, allpaths, a):
         x[-1] = 1 - np.sum(x[:-1])  # the flow in the last path
 
         if np.sum(np.where(x < 0, 1, 0)) > 0:  # flow in at least one path is negtive
-            print('Iteration %d: The total cost is %f, and the flow is ' % (
-            k, obj_fun), prev_x)
+            print('One of the flows reaches zero')
+            print('Iteration %d: The total cost is %f, and the flow is ' % (k, obj_fun), prev_x)
             G.SOflowsLinear[s][t] = prev_x
             G.SOcostsLinear[s][t] = obj_fun
             G.SOflowsLinear_edge[s][t] = allflows
@@ -237,8 +237,7 @@ def _SOlinearsolve(G, s, t, tol, maximum_iter, allpaths, a):
             G.SOflowsLinear[s][t] = x
             G.SOcostsLinear[s][t] = obj_fun
             G.SOflowsLinear_edge[s][t] = allflows
-            print('Iteration %d: The total cost is %f, and the flow is ' % (
-            k, obj_fun), x)
+            print('Iteration %d: The total cost is %f, and the flow is ' % (k, obj_fun), x)
             return obj_fun, x
 
         gamma = np.inner(x[:-1] - prev_x[:-1], gradients - prev_gradients) \

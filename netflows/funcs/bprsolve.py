@@ -99,7 +99,7 @@ def _WEbprsolve(G, s, t, tol, maximum_iter, allpaths, a, u):
     # initial gamma determination
     gamma1 = np.min(np.abs( x[:-1] / gradients ))
     gamma2 = np.min(np.abs( (1 - x[:-1]) / gradients) )
-    gamma = min(gamma1, gamma2)
+    gamma = min(gamma1, gamma2) * 2 / 3
 
     for k in range(maximum_iter):  # maximal iteration 10000
 
@@ -116,6 +116,7 @@ def _WEbprsolve(G, s, t, tol, maximum_iter, allpaths, a, u):
         x[-1] = 1 - np.sum(x[:-1])  # the flow in the last path
 
         if np.sum(np.where(x < 0, 1, 0)) > 0:  # flow in at least one path is negtive
+            print('One of the flows reaches zero')
             print('Iteration %d: The total cost is %f, and the flow is ' % (k, total_cost), prev_x)
             G.WEflowsBPR[s][t] = prev_x
             G.WEcostsBPR[s][t] = total_cost
@@ -200,7 +201,7 @@ def _SObprsolve(G, s, t, tol, maximum_iter, allpaths, a, u):
     # initial step size
     gamma1 = np.min(np.abs(x[:-1] / gradients))
     gamma2 = np.min(np.abs((1 - x[:-1]) / gradients))
-    gamma = min(gamma1, gamma2)
+    gamma = min(gamma1, gamma2) * 2 / 3
 
     for k in range(maximum_iter):  # maximal iteration 10000
         ######## TBC
@@ -229,6 +230,7 @@ def _SObprsolve(G, s, t, tol, maximum_iter, allpaths, a, u):
         x[-1] = 1 - np.sum(x[:-1])  # the flow in the last path
 
         if np.sum(np.where(x < 0, 1, 0)) > 0:  # flow in at least one path is negtive
+            print('One of the flows reaches zero')
             print('Iteration %d: The total cost is %f, and the flow is ' % (k, obj_fun), prev_x)
             G.SOflowsBPR[s][t] = prev_x
             G.SOcostsBPR[s][t] = obj_fun
@@ -259,7 +261,7 @@ def _SObprsolve(G, s, t, tol, maximum_iter, allpaths, a, u):
             G.SOflowsBPR[s][t] = x
             G.SOcostsBPR[s][t] = obj_fun
             G.SOflowsBPR_edge[s][t] = allflows
-            return obj_fun, total_traveltime, x
+            return obj_fun, x
         # new step size
         gamma = np.inner(x[:-1] - prev_x[:-1], gradients - prev_gradients) / \
                 np.inner(gradients - prev_gradients, gradients - prev_gradients)
