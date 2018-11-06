@@ -103,7 +103,7 @@ def _WEaffinesolve(G, s, t, tol, maximum_iter, allpaths, a, a0):
     # initial estimation of gamma
     gamma1 = np.min( np.abs( x[:-1] / gradients ) )
     gamma2 = np.min( np.abs( (1 - x[:-1]) / gradients ) )
-    gamma = min(gamma1, gamma2) * 2 / 3
+    gamma = min(gamma1, gamma2) / 100
 
     for k in range(maximum_iter):  # maximal iteration 10000
 
@@ -205,9 +205,10 @@ def _SOaffinesolve(G, s, t, tol, maximum_iter, allpaths, a, a0):
     # initial step size determination
     gamma1 = np.min(np.abs(x[:-1] / gradients))
     gamma2 = np.min(np.abs((1 - x[:-1]) / gradients))
-    gamma = min(gamma1, gamma2) * 2 / 3
+    gamma = min(gamma1, gamma2) / 100
 
     for k in range(maximum_iter):  # maximal iteration 10000
+        print(gamma)
 
         #prev_obj_fun = np.copy(obj_fun)
         prev_x = np.copy(x)
