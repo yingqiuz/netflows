@@ -86,7 +86,7 @@ def _WEaffinesolve(G, s, t, tol, maximum_iter, allpaths, a, a0):
     # element (i, j) is the total flow on edge (i,j)
     allflows = np.sum(path_arrays * x.reshape(num_variables, 1, 1), axis=0)
 
-    #obj_fun = np.sum(affine_WE_obj(allflows, a, a0))
+    obj_fun = np.sum(affine_WE_obj(allflows, a, a0))
     # obj_fun = np.sum(G.WE_obj(allflows), axis = None)
     total_cost = np.sum(allflows *  affine_cost(allflows, a, a0))
     #total_traveltime = np.sum( affine_cost(allflows, G.adj_dist, a0=a0))
@@ -129,8 +129,8 @@ def _WEaffinesolve(G, s, t, tol, maximum_iter, allpaths, a, a0):
 
         # update allflows and travel cost according to path formulation x
         allflows = np.sum(path_arrays * x.reshape(num_variables, 1, 1), axis=0)
-        # obj_fun = np.sum(affine_WE_obj(allflows, a, a0), axis=None) value of obj func. useless
-        # diff_value = obj_fun - prev_obj_fun useless.....
+        #obj_fun = np.sum(affine_WE_obj(allflows, a, a0), axis=None) #value of obj func. useless
+        #diff_value = obj_fun - prev_obj_fun #useless.....
         total_cost = np.sum(allflows * affine_cost(allflows, a, a0), axis=None)
         #total_traveltime = np.sum( affine_cost(allflows, a, a0), axis=None)
         print('Iteration %d: The total cost is %f, and the flow is ' % (k, total_cost), x)
