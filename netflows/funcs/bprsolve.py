@@ -99,7 +99,7 @@ def _WEbprsolve(G, s, t, tol, maximum_iter, allpaths, a, u):
     # initial gamma determination
     gamma1 = np.min(np.abs( x[:-1] / gradients ))
     gamma2 = np.min(np.abs( (1 - x[:-1]) / gradients) )
-    gamma = min(gamma1, gamma2) * 2 / 3
+    gamma = min(gamma1, gamma2) / 1000000
 
     for k in range(maximum_iter):  # maximal iteration 10000
 
@@ -201,7 +201,8 @@ def _SObprsolve(G, s, t, tol, maximum_iter, allpaths, a, u):
     # initial step size
     gamma1 = np.min(np.abs(x[:-1] / gradients))
     gamma2 = np.min(np.abs((1 - x[:-1]) / gradients))
-    gamma = min(gamma1, gamma2) * 2 / 3
+    gamma = min(gamma1, gamma2)  / 1000000
+    gamma = 1e-6
 
     for k in range(maximum_iter):  # maximal iteration 10000
         ######## TBC
@@ -217,8 +218,7 @@ def _SObprsolve(G, s, t, tol, maximum_iter, allpaths, a, u):
         # for k in range(num_variables - 1)]
         # )
         # print(gradients)
-        ######### TBC
-
+        print(gamma)
         #prev_obj_fun = np.copy(obj_fun)
         prev_x = np.copy(x)
         #prev_allflows = np.copy(allflows)
