@@ -242,7 +242,7 @@ def _SOaffinesolve(G, s, t, tol, maximum_iter, allpaths, a, a0):
         #total_traveltime = np.sum(cost_funcs.affine_cost(allflows, self.adj_dist, a0=a0), axis=None)
         # new gradients
         gradients = so_affine_grad(x, a, a0, path_arrays, num_variables)
-        print(gradients * gamma)
+        print(gradients)
         if np.sum(np.where(np.abs(diff_value_x) < np.abs(prev_x)*tol, 0, 1 )) == 0:
             print('system optimum found: total cost %f' % obj_fun)
             print('the flows are (path formulation)', x)
