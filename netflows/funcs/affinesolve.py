@@ -139,13 +139,13 @@ def _WEaffinesolve(G, s, t, tol, maximum_iter, allpaths, a, a0):
         obj_fun = affine_WE_obj(allflows, a, a0)
         diff_value = obj_fun - prev_obj_fun
         #print(diff_value)
-        #diff_value_x = x - prev_x
+        diff_value_x = x - prev_x
         total_cost = np.sum(allflows * affine_cost(allflows, a, a0), axis=None)
         #total_traveltime = np.sum(cost_funcs.affine_cost(allflows, self.adj_dist, a0=a0), axis=None)
         # new gradients
         gradients = we_affine_grad(x, a, a0, path_arrays, num_variables)
 
-        if np.abs(gradients).all() < tol: #and np.sum(np.where(np.abs(diff_value_x) < np.abs( tol * prev_x), 0, 1)) == 0:
+        if np.sum(np.where(np.abs(diff_value_x) < tol*np.abs(prev_x), 0, 1)) == 0: #and np.sum(np.where(np.abs(diff_value_x) < np.abs( tol * prev_x), 0, 1)) == 0:
             print('Wardrop equilibrium found. total cost %f' % total_cost)
             print('flows (path formulation) are', x)
             G.WEflowsAffine[s][t] = x
@@ -242,8 +242,8 @@ def _SOaffinesolve(G, s, t, tol, maximum_iter, allpaths, a, a0):
         #total_traveltime = np.sum(cost_funcs.affine_cost(allflows, self.adj_dist, a0=a0), axis=None)
         # new gradients
         gradients = so_affine_grad(x, a, a0, path_arrays, num_variables)
-
-        if np.abs(diff_value_x).all() < tol * np.abs(prev_x).all() :
+        print(gradients * gamma)
+        if np.sum(np.where(np.abs(diff_value_x) < np.abs(prev_x)*tol, 0, 1 )) == 0:
             print('system optimum found: total cost %f' % obj_fun)
             print('the flows are (path formulation)', x)
             G.SOflowsAffine[s][t] = x
