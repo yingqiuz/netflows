@@ -89,7 +89,7 @@ def _WElinearsolve(G, s, t, tol, maximum_iter, allpaths, a):
     # initial step size determination
     gamma1 = np.min(np.abs(x[:-1] / gradients))
     gamma2 = np.min(np.abs((1 - x[:-1]) / gradients))
-    gamma = min(gamma1, gamma2)  / 100
+    gamma = min(gamma1, gamma2) * 2 / 3
     #print(min(gamma1, gamma2) )
     #gamma = 1e-8
 
@@ -108,14 +108,20 @@ def _WElinearsolve(G, s, t, tol, maximum_iter, allpaths, a):
         x[-1] = 1 - np.sum(x[:-1])  # the flow in the last path
 
         if np.sum(np.where(x < 0, 1, 0)) > 0:  # flow in at least one path is negtive
-            print('One of the flows reaches zero')
-            print('Iteration %d: The total cost is %f, and the flow is ' % (k, total_cost), prev_x)
+            #print('One of the flows reaches zero')
+            #print('Iteration %d: The total cost is %f, and the flow is ' % (k, total_cost), prev_x)
             # store flow and cost
-            G.WEflowsLinear[s][t] = prev_x
-            G.WEcostsLinear[s][t] = total_cost
+            #G.WEflowsLinear[s][t] = prev_x
+            #G.WEcostsLinear[s][t] = total_cost
             # store flow in edge formulation
-            G.WEflowsLinear_edge[s][t] = allflows
-            return total_cost, prev_x
+            #G.WEflowsLinear_edge[s][t] = allflows
+            #return total_cost, prev_x
+            gamma1 = np.min(np.abs(x[:-1] / gradients))
+            gamma2 = np.min(np.abs((1 - x[:-1]) / gradients))
+            gamma = min(gamma1, gamma2) * 2 / 3
+            x[:-1] = prev_x[:-1] - gamma * gradients
+            x[-1] = 1 - np.sum(x[:-1])  # the flow in the last path
+
         # update allflows, obj func
         allflows = np.sum(path_arrays * x.reshape(num_variables, 1, 1), axis=0)
         #obj_fun = np.sum( linear_WE_obj(allflows, a), axis=None)
@@ -135,7 +141,7 @@ def _WElinearsolve(G, s, t, tol, maximum_iter, allpaths, a):
         # print(gradients)
         # print('the gamma is')
         # print(gamma)
-        if np.abs(gradients).all() < tol:
+        if np.sum(np.where(np.abs(gradients) < tol, 0, 1)) == 0:
             G.WEflowsLinear[s][t] = x
             G.WEcostsLinear[s][t] = total_cost
             G.WEflowsLinear_edge[s][t] = allflows
@@ -195,7 +201,7 @@ def _SOlinearsolve(G, s, t, tol, maximum_iter, allpaths, a):
     # initial step size determination
     gamma1 = np.min( np.abs( x[:-1]/gradients ) )
     gamma2 = np.min( np.abs( (1 - x[:-1])/ gradients ) )
-    gamma = min(gamma1, gamma2) / 100
+    gamma = min(gamma1, gamma2) * 2  / 3
 
     for k in range(maximum_iter):  # maximal iteration 10000
 
@@ -210,12 +216,17 @@ def _SOlinearsolve(G, s, t, tol, maximum_iter, allpaths, a):
         x[-1] = 1 - np.sum(x[:-1])  # the flow in the last path
 
         if np.sum(np.where(x < 0, 1, 0)) > 0:  # flow in at least one path is negtive
-            print('One of the flows reaches zero')
-            print('Iteration %d: The total cost is %f, and the flow is ' % (k, obj_fun), prev_x)
-            G.SOflowsLinear[s][t] = prev_x
-            G.SOcostsLinear[s][t] = obj_fun
-            G.SOflowsLinear_edge[s][t] = allflows
-            return obj_fun, prev_x
+            #print('One of the flows reaches zero')
+            #print('Iteration %d: The total cost is %f, and the flow is ' % (k, obj_fun), prev_x)
+            #G.SOflowsLinear[s][t] = prev_x
+            #G.SOcostsLinear[s][t] = obj_fun
+            #G.SOflowsLinear_edge[s][t] = allflows
+            #return obj_fun, prev_x
+            gamma1 = np.min(np.abs(x[:-1] / gradients))
+            gamma2 = np.min(np.abs((1 - x[:-1]) / gradients))
+            gamma = min(gamma1, gamma2) * 2 / 3
+            x[:-1] = prev_x[:-1] - gamma * gradients
+            x[-1] = 1 - np.sum(x[:-1])  # the flow in the last path
 
         allflows = np.sum(path_arrays * x.reshape(num_variables, 1, 1), axis=0)
         obj_fun = np.sum( linear_SO_obj(allflows, a), axis=None)
@@ -235,7 +246,7 @@ def _SOlinearsolve(G, s, t, tol, maximum_iter, allpaths, a):
              for k in range(num_variables - 1)]
         )
 
-        if np.abs(gradients).all() < tol:
+        if np.sum(np.where(np.abs(gradients) < tol, 0, 1)) == 0:
             G.SOflowsLinear[s][t] = x
             G.SOcostsLinear[s][t] = obj_fun
             G.SOflowsLinear_edge[s][t] = allflows

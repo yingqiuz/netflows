@@ -103,7 +103,7 @@ def _WEaffinesolve(G, s, t, tol, maximum_iter, allpaths, a, a0):
     # initial estimation of gamma
     gamma1 = np.min( np.abs( x[:-1] / gradients ) )
     gamma2 = np.min( np.abs( (1 - x[:-1]) / gradients ) )
-    gamma = min(gamma1, gamma2) / 100
+    gamma = min(gamma1, gamma2) * 2 / 3
 
     for k in range(maximum_iter):  # maximal iteration 10000
 
@@ -119,13 +119,25 @@ def _WEaffinesolve(G, s, t, tol, maximum_iter, allpaths, a, a0):
         x[:-1] = prev_x[:-1] - gamma * gradients
         x[-1] = 1 - np.sum(x[:-1])  # the flow in the last path
 
+        #if x[-1] < 0 :
+        #    gradients = gradients + np.abs(x[-1])/gamma
+        #    x[:-1] = prev_x[:-1] - gamma * gradients
+        #    x[-1] = 1 - np.sum(x[:-1])  # the flow in the last path
+
+
         if np.sum(np.where(x < 0, 1, 0)) > 0:  # flow in at least one path is negtive
-            print('One of the flows reaches zero')
-            print('Iteration %d: The total cost is %f, and the flow is ' % (k, total_cost), prev_x)
-            G.WEflowsAffine[s][t] = prev_x
-            G.WEcostsAffine[s][t] = total_cost
-            G.WEflowsAffine_edge[s][t] = allflows
-            return total_cost, prev_x
+            #print('One of the flows reaches zero')
+            #print('Iteration %d: The total cost is %f, and the flow is ' % (k, total_cost), prev_x)
+            #G.WEflowsAffine[s][t] = prev_x
+            #G.WEcostsAffine[s][t] = total_cost
+            #G.WEflowsAffine_edge[s][t] = allflows
+            #return total_cost, prev_x
+            gamma1 = np.min(np.abs(x[:-1] / gradients))
+            gamma2 = np.min(np.abs((1 - x[:-1]) / gradients))
+            gamma = min(gamma1, gamma2) * 2 / 3
+            x[:-1] = prev_x[:-1] - gamma * gradients
+            x[-1] = 1 - np.sum(x[:-1])  # the flow in the last path
+
 
         # update allflows and travel cost according to path formulation x
         allflows = np.sum(path_arrays * x.reshape(num_variables, 1, 1), axis=0)
@@ -143,7 +155,7 @@ def _WEaffinesolve(G, s, t, tol, maximum_iter, allpaths, a, a0):
              for k in range(num_variables - 1)]
         )
 
-        if np.abs(gradients).all() < tol: # convergence
+        if np.sum(np.where(np.abs(gradients) < tol, 0, 1)) == 0: # convergence
             G.WEflowsAffine[s][t] = x
             G.WEcostsAffine[s][t] = total_cost
             G.WEflowsAffine_edge[s][t] = allflows
@@ -205,7 +217,7 @@ def _SOaffinesolve(G, s, t, tol, maximum_iter, allpaths, a, a0):
     # initial step size determination
     gamma1 = np.min(np.abs(x[:-1] / gradients))
     gamma2 = np.min(np.abs((1 - x[:-1]) / gradients))
-    gamma = min(gamma1, gamma2) / 100
+    gamma = min(gamma1, gamma2) *2 / 3
 
     for k in range(maximum_iter):  # maximal iteration 10000
         print(gamma)
@@ -220,13 +232,19 @@ def _SOaffinesolve(G, s, t, tol, maximum_iter, allpaths, a, a0):
         x[:-1] = prev_x[:-1] - gamma * gradients
         x[-1] = 1 - np.sum(x[:-1])  # the flow in the last path
 
+
         if np.sum(np.where(x < 0, 1, 0)) > 0:  # flow in at least one path is negtive
-            print('one of the flows reaches zero')
-            print('Iteration %d: The total cost is %f, and the flow is ' % (k, obj_fun), prev_x)
-            G.SOflowsAffine[s][t] = prev_x
-            G.SOcostsAffine[s][t] = obj_fun
-            G.SOflowsAffine_edge[s][t] = allflows
-            return obj_fun, prev_x
+            #print('one of the flows reaches zero')
+            #print('Iteration %d: The total cost is %f, and the flow is ' % (k, obj_fun), prev_x)
+            #G.SOflowsAffine[s][t] = prev_x
+            #G.SOcostsAffine[s][t] = obj_fun
+            #G.SOflowsAffine_edge[s][t] = allflows
+            #return obj_fun, prev_x
+            gamma1 = np.min(np.abs(x[:-1] / gradients))
+            gamma2 = np.min(np.abs((1 - x[:-1]) / gradients))
+            gamma = min(gamma1, gamma2) * 2 / 3
+            x[:-1] = prev_x[:-1] - gamma * gradients
+            x[-1] = 1 - np.sum(x[:-1])  # the flow in the last path
 
         # update all flows, obj fun
         allflows = np.sum(path_arrays * x.reshape(num_variables, 1, 1), axis=0)
@@ -248,7 +266,7 @@ def _SOaffinesolve(G, s, t, tol, maximum_iter, allpaths, a, a0):
              for k in range(num_variables - 1)]
         )
 
-        if np.abs(gradients).all() < tol:
+        if np.sum(np.where(np.abs(gradients) < tol, 0, 1)) == 0:
               G.SOflowsAffine[s][t] = x
               G.SOcostsAffine[s][t] = obj_fun
               G.SOflowsAffine_edge[s][t] = allflows
