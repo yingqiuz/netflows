@@ -160,8 +160,8 @@ def _WEaffinesolve(G, s, t, tol, maximum_iter, allpaths, a, a0):
                         path_arrays[-1]))
              for k in range(num_variables - 1)]
         )
-
-        if np.sum(np.where(np.abs(gradients-prev_gradients) < tol * np.abs(prev_gradients), 0, 1)) == 0: # convergence
+        print(gradients)
+        if np.sum(np.where(np.abs(gradients) < tol, 0, 1)) == 0: # convergence
             G.WEflowsAffine[s][t] = x
             G.WEcostsAffine[s][t] = total_cost
             G.WEflowsAffine_edge[s][t] = allflows

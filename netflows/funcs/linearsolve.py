@@ -245,7 +245,7 @@ def _SOlinearsolve(G, s, t, tol, maximum_iter, allpaths, a):
                         path_arrays[-1]))
              for k in range(num_variables - 1)]
         )
-
+        print('gradients', gradients)
         if np.sum(np.where(np.abs(gradients) < tol, 0, 1)) == 0:
             G.SOflowsLinear[s][t] = x
             G.SOcostsLinear[s][t] = obj_fun
