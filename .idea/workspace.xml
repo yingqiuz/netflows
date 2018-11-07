@@ -1,7 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
   <component name="ChangeListManager">
-    <list default="true" id="12d2d747-a25b-4562-a91c-5913d8d6682c" name="Default Changelist" comment="" />
+    <list default="true" id="12d2d747-a25b-4562-a91c-5913d8d6682c" name="Default Changelist" comment="">
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+    </list>
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -54,8 +56,8 @@
       <file pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/netflows/funcs/affinesolve.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="-400">
-              <caret line="172" lean-forward="true" selection-start-line="172" selection-end-line="172" />
+            <state relative-caret-position="926">
+              <caret line="284" column="23" selection-start-line="284" selection-start-column="23" selection-end-line="284" selection-end-column="23" />
               <folding>
                 <element signature="e#0#38#0" expanded="true" />
               </folding>
@@ -115,7 +117,7 @@
               <caret line="20" selection-start-line="20" selection-end-line="20" />
               <folding>
                 <element signature="e#17#54#0" expanded="true" />
-                <marker date="1541552757246" expanded="true" signature="2262:2271" ph="..." />
+                <marker date="1541620303919" expanded="true" signature="2262:2271" ph="..." />
               </folding>
             </state>
           </provider>
@@ -142,7 +144,6 @@
     </findStrings>
     <replaceStrings>
       <replace>G.</replace>
-      <replace />
       <replace />
     </replaceStrings>
   </component>
@@ -452,7 +453,7 @@
           <caret line="20" selection-start-line="20" selection-end-line="20" />
           <folding>
             <element signature="e#17#54#0" expanded="true" />
-            <marker date="1541552757246" expanded="true" signature="2262:2271" ph="..." />
+            <marker date="1541620303919" expanded="true" signature="2262:2271" ph="..." />
           </folding>
         </state>
       </provider>
@@ -503,8 +504,8 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/netflows/funcs/affinesolve.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="-400">
-          <caret line="172" lean-forward="true" selection-start-line="172" selection-end-line="172" />
+        <state relative-caret-position="926">
+          <caret line="284" column="23" selection-start-line="284" selection-start-column="23" selection-end-line="284" selection-end-column="23" />
           <folding>
             <element signature="e#0#38#0" expanded="true" />
           </folding>
