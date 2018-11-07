@@ -3,7 +3,7 @@ from netflows.funcs.costfuncs import linear_cost, linear_WE_obj, linear_SO_obj
 
 import numpy as np
 
-def WElinearsolve(G, s, t, tol = 1e-12, maximum_iter = 10000, cutoff = None, a = None):
+def WElinearsolve(G, s, t, tol = 1e-8, maximum_iter = 10000, cutoff = None, a = None):
     """
     single pair Wardrop Equilibrium flow
     s: source
@@ -24,7 +24,7 @@ def WElinearsolve(G, s, t, tol = 1e-12, maximum_iter = 10000, cutoff = None, a =
 
     return _WElinearsolve(G, s, t, tol, maximum_iter, allpaths, a)
 
-def SOlinearsolve(G, s, t, tol=1e-12, maximum_iter = 10000, cutoff = None, a = None):
+def SOlinearsolve(G, s, t, tol=1e-8, maximum_iter = 10000, cutoff = None, a = None):
     """
     :param G:
     :param s:

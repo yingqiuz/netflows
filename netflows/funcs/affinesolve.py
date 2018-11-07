@@ -3,7 +3,7 @@ from netflows.funcs.costfuncs import affine_cost,affine_SO_obj,affine_WE_obj
 
 import numpy as np
 
-def WEaffinesolve(G, s, t, tol = 1e-12, maximum_iter = 10000, cutoff = None, a = None, a0 = None):
+def WEaffinesolve(G, s, t, tol = 1e-8, maximum_iter = 10000, cutoff = None, a = None, a0 = None):
     """
     single pair Wardrop Equilibrium flow
     s: source
@@ -29,7 +29,7 @@ def WEaffinesolve(G, s, t, tol = 1e-12, maximum_iter = 10000, cutoff = None, a =
 
     return _WEaffinesolve(G, s, t, tol, maximum_iter, allpaths, a, a0)
 
-def SOaffinesolve(G, s, t, tol=1e-12, maximum_iter = 10000, cutoff = None, a = None, a0 = None):
+def SOaffinesolve(G, s, t, tol=1e-8, maximum_iter = 10000, cutoff = None, a = None, a0 = None):
     """
     :param G:
     :param s:
@@ -217,7 +217,7 @@ def _SOaffinesolve(G, s, t, tol, maximum_iter, allpaths, a, a0):
     # initial step size determination
     gamma1 = np.min(np.abs(x[:-1] / gradients))
     gamma2 = np.min(np.abs((1 - x[:-1]) / gradients))
-    gamma = min(gamma1, gamma2) *2 / 3
+    gamma = min(gamma1, gamma2) * 2 / 3
 
     for k in range(maximum_iter):  # maximal iteration 10000
         print(gamma)

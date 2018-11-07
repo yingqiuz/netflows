@@ -4,7 +4,7 @@ from netflows.funcs.costfuncs import BPR_cost, BPR_WE_obj, BPR_SO_obj
 import numpy as np
 import scipy
 
-def WEbprsolve(G, s, t, tol = 1e-12, maximum_iter = 10000, cutoff = None, a = None, u = None):
+def WEbprsolve(G, s, t, tol = 1e-8, maximum_iter = 10000, cutoff = None, a = None, u = None):
     """
     single pair Wardrop Equilibrium flow
     s: source
@@ -28,7 +28,7 @@ def WEbprsolve(G, s, t, tol = 1e-12, maximum_iter = 10000, cutoff = None, a = No
 
     return _WEbprsolve(G, s, t, tol, maximum_iter, allpaths, a, u)
 
-def SObprsolve(G, s, t, tol=1e-12, maximum_iter = 10000, cutoff = None, a = None, u = None):
+def SObprsolve(G, s, t, tol=1e-8, maximum_iter = 10000, cutoff = None, a = None, u = None):
     """
     :param G:
     :param s:
@@ -99,7 +99,7 @@ def _WEbprsolve(G, s, t, tol, maximum_iter, allpaths, a, u):
     # initial gamma determination
     gamma1 = np.min(np.abs( x[:-1] / gradients ))
     gamma2 = np.min(np.abs( (1 - x[:-1]) / gradients) )
-    gamma = min(gamma1, gamma2) / 100
+    gamma = min(gamma1, gamma2) * 2 / 3
 
     for k in range(maximum_iter):  # maximal iteration 10000
 
@@ -116,12 +116,17 @@ def _WEbprsolve(G, s, t, tol, maximum_iter, allpaths, a, u):
         x[-1] = 1 - np.sum(x[:-1])  # the flow in the last path
 
         if np.sum(np.where(x < 0, 1, 0)) > 0:  # flow in at least one path is negtive
-            print('One of the flows reaches zero')
-            print('Iteration %d: The total cost is %f, and the flow is ' % (k, total_cost), prev_x)
-            G.WEflowsBPR[s][t] = prev_x
-            G.WEcostsBPR[s][t] = total_cost
-            G.WEflowsBPR_edge[s][t] = allflows
-            return total_cost, prev_x
+            #print('One of the flows reaches zero')
+            #print('Iteration %d: The total cost is %f, and the flow is ' % (k, total_cost), prev_x)
+            #G.WEflowsBPR[s][t] = prev_x
+            #G.WEcostsBPR[s][t] = total_cost
+            #G.WEflowsBPR_edge[s][t] = allflows
+            #return total_cost, prev_x
+            gamma1 = np.min(np.abs(x[:-1] / gradients))
+            gamma2 = np.min(np.abs((1 - x[:-1]) / gradients))
+            gamma = min(gamma1, gamma2) * 2 / 3
+            x[:-1] = prev_x[:-1] - gamma * gradients
+            x[-1] = 1 - np.sum(x[:-1])  # the flow in the last path
 
         allflows = np.sum(path_arrays * x.reshape(num_variables, 1, 1), axis=0)
         # obj_fun = np.sum( BPR_WE_obj(allflows, a, u), axis=None)
@@ -138,7 +143,7 @@ def _WEbprsolve(G, s, t, tol, maximum_iter, allpaths, a, u):
         )
         # new gamma
         
-        if np.abs(gradients).all() < tol:
+        if np.sum(np.where(np.abs(gradients) < tol, 0, 1)) == 0:
             G.WEflowsBPR[s][t] = x
             G.WEcostsBPR[s][t] = total_cost
             G.WEflowsBPR_edge[s][t] = allflows
@@ -201,7 +206,7 @@ def _SObprsolve(G, s, t, tol, maximum_iter, allpaths, a, u):
     # initial step size
     gamma1 = np.min(np.abs(x[:-1] / gradients))
     gamma2 = np.min(np.abs((1 - x[:-1]) / gradients))
-    gamma = min(gamma1, gamma2)  / 100
+    gamma = min(gamma1, gamma2) * 2 / 3
 
     for k in range(maximum_iter):  # maximal iteration 10000
         ######## TBC
@@ -228,12 +233,17 @@ def _SObprsolve(G, s, t, tol, maximum_iter, allpaths, a, u):
         x[-1] = 1 - np.sum(x[:-1])  # the flow in the last path
 
         if np.sum(np.where(x < 0, 1, 0)) > 0:  # flow in at least one path is negtive
-            print('One of the flows reaches zero')
-            print('Iteration %d: The total cost is %f, and the flow is ' % (k, obj_fun), prev_x)
-            G.SOflowsBPR[s][t] = prev_x
-            G.SOcostsBPR[s][t] = obj_fun
-            G.SOflowsBPR_edge[s][t] = allflows
-            return obj_fun, prev_x
+            #print('One of the flows reaches zero')
+            #print('Iteration %d: The total cost is %f, and the flow is ' % (k, obj_fun), prev_x)
+            #G.SOflowsBPR[s][t] = prev_x
+            #G.SOcostsBPR[s][t] = obj_fun
+            #G.SOflowsBPR_edge[s][t] = allflows
+            #return obj_fun, prev_x
+            gamma1 = np.min(np.abs(x[:-1] / gradients))
+            gamma2 = np.min(np.abs((1 - x[:-1]) / gradients))
+            gamma = min(gamma1, gamma2) * 2 / 3
+            x[:-1] = prev_x[:-1] - gamma * gradients
+            x[-1] = 1 - np.sum(x[:-1])  # the flow in the last path
 
         allflows = np.sum(path_arrays * x.reshape(num_variables, 1, 1), axis=0)
         obj_fun = np.sum( BPR_SO_obj(allflows, a, u), axis=None)
@@ -255,7 +265,7 @@ def _SObprsolve(G, s, t, tol, maximum_iter, allpaths, a, u):
         )
 
         # convergence?
-        if np.abs(gradients).all() < tol:
+        if np.sum(np.where(np.abs(gradients) < tol, 0, 1)) == 0:
             G.SOflowsBPR[s][t] = x
             G.SOcostsBPR[s][t] = obj_fun
             G.SOflowsBPR_edge[s][t] = allflows
