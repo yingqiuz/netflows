@@ -2,7 +2,6 @@ from __future__ import absolute_import
 from netflows.funcs.costfuncs import linear_cost, linear_WE_obj, linear_SO_obj
 
 import numpy as np
-import scipy
 
 def WElinearsolve(G, s, t, tol = 1e-12, maximum_iter = 10000, cutoff = None, a = None):
     """
@@ -12,15 +11,14 @@ def WElinearsolve(G, s, t, tol = 1e-12, maximum_iter = 10000, cutoff = None, a =
     tol: tolerance
     gamma: descent speed
     """
-    if cutoff == None:
+
+    if cutoff is None:
         print("Warning: cutoff not specified. it may take hugh memory to find all paths")
         cutoff = min(G.adj.shape)
 
-    allpaths = G.allpaths[s][t]
-    if allpaths == []:
-        allpaths = G.findallpaths(s, t, cutoff)
-
-    if a == None:
+    allpaths = G.findallpaths(s, t, cutoff)
+    
+    if a is None:
         a = G.dist_weight_ratio
 
     return _WElinearsolve(G, s, t, tol, maximum_iter, allpaths, a)
@@ -35,15 +33,14 @@ def SOlinearsolve(G, s, t, tol=1e-12, maximum_iter = 10000, cutoff = None, a = N
     :param cutoff:
     :return:
     """
-    if cutoff == None:
-        print("Warning: cutoff not specified. it may take hugh memory to find all paths")
+
+    if cutoff is None:
+        print("Warning: cutoff not specified. it may take huge memory to find all paths")
         cutoff = min(G.adj.shape)
 
-    allpaths = G.allpaths[s][t]
-    if allpaths == []:
-        allpaths = G.findallpaths(s, t, cutoff)
+    allpaths = G.findallpaths(s, t, cutoff)
 
-    if a == None:
+    if a is None:
         a = G.dist_weight_ratio
 
     return _SOlinearsolve(G, s, t, tol, maximum_iter, allpaths, a)
@@ -69,65 +66,67 @@ def _WElinearsolve(G, s, t, tol, maximum_iter, allpaths, a):
     # element (i, j) is the total flow on edge (i,j)
     allflows = np.sum(path_arrays * x.reshape(num_variables, 1, 1), axis = 0)
 
-    obj_fun = np.sum(linear_WE_obj(allflows, a))
-    # obj_fun = np.sum(self.WE_obj(allflows), axis = None)
-    total_cost = np.sum(allflows * linear_cost(allflows, a))
-    # total_traveltime = np.sum(linear_cost(allflows, G.adj_dist))
-    print('initial cost %f' % total_cost)
-    print('initial flows are', x)
+    total_cost = (allflows *  linear_cost(allflows, a)).sum()
+ 
+    print('The initial cost is %f, and the initial flow is ' % (total_cost), x)
     print('------solve the Wardrop Equilibrium------')
 
     gradients = np.array(
-            [np.sum( linear_cost(allflows, a) * (path_arrays[k] * np.where(path_arrays[-1]==0, 1, 0) -
-                                                                   np.where(path_arrays[k]==0, 1, 0) * path_arrays[-1]) )
+        [np.sum( linear_cost(allflows, a) * (
+                    path_arrays[k] * np.where(path_arrays[-1] == 0, 1, 0) - np.where(path_arrays[k] == 0, 1, 0) *
+                    path_arrays[-1]))
+         for k in range(num_variables - 1)]
+    )
+
+    # initial step size determination
+    gamma1 = np.min(np.abs(x[:-1] / gradients))
+    gamma2 = np.min(np.abs((1 - x[:-1]) / gradients))
+    gamma = min(gamma1, gamma2) * 2 / 3
+
+    for k in range(maximum_iter):  # maximal iteration 10000
+        prev_x = np.copy(x)
+        prev_gradients = np.copy(gradients)
+
+        # update x
+        x[:-1] = prev_x[:-1] - gamma * gradients
+        x[-1] = 1 - np.sum(x[:-1])  # the flow in the last path
+
+        if np.sum(np.where(x < 0, 1, 0)) > 0:  # flow in at least one path is negtive
+            gradients[x[:-1] < 0] = prev_x[:-1][x[:-1] < 0] / gamma
+            x[:-1] = prev_x[:-1] - gamma * gradients
+            x[-1] = 1 - np.sum(x[:-1])  # the flow in the last path
+            # the flow on the last path is still negative
+            if x[-1] < 0:
+                # define new gradients, increase negative ones
+                # how much increase to make sure they are within the constraints?
+                # reduce the amount proportional to the original
+                gradients[gradients < 0] += (np.abs(x[-1]) / gamma) * (
+                        gradients[gradients < 0] / gradients[gradients < 0].sum())
+                x[:-1] = prev_x[:-1] - gamma * gradients
+                x[-1] = 1 - np.sum(x[:-1])  # the flow in the last path
+
+        # update allflows, obj func
+        allflows = np.sum(path_arrays * x.reshape(num_variables, 1, 1), axis=0)
+        total_cost = (allflows *  linear_cost(allflows, a)).sum()
+        
+        # new gradients and step size
+        gradients = np.array(
+            [np.sum( linear_cost(allflows, a) * (
+                        path_arrays[k] * np.where(path_arrays[-1] == 0, 1, 0) - np.where(path_arrays[k] == 0, 1, 0) *
+                        path_arrays[-1]))
              for k in range(num_variables - 1)]
         )
 
-    for k in range(maximum_iter): # maximal iteration 10000
-
-        prev_obj_fun = np.copy(obj_fun)
-        prev_x = np.copy(x)
-
-        # update x
-        result = scipy.optimize.linprog(gradients, bounds=(0, 1), options={'maxiter': 1000, 'disp': False, 'tol': 1e-12, 'bland': True} )
-
-        # step size determination
-        gamma = 2 / (k + 1 + 2)
-        # update x
-        x[:-1] = prev_x[:-1] + gamma * (result.x - x[:-1])
-        x[-1] = 1 - np.sum(x[:-1]) # the flow in the last path
-
-        #if np.sum(np.where(x<0, 1, 0)) > 0: # flow in at least one path is negtive
-            #print('Iteration %d: The total cost is %f, the total travel time is %f, and the flow is ' % (k, prev_total_cost, prev_total_traveltime), prev_x)
-            #return prev_total_cost, prev_total_traveltime, prev_x
-
-        # update the obj funcs
-        allflows = np.sum(path_arrays * x.reshape(num_variables, 1, 1), axis = 0) # element (i, j) is the flow on edge (i, j)
-        obj_fun = np.sum(linear_WE_obj(allflows, a), axis = None)
-        diff_value = obj_fun - prev_obj_fun
-        diff_value_x = x - prev_x
-        total_cost = np.sum(allflows * linear_cost(allflows, a), axis = None)
-        #total_traveltime = np.sum(linear_cost(allflows, G.adj_dist), axis = None)
-        #print('Iteration %d: The total cost is %f, the total travel time is %f, and the flow is ' % (k, total_cost, total_traveltime), x)
-
-        if np.abs(diff_value) < np.abs(prev_obj_fun * tol) and np.abs(diff_value_x) < np.abs( tol * prev_x):
-            print('Wardrop equilibrium found: total cost %f' % total_cost)
-            print('flows (path formulation) are', x)
-            G.WEflowsLinear[s][t] = x # x is path formulation
-            G.WEflowsLinear_edge[s][t] = allflows # allflows is edge formulation
+        if np.sum(np.where(np.abs(gradients-prev_gradients) < tol * np.abs(prev_gradients), 0, 1)) == 0:
+            print('Wardrop equilibrium found:')
+            G.WEflowsLinear[s][t] = x
             G.WEcostsLinear[s][t] = total_cost
+            G.WEflowsLinear_edge[s][t] = allflows
+            print('Iteration %d: The total cost is %f, and the flow is ' % (k, total_cost), x)
             return total_cost, x
 
-        # new gradients
-        gradients = np.array(
-            [np.sum( linear_cost(allflows, a) * (path_arrays[k] * np.where(path_arrays[-1]==0, 1, 0) - np.where(path_arrays[k]==0, 1, 0) * path_arrays[-1]) )
-             for k in range(num_variables - 1)]
-        )
-
-        #gamma = np.inner(x[:-1]-prev_x[:-1], gradients - prev_gradients) / np.inner(gradients - prev_gradients, gradients - prev_gradients)
-
-        #if np.abs(diff_value/prev_obj_fun) < tol:
-            #return total_cost, total_traveltime, x
+        gamma = np.inner(x[:-1] - prev_x[:-1], gradients - prev_gradients) / \
+                np.inner(gradients - prev_gradients, gradients - prev_gradients)
 
     print('global minimum not found')
     return
@@ -158,15 +157,14 @@ def _SOlinearsolve(G, s, t, tol, maximum_iter, allpaths, a):
     # element (i, j) is the total flow on edge (i,j)
     allflows = np.sum(path_arrays * x.reshape(num_variables, 1, 1), axis=0)
 
-    obj_fun = np.sum(linear_SO_obj(allflows, a)) # obj_fun is total cost
-    # total_cost = np.sum(allflows * cost_funcs.linear_cost(allflows, self.adj_dist))
-    # total_traveltime = np.sum(cost_funcs.linear_cost(allflows, self.dist_weight_ratio)) useless.....
-    print('initial cost is %f' % obj_fun)
-    print('initial flows are', x)
+    obj_fun = linear_SO_obj(allflows, a).sum()
+
+    print('The initial cost is %f, and the initial flow is ' % (obj_fun), x)
     print('------solve the system optimal flow------')
 
     gradients = np.array(
-        [np.sum(linear_cost(allflows, a) * (
+        [np.sum( linear_cost(allflows, a) * (
+
                     path_arrays[k] * np.where(path_arrays[-1] == 0, 1, 0) - np.where(path_arrays[k] == 0, 1, 0) *
                     path_arrays[-1]))
          for k in range(num_variables - 1)]
@@ -177,66 +175,60 @@ def _SOlinearsolve(G, s, t, tol, maximum_iter, allpaths, a):
          for k in range(num_variables - 1)]
     )
 
+    # initial step size determination
+    gamma1 = np.min( np.abs( x[:-1]/gradients ) )
+    gamma2 = np.min( np.abs( (1 - x[:-1])/ gradients ) )
+    gamma = min(gamma1, gamma2) * 2  / 3
+
     for k in range(maximum_iter):  # maximal iteration 10000
-
-        prev_obj_fun = np.copy(obj_fun)
         prev_x = np.copy(x)
-        #prev_allflows = np.copy(allflows)
-        #prev_total_traveltime = np.copy(total_traveltime)
-        #prev_gradients = np.copy(gradients)
-        # determine step size
-        result = scipy.optimize.linprog(gradients, bounds=(0, 1),
-                                        options={'maxiter': 1000, 'disp': False, 'tol': 1e-12, 'bland': True})
+        prev_gradients = np.copy(gradients)
 
-        # step size determination
-        gamma = 2 / (k + 1 + 2)
         # update x
-        x[:-1] = prev_x[:-1] + gamma * (result.x - x[:-1])
+        x[:-1] = prev_x[:-1] - gamma * gradients
         x[-1] = 1 - np.sum(x[:-1])  # the flow in the last path
 
-        #if np.sum(np.where(x < 0, 1, 0)) > 0:  # flow in at least one path is negtive
-            #print('Iteration %d: The total cost is %f, and total travel time is %f, and the flow is ' % (
-            #k, prev_obj_fun, prev_total_traveltime), prev_x)
-            #self.SOflowsLinear[s][t] = prev_x
-            #self.SOcostsLinear[s][t] = prev_obj_fun
-            #self.SOflowsLinear_edge[s][t] = prev_allflows
-            #return prev_obj_fun, prev_total_traveltime, prev_x
+        if np.sum(np.where(x < 0, 1, 0)) > 0:  # flow in at least one path is negtive
+            gradients[x[:-1] < 0] = prev_x[:-1][x[:-1] < 0] / gamma
+            x[:-1] = prev_x[:-1] - gamma * gradients
+            x[-1] = 1 - np.sum(x[:-1])  # the flow in the last path
+            # print('new x is ', x)
+            if x[-1] < 0:
+                # define new gradients, increase negative ones
+                # how much increase to make sure they are within the constraints?
+                # reduce the amount proportional to the original
+                gradients[gradients < 0] += (np.abs(x[-1]) / gamma) * (
+                        gradients[gradients < 0] / gradients[gradients < 0].sum())
+                x[:-1] = prev_x[:-1] - gamma * gradients
+                x[-1] = 1 - np.sum(x[:-1])  # the flow in the last path
 
         allflows = np.sum(path_arrays * x.reshape(num_variables, 1, 1), axis=0)
-        obj_fun = np.sum(linear_SO_obj(allflows, a), axis = None)
-        diff_value = obj_fun - prev_obj_fun
-        diff_value_x = x - prev_x
-        # total_traveltime = np.sum(linear_cost(allflows, a), axis=None)
 
-        if np.abs(diff_value) < np.abs(prev_obj_fun * tol) and np.abs(diff_value_x) < np.abs( tol * prev_x):
-            print('System Optimum found: total cost %d' % obj_fun)
-            print('flows (path formulation) are', x)
-            G.SOflowsLinear[s][t] = x
-            G.SOflowsLinear_edge[s][t] = allflows
-            G.SOcostsLinear[s][t] = obj_fun
-            return obj_fun, x
+        obj_fun = linear_SO_obj(allflows, a).sum()
 
-        # new gradients
+        # new gradients and gamma 
         gradients = np.array(
-            [np.sum(linear_cost(allflows, a) * (
-                        path_arrays[k] * np.where(path_arrays[-1] == 0, 1, 0) - np.where(path_arrays[k] == 0, 1,
-                                                                                         0) * path_arrays[-1]))
+            [np.sum( linear_cost(allflows, a) * (
+                        path_arrays[k] * np.where(path_arrays[-1] == 0, 1, 0) - np.where(path_arrays[k] == 0, 1, 0) *
+                        path_arrays[-1]))
              for k in range(num_variables - 1)]
         ) + np.array(
             [np.sum(allflows * a * (
-                        path_arrays[k] * np.where(path_arrays[-1] == 0, 1, 0) - np.where(path_arrays[k] == 0, 1,
-                                                                                         0) * path_arrays[-1]))
+                        path_arrays[k] * np.where(path_arrays[-1] == 0, 1, 0) - np.where(path_arrays[k] == 0, 1, 0) *
+                        path_arrays[-1]))
              for k in range(num_variables - 1)]
         )
-        #gamma = np.inner(x[:-1] - prev_x[:-1], gradients - prev_gradients) / np.inner(gradients - prev_gradients,
-                                                                                     # gradients - prev_gradients)
-        #if np.abs(diff_value / prev_obj_fun) < tol:
-        #    self.SOflowsLinear[s][t] = x
-        #    self.SOcostsLinear[s][t] = obj_fun
-        #    self.SOflowsLinear_edge[s][t] = allflows
-        #    print('Iteration %d: The total cost is %f, the total travel time is %f, and the flow is ' % (
-        #    k, obj_fun, total_traveltime), x)
-        #    return obj_fun, total_traveltime, x
+        
+        if np.sum(np.where(np.abs(gradients-prev_gradients) < tol * np.abs(prev_gradients), 0, 1)) == 0:
+            G.SOflowsLinear[s][t] = x
+            G.SOcostsLinear[s][t] = obj_fun
+            G.SOflowsLinear_edge[s][t] = allflows
+            print('System optimum found:')
+            print('Iteration %d: The total cost is %f, and the flow is ' % (k, obj_fun), x)
+            return obj_fun, x
+
+        gamma = np.inner(x[:-1] - prev_x[:-1], gradients - prev_gradients) \
+                / np.inner(gradients - prev_gradients, gradients - prev_gradients)
 
     print('global minimum not found')
     return
