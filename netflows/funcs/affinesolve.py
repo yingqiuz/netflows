@@ -1,5 +1,6 @@
 from __future__ import absolute_import
-from netflows.funcs.costfuncs import affine_cost,affine_SO_obj,affine_WE_obj
+from netflows.funcs.costfuncs import affine_cost,affine_SO_obj,affine_WE_obj, affine_we_obj_search, affine_so_obj_search
+from netflows.funcs.gradfuncs import we_affine_grad,so_affine_grad
 
 import numpy as np
 
@@ -12,14 +13,12 @@ def WEaffinesolve(G, s, t, tol = 1e-12, maximum_iter = 10000, cutoff = None, a =
     gamma: descent speed
     """
 
-    allpaths = G.allpaths[s][t]
-    if allpaths == []:
-        # find all paths less than cutoff
-        if cutoff == None:
-            print("Warning: cutoff not specified. it may take hugh memory to find all paths")
-            cutoff = min(G.adj.shape)
+    if cutoff is None:
+        print("Warning: cutoff not specified. it may take hugh memory to find all paths")
+        cutoff = min(G.adj.shape)
+    # find all paths
+    allpaths = G.findallpaths(s, t, cutoff)
 
-        allpaths = G.findallpaths(s, t, cutoff)
 
     if a is None:
         a = G.rpl_weights
@@ -86,13 +85,15 @@ def _WEaffinesolve(G, s, t, tol, maximum_iter, allpaths, a, a0):
     # element (i, j) is the total flow on edge (i,j)
     allflows = np.sum(path_arrays * x.reshape(num_variables, 1, 1), axis=0)
 
-    obj_fun = np.sum(affine_WE_obj(allflows, a, a0))
-    # obj_fun = np.sum(G.WE_obj(allflows), axis = None)
-    total_cost = np.sum(allflows *  affine_cost(allflows, a, a0))
-    #total_traveltime = np.sum( affine_cost(allflows, G.adj_dist, a0=a0))
+    # objective function to minimize
+    obj_fun = affine_WE_obj(allflows, a, a0).sum()
+    # total cost (i.e., flow * cost_func(flow) )
+    total_cost = (allflows *  affine_cost(allflows, a, a0)).sum()
+    #total_traveltime = np.sum( affine_cost(allflows, G.adj_dist, a0=a0)) useless for now...
+    
     print('The initial cost is %f, and the initial flow is ' % (total_cost), x)
     print('------solve the Wardrop Equilibrium------')
-
+    # initial gradients
     gradients = np.array(
         [np.sum(affine_cost(allflows, a, a0) * (
                     path_arrays[k] * np.where(path_arrays[-1] == 0, 1, 0) - np.where(path_arrays[k] == 0, 1, 0) *
@@ -100,86 +101,55 @@ def _WEaffinesolve(G, s, t, tol, maximum_iter, allpaths, a, a0):
          for k in range(num_variables - 1)]
     )
 
-    # initial estimation of gamma
+    # initial estimation of step size gamma
     gamma1 = np.min( np.abs( x[:-1] / gradients ) )
     gamma2 = np.min( np.abs( (1 - x[:-1]) / gradients ) )
-    gamma = min(gamma1, gamma2) * 2 / 3
+    gamma = min(gamma1, gamma2) * 2 / 3 # to make sure the flow on each path is positive after initial iteration
 
     for k in range(maximum_iter):  # maximal iteration 10000
-
+        # store previous values
         prev_obj_fun = np.copy(obj_fun)
         prev_x = np.copy(x)
-        #prev_allflows = np.copy(allflows)
-        #prev_total_cost = np.copy(total_cost)
-        #prev_total_traveltime = np.copy(total_traveltime)
         prev_gradients = np.copy(gradients)
-
+        
         # update x
-        # initial gamma --- to be modified
         x[:-1] = prev_x[:-1] - gamma * gradients
         x[-1] = 1 - np.sum(x[:-1])  # the flow in the last path
-
-        #if x[-1] < 0 :
-        #    gradients = gradients + np.abs(x[-1])/gamma
-        #    x[:-1] = prev_x[:-1] - gamma * gradients
-        #    x[-1] = 1 - np.sum(x[:-1])  # the flow in the last path
-
-
-        if np.sum(np.where(x < 0, 1, 0)) > 0:  # flow in at least one path is negtive
-            #print('One of the flows reaches zero')
-            #print('Iteration %d: The total cost is %f, and the flow is ' % (k, total_cost), prev_x)
-            #G.WEflowsAffine[s][t] = prev_x
-            #G.WEcostsAffine[s][t] = total_cost
-            #G.WEflowsAffine_edge[s][t] = allflows
-            #return total_cost, prev_x
-            #gamma1 = np.min(np.abs(prev_x[:-1] / gradients))
-            #gamma2 = np.min(np.abs((1 - prev_x[:-1]) / gradients))
-            #gamma3 = gamma + np.abs(x[-1]) / np.sum(gradients)
-            #gamma = min(gamma1, gamma2)
-            #x[:-1] = prev_x[:-1] - gamma * gradients
-            #x[-1] = 1 - np.sum(x[:-1])  # the flow in the last path
-            #if x[-1] < 0:
-            #    gamma = gamma + np.abs(x[-1]) / np.sum(gradients)
-            #    x[:-1] = prev_x[:-1] - gamma * gradients
-            #    x[-1] = 1 - np.sum(x[:-1])  # the flow in the last path
+        
+        # if at least one of the flows is negative, re-adapt the gradients
+        if np.sum(np.where(x < 0, 1, 0)) > 0:  
+            # reduce positive gradients
             gradients[x[:-1] < 0] = prev_x[:-1][x[:-1] < 0] / gamma
-            # neg = x[x < 0].sum()
-            # gamma1 = np.min(np.abs(prev_x[:-1] / gradients))
-            # gamma2 = np.min(np.abs((1 - prev_x[:-1]) / gradients))
-            # gamma3 = gamma + np.abs(x[-1])/np.sum(gradients)
-            # gamma = min(gamma1, gamma2)
-            # print(gamma)
+            
             x[:-1] = prev_x[:-1] - gamma * gradients
             x[-1] = 1 - np.sum(x[:-1])  # the flow in the last path
-            # print('new x is ', x)
+            # if  the last one is still negative
             if x[-1] < 0:
                 # define new gradients, increase negative ones
-                # how much increase to make sure they are within the constraints?
                 # reduce the amount proportional to the original
                 gradients[gradients < 0] += (np.abs(x[-1]) / gamma) * (
                             gradients[gradients < 0] / gradients[gradients < 0].sum())
-                # gamma = gamma + np.abs(x[-1]) / np.sum(gradients)
                 x[:-1] = prev_x[:-1] - gamma * gradients
                 x[-1] = 1 - np.sum(x[:-1])  # the flow in the last path
 
         # update allflows and travel cost according to path formulation x
         allflows = np.sum(path_arrays * x.reshape(num_variables, 1, 1), axis=0)
-        obj_fun = np.sum(affine_WE_obj(allflows, a, a0), axis=None) #value of obj func. useless
+        obj_fun = affine_WE_obj(allflows, a, a0).sum() #value of obj func. useless
         diff_value = obj_fun - prev_obj_fun #useless.....
-        #print(diff_value)
-        total_cost = np.sum(allflows * affine_cost(allflows, a, a0), axis=None)
-        #total_traveltime = np.sum( affine_cost(allflows, a, a0), axis=None)
+        total_cost = (allflows * affine_cost(allflows, a, a0)).sum()
+        
         print('Iteration %d: The total cost is %f, and the flow is ' % (k, total_cost), x)
-
-        # new gradients and gamma
+        # new gradients and stepsize
         gradients = np.array(
             [np.sum( affine_cost(allflows, a, a0) * (
                         path_arrays[k] * np.where(path_arrays[-1] == 0, 1, 0) - np.where(path_arrays[k] == 0, 1, 0) *
                         path_arrays[-1]))
              for k in range(num_variables - 1)]
         )
-        #print(gradients)
-        if np.where(np.abs(gradients - prev_gradients) < tol, 0, 1).sum() == 0: # convergence
+        
+        if np.where(np.abs(gradients - prev_gradients) < tol * np.abs(prev_gradients), 0, 1).sum() == 0: # convergence
+            print('Wardrop equilibrium found:')
+            print('Iteration %d: The total cost is %f, and the flow is ' % (k, total_cost), x)
             G.WEflowsAffine[s][t] = x
             G.WEcostsAffine[s][t] = total_cost
             G.WEflowsAffine_edge[s][t] = allflows
@@ -219,13 +189,13 @@ def _SOaffinesolve(G, s, t, tol, maximum_iter, allpaths, a, a0):
     # element (i, j) is the total flow on edge (i,j)
     allflows = np.sum(path_arrays * x.reshape(num_variables, 1, 1), axis=0)
 
-    obj_fun = np.sum( affine_SO_obj(allflows, a, a0))
-    # total_cost = np.sum(allflows *   linear_cost(allflows,   G.adj_dist))
-    #total_traveltime = np.sum(  affine_cost(allflows, a, a0))
+
+    obj_fun = affine_SO_obj(allflows, a, a0).sum()  # objective function is the total cost function
+  
     print('The initial cost is %f, and the initial flow is ' % (obj_fun), x)
     print('------solve the system optimal flow------')
 
-    # gradients
+    # initial gradients
     gradients = np.array(
         [np.sum(  affine_cost(allflows, a, a0) * (
                     path_arrays[k] * np.where(path_arrays[-1] == 0, 1, 0) - np.where(path_arrays[k] == 0, 1, 0) *
@@ -249,53 +219,33 @@ def _SOaffinesolve(G, s, t, tol, maximum_iter, allpaths, a, a0):
 
         prev_obj_fun = np.copy(obj_fun)
         prev_x = np.copy(x)
-        #prev_allflows = np.copy(allflows)
-        #prev_total_traveltime = np.copy(total_traveltime)
-        #prev_gradients = np.copy(gradients)
         prev_gradients = np.copy(gradients)
-        #print('prev_gradients', prev_gradients)
+        
         # update x
         x[:-1] = prev_x[:-1] - gamma * gradients
         x[-1] = 1 - np.sum(x[:-1])  # the flow in the last path
 
-
+        # if at least one of the flows is negative, change the gradients
         if np.sum(np.where(x < 0, 1, 0)) > 0:  # flow in at least one path is negtive
-            #print('one of the flows reaches zero')
-            #print('Iteration %d: The total cost is %f, and the flow is ' % (k, obj_fun), prev_x)
-            #G.SOflowsAffine[s][t] = prev_x
-            #G.SOcostsAffine[s][t] = obj_fun
-            #G.SOflowsAffine_edge[s][t] = allflows
-            #return obj_fun, prev_x
-            # define new gradients, reduce the positive ones
             gradients[x[:-1]< 0 ] =  prev_x[:-1][x[:-1]<0] / gamma
-            #neg = x[x < 0].sum()
-            #gamma1 = np.min(np.abs(prev_x[:-1] / gradients))
-            #gamma2 = np.min(np.abs((1 - prev_x[:-1]) / gradients))
-            #gamma3 = gamma + np.abs(x[-1])/np.sum(gradients)
-            #gamma = min(gamma1, gamma2)
-            #print(gamma)
             x[:-1] = prev_x[:-1] - gamma * gradients
             x[-1] = 1 - np.sum(x[:-1])  # the flow in the last path
-            #print('new x is ', x)
+            # if the flow on the last path is still negative
             if x[-1] < 0:
                 # define new gradients, increase negative ones
                 # how much increase to make sure they are within the constraints?
                 # reduce the amount proportional to the original
                 gradients[gradients < 0] += (np.abs(x[-1]) / gamma) * (gradients[gradients<0] / gradients[gradients<0].sum())
-                #gamma = gamma + np.abs(x[-1]) / np.sum(gradients)
                 x[:-1] = prev_x[:-1] - gamma * gradients
                 x[-1] = 1 - np.sum(x[:-1])  # the flow in the last path
 
-        #print('gamma', gamma)
-
         # update all flows, obj fun
         allflows = np.sum(path_arrays * x.reshape(num_variables, 1, 1), axis=0)
-        obj_fun = np.sum(  affine_SO_obj(allflows, a, a0), axis=None)
+        obj_fun = affine_SO_obj(allflows, a, a0).sum()
         diff_value = obj_fun - prev_obj_fun
-        #total_traveltime = np.sum(  affine_cost(allflows,  a, a0=a0), axis=None)
         print('Iteration %d: The total cost is %f, and the flow is ' % (k, obj_fun), x)
 
-        # update gradients and gamma
+        # update gradients and step size
         gradients = np.array(
             [np.sum(  affine_cost(allflows, a, a0) * (
                         path_arrays[k] * np.where(path_arrays[-1] == 0, 1, 0) - np.where(path_arrays[k] == 0, 1, 0) *
@@ -308,21 +258,17 @@ def _SOaffinesolve(G, s, t, tol, maximum_iter, allpaths, a, a0):
              for k in range(num_variables - 1)]
         )
 
-
-        #print('gradients', gradients)
-        #print('gradients - prev_gradients', gradients - prev_gradients)
-        #print('x - prev_x', x - prev_x)
-        #print('prev_x*tol', prev_x*tol)
-        if np.where(np.abs(gradients - prev_gradients) < tol, 0, 1).sum() == 0:#np.sum(  np.where( np.abs(x - prev_x) < np.abs(prev_x)*tol, 0, 1 )  ) == 0:
+        if np.where(np.abs(gradients - prev_gradients) < tol * np.abs(prev_gradients), 0, 1).sum() == 0:
+            print('Wardrop equilibrium found:')
+            print('Iteration %d: The total cost is %f, and the flow is ' % (k, obj_fun), x)
             G.SOflowsAffine[s][t] = x
             G.SOcostsAffine[s][t] = obj_fun
             G.SOflowsAffine_edge[s][t] = allflows
             return obj_fun, x
 
+        # update step size
         gamma = np.inner(x[:-1] - prev_x[:-1], gradients - prev_gradients) / \
                 np.inner(gradients - prev_gradients, gradients - prev_gradients)
-
-
 
     print('global minimum not found')
     return

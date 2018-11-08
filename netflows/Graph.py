@@ -14,6 +14,7 @@ class Graph:
         """
         # weighted adj matrix
         self.adj = np.array(adj).T
+
         self.adj = np.where(self.adj != 0, 1, 0) # adjacency matrix
 
         self.weights = np.array(weights, dtype=np.float).T
@@ -22,6 +23,9 @@ class Graph:
         # distance matrix
         self.dist = np.array(dist, dtype=np.float).T
         self.adj_dist = self.dist * self.adj
+        # wiring cost
+        # self.wiring_cost = np.zeros(self.adj.shape)
+        self.wiring_cost = self.dist * self.adj_weights
 
         # wiring cost
         self.wiring_cost = self.adj_dist * self.adj_weights
@@ -34,6 +38,7 @@ class Graph:
         self.dist_weight_ratio = self.adj_dist * self.rpl_weights
 
         # initialize arrays to store flows and costs
+
         self.allpaths = [[[] for k in range(self.adj.shape[1])] for kk in range(self.adj.shape[0])] # store all paths in a 3D list
         self.WEflowsLinear, self.WEflowsAffine, self.WEflowsBPR = [ [[[] for k in range(self.adj.shape[1])] for kk in range(self.adj.shape[0])] ] * 3
         self.WEflowsLinear_edge, self.WEflowsAffine_edge, self.WEflowsBPR_edge = [ [[[] for k in range(self.adj.shape[1])] for kk in range(self.adj.shape[0])] ] * 3        

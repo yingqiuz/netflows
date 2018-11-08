@@ -11,14 +11,13 @@ def WElinearsolve(G, s, t, tol = 1e-12, maximum_iter = 10000, cutoff = None, a =
     tol: tolerance
     gamma: descent speed
     """
-    allpaths = G.allpaths[s][t]
-    if allpaths == []:
-        if cutoff is None:
-            print("Warning: cutoff not specified. it may take hugh memory to find all paths")
-            cutoff = min(G.adj.shape)
 
-        allpaths = G.findallpaths(s, t, cutoff)
+    if cutoff is None:
+        print("Warning: cutoff not specified. it may take hugh memory to find all paths")
+        cutoff = min(G.adj.shape)
 
+    allpaths = G.findallpaths(s, t, cutoff)
+    
     if a is None:
         a = G.dist_weight_ratio
 
@@ -34,13 +33,12 @@ def SOlinearsolve(G, s, t, tol=1e-12, maximum_iter = 10000, cutoff = None, a = N
     :param cutoff:
     :return:
     """
-    allpaths = G.allpaths[s][t]
-    if allpaths == []:
-        if cutoff is None:
-            print("Warning: cutoff not specified. it may take hugh memory to find all paths")
-            cutoff = min(G.adj.shape)
 
-        allpaths = G.findallpaths(s, t, cutoff)
+    if cutoff is None:
+        print("Warning: cutoff not specified. it may take huge memory to find all paths")
+        cutoff = min(G.adj.shape)
+
+    allpaths = G.findallpaths(s, t, cutoff)
 
     if a is None:
         a = G.dist_weight_ratio
@@ -68,10 +66,8 @@ def _WElinearsolve(G, s, t, tol, maximum_iter, allpaths, a):
     # element (i, j) is the total flow on edge (i,j)
     allflows = np.sum(path_arrays * x.reshape(num_variables, 1, 1), axis = 0)
 
-    #obj_fun = np.sum( linear_WE_obj(allflows, a))
-    # obj_fun = np.sum(G.WE_obj(allflows), axis = None)
-    total_cost = np.sum(allflows *  linear_cost(allflows, a))
-    #total_traveltime = np.sum( linear_cost(allflows, a))
+    total_cost = (allflows *  linear_cost(allflows, a)).sum()
+ 
     print('The initial cost is %f, and the initial flow is ' % (total_cost), x)
     print('------solve the Wardrop Equilibrium------')
 
@@ -81,26 +77,14 @@ def _WElinearsolve(G, s, t, tol, maximum_iter, allpaths, a):
                     path_arrays[-1]))
          for k in range(num_variables - 1)]
     )
-    # print('the gradients are')
-    # print(gradients)
-    # print('the gamma is')
-    # print(gamma)
 
     # initial step size determination
     gamma1 = np.min(np.abs(x[:-1] / gradients))
     gamma2 = np.min(np.abs((1 - x[:-1]) / gradients))
     gamma = min(gamma1, gamma2) * 2 / 3
-    #print(min(gamma1, gamma2) )
-    #gamma = 1e-8
 
     for k in range(maximum_iter):  # maximal iteration 10000
-
-        #prev_obj_fun = np.copy(obj_fun)
         prev_x = np.copy(x)
-        #prev_allflows = np.copy(allflows)
-
-        #prev_total_cost = np.copy(total_cost)
-        #prev_total_traveltime = np.copy(total_traveltime)
         prev_gradients = np.copy(gradients)
 
         # update x
@@ -109,33 +93,23 @@ def _WElinearsolve(G, s, t, tol, maximum_iter, allpaths, a):
 
         if np.sum(np.where(x < 0, 1, 0)) > 0:  # flow in at least one path is negtive
             gradients[x[:-1] < 0] = prev_x[:-1][x[:-1] < 0] / gamma
-            # neg = x[x < 0].sum()
-            # gamma1 = np.min(np.abs(prev_x[:-1] / gradients))
-            # gamma2 = np.min(np.abs((1 - prev_x[:-1]) / gradients))
-            # gamma3 = gamma + np.abs(x[-1])/np.sum(gradients)
-            # gamma = min(gamma1, gamma2)
-            # print(gamma)
             x[:-1] = prev_x[:-1] - gamma * gradients
             x[-1] = 1 - np.sum(x[:-1])  # the flow in the last path
-            # print('new x is ', x)
+            # the flow on the last path is still negative
             if x[-1] < 0:
                 # define new gradients, increase negative ones
                 # how much increase to make sure they are within the constraints?
                 # reduce the amount proportional to the original
                 gradients[gradients < 0] += (np.abs(x[-1]) / gamma) * (
                         gradients[gradients < 0] / gradients[gradients < 0].sum())
-                # gamma = gamma + np.abs(x[-1]) / np.sum(gradients)
                 x[:-1] = prev_x[:-1] - gamma * gradients
                 x[-1] = 1 - np.sum(x[:-1])  # the flow in the last path
 
         # update allflows, obj func
         allflows = np.sum(path_arrays * x.reshape(num_variables, 1, 1), axis=0)
-        #obj_fun = np.sum( linear_WE_obj(allflows, a), axis=None)
-        #diff_value = obj_fun - prev_obj_fun
-        total_cost = np.sum(allflows *  linear_cost(allflows, a), axis=None)
-        #total_traveltime = np.sum( linear_cost(allflows, a), axis=None)
-
-        # new gradients and learning rate
+        total_cost = (allflows *  linear_cost(allflows, a)).sum()
+        
+        # new gradients and step size
         gradients = np.array(
             [np.sum( linear_cost(allflows, a) * (
                         path_arrays[k] * np.where(path_arrays[-1] == 0, 1, 0) - np.where(path_arrays[k] == 0, 1, 0) *
@@ -143,11 +117,8 @@ def _WElinearsolve(G, s, t, tol, maximum_iter, allpaths, a):
              for k in range(num_variables - 1)]
         )
 
-        # print('the gradients are')
-        # print(gradients)
-        # print('the gamma is')
-        # print(gamma)
-        if np.sum(np.where(np.abs(gradients-prev_gradients) < tol, 0, 1)) == 0:
+        if np.sum(np.where(np.abs(gradients-prev_gradients) < tol * np.abs(prev_gradients), 0, 1)) == 0:
+            print('Wardrop equilibrium found:')
             G.WEflowsLinear[s][t] = x
             G.WEcostsLinear[s][t] = total_cost
             G.WEflowsLinear_edge[s][t] = allflows
@@ -186,14 +157,14 @@ def _SOlinearsolve(G, s, t, tol, maximum_iter, allpaths, a):
     # element (i, j) is the total flow on edge (i,j)
     allflows = np.sum(path_arrays * x.reshape(num_variables, 1, 1), axis=0)
 
-    obj_fun = np.sum( linear_SO_obj(allflows, a))
-    # total_cost = np.sum(allflows *  linear_cost(allflows, G.adj_dist))
-    #total_traveltime = np.sum( linear_cost(allflows, G.dist_weight_ratio))
+    obj_fun = linear_SO_obj(allflows, a).sum()
+
     print('The initial cost is %f, and the initial flow is ' % (obj_fun), x)
     print('------solve the system optimal flow------')
 
     gradients = np.array(
         [np.sum( linear_cost(allflows, a) * (
+
                     path_arrays[k] * np.where(path_arrays[-1] == 0, 1, 0) - np.where(path_arrays[k] == 0, 1, 0) *
                     path_arrays[-1]))
          for k in range(num_variables - 1)]
@@ -210,11 +181,7 @@ def _SOlinearsolve(G, s, t, tol, maximum_iter, allpaths, a):
     gamma = min(gamma1, gamma2) * 2  / 3
 
     for k in range(maximum_iter):  # maximal iteration 10000
-
-        #prev_obj_fun = np.copy(obj_fun)
         prev_x = np.copy(x)
-        #prev_allflows = np.copy(allflows)
-        #prev_total_traveltime = np.copy(total_traveltime)
         prev_gradients = np.copy(gradients)
 
         # update x
@@ -223,12 +190,6 @@ def _SOlinearsolve(G, s, t, tol, maximum_iter, allpaths, a):
 
         if np.sum(np.where(x < 0, 1, 0)) > 0:  # flow in at least one path is negtive
             gradients[x[:-1] < 0] = prev_x[:-1][x[:-1] < 0] / gamma
-            # neg = x[x < 0].sum()
-            # gamma1 = np.min(np.abs(prev_x[:-1] / gradients))
-            # gamma2 = np.min(np.abs((1 - prev_x[:-1]) / gradients))
-            # gamma3 = gamma + np.abs(x[-1])/np.sum(gradients)
-            # gamma = min(gamma1, gamma2)
-            # print(gamma)
             x[:-1] = prev_x[:-1] - gamma * gradients
             x[-1] = 1 - np.sum(x[:-1])  # the flow in the last path
             # print('new x is ', x)
@@ -238,14 +199,12 @@ def _SOlinearsolve(G, s, t, tol, maximum_iter, allpaths, a):
                 # reduce the amount proportional to the original
                 gradients[gradients < 0] += (np.abs(x[-1]) / gamma) * (
                         gradients[gradients < 0] / gradients[gradients < 0].sum())
-                # gamma = gamma + np.abs(x[-1]) / np.sum(gradients)
                 x[:-1] = prev_x[:-1] - gamma * gradients
                 x[-1] = 1 - np.sum(x[:-1])  # the flow in the last path
 
         allflows = np.sum(path_arrays * x.reshape(num_variables, 1, 1), axis=0)
-        obj_fun = np.sum( linear_SO_obj(allflows, a), axis=None)
-        #diff_value = obj_fun - prev_obj_fun
-        #total_traveltime = np.sum( linear_cost(allflows, G.dist_weight_ratio), axis=None)
+
+        obj_fun = linear_SO_obj(allflows, a).sum()
 
         # new gradients and gamma 
         gradients = np.array(
@@ -259,11 +218,12 @@ def _SOlinearsolve(G, s, t, tol, maximum_iter, allpaths, a):
                         path_arrays[-1]))
              for k in range(num_variables - 1)]
         )
-        #print('gradients', gradients)
-        if np.sum(np.where(np.abs(gradients-prev_gradients) < tol, 0, 1)) == 0:
+        
+        if np.sum(np.where(np.abs(gradients-prev_gradients) < tol * np.abs(prev_gradients), 0, 1)) == 0:
             G.SOflowsLinear[s][t] = x
             G.SOcostsLinear[s][t] = obj_fun
             G.SOflowsLinear_edge[s][t] = allflows
+            print('System optimum found:')
             print('Iteration %d: The total cost is %f, and the flow is ' % (k, obj_fun), x)
             return obj_fun, x
 
