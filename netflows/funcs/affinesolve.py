@@ -1,5 +1,5 @@
 from __future__ import absolute_import
-from netflows.funcs.costfuncs import affine_cost,affine_SO_obj,affine_WE_obj, affine_we_obj_search, affine_so_obj_search
+from netflows.funcs.costfuncs import affine_cost,affine_SO_obj,affine_WE_obj
 from netflows.funcs.gradfuncs import we_affine_grad,so_affine_grad
 
 import numpy as np
@@ -147,7 +147,7 @@ def _WEaffinesolve(G, s, t, tol, maximum_iter, allpaths, a, a0):
              for k in range(num_variables - 1)]
         )
         
-        if np.where(np.abs(gradients - prev_gradients) < tol * np.abs(prev_gradients), 0, 1).sum() == 0: # convergence
+        if np.where(np.abs(gradients - prev_gradients) < tol, 0, 1).sum() == 0: # convergence
             print('Wardrop equilibrium found:')
             print('Iteration %d: The total cost is %f, and the flow is ' % (k, total_cost), x)
             G.WEflowsAffine[s][t] = x
@@ -258,8 +258,8 @@ def _SOaffinesolve(G, s, t, tol, maximum_iter, allpaths, a, a0):
              for k in range(num_variables - 1)]
         )
 
-        if np.where(np.abs(gradients - prev_gradients) < tol * np.abs(prev_gradients), 0, 1).sum() == 0:
-            print('Wardrop equilibrium found:')
+        if np.where(np.abs(gradients - prev_gradients) < tol, 0, 1).sum() == 0:
+            print('System optimum found:')
             print('Iteration %d: The total cost is %f, and the flow is ' % (k, obj_fun), x)
             G.SOflowsAffine[s][t] = x
             G.SOcostsAffine[s][t] = obj_fun

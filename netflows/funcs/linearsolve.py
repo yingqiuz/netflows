@@ -107,7 +107,7 @@ def _WElinearsolve(G, s, t, tol, maximum_iter, allpaths, a):
 
         # update allflows, obj func
         allflows = np.sum(path_arrays * x.reshape(num_variables, 1, 1), axis=0)
-        total_cost = (allflows *  linear_cost(allflows, a)).sum()
+        total_cost = (allflows * linear_cost(allflows, a)).sum()
         
         # new gradients and step size
         gradients = np.array(
@@ -117,7 +117,7 @@ def _WElinearsolve(G, s, t, tol, maximum_iter, allpaths, a):
              for k in range(num_variables - 1)]
         )
 
-        if np.sum(np.where(np.abs(gradients-prev_gradients) < tol * np.abs(prev_gradients), 0, 1)) == 0:
+        if np.sum(np.where(np.abs(gradients-prev_gradients) < tol , 0, 1)) == 0:
             print('Wardrop equilibrium found:')
             G.WEflowsLinear[s][t] = x
             G.WEcostsLinear[s][t] = total_cost
@@ -219,7 +219,7 @@ def _SOlinearsolve(G, s, t, tol, maximum_iter, allpaths, a):
              for k in range(num_variables - 1)]
         )
         
-        if np.sum(np.where(np.abs(gradients-prev_gradients) < tol * np.abs(prev_gradients), 0, 1)) == 0:
+        if np.sum(np.where(np.abs(gradients-prev_gradients) < tol , 0, 1)) == 0:
             G.SOflowsLinear[s][t] = x
             G.SOcostsLinear[s][t] = obj_fun
             G.SOflowsLinear_edge[s][t] = allflows

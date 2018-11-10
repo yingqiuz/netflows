@@ -84,7 +84,7 @@ def _WEbprsolve(G, s, t, tol, maximum_iter, allpaths, a, u):
     allflows[G.adj == 0] = 0 #seems unnecessary... ?
 
     #obj_fun = BPR_WE_obj(allflows, a, weights).sum()
-    total_cost = (allflows *  BPR_cost(allflows, a, u).sum()
+    total_cost = (allflows *  BPR_cost(allflows, a, u)).sum()
                   
     print('The initial cost is %f, and the initial flow is ' % (total_cost), x)
     print('------solve the Wardrop Equilibrium------')
@@ -139,7 +139,7 @@ def _WEbprsolve(G, s, t, tol, maximum_iter, allpaths, a, u):
              for k in range(num_variables - 1)]
         )
         
-        if np.sum(np.where(np.abs(gradients-prev_gradients) < tol * np.abs(prev_gradients), 0, 1)) == 0: # convergence
+        if np.sum(np.where(np.abs(gradients-prev_gradients) < tol, 0, 1)) == 0: # convergence
             print('Wardrop equilibrium found:')
             print('Iteration %d: The total cost is %f, and the flow is ' % (k, total_cost), x)
             G.WEflowsBPR[s][t] = x
@@ -246,8 +246,8 @@ def _SObprsolve(G, s, t, tol, maximum_iter, allpaths, a, u):
         )
 
         # convergence?
-        if np.sum(np.where(np.abs(gradients-prev_gradients) < tol * np.abs(prev_gradients), 0, 1)) == 0:
-            print('Wardrop equilibrium found:')
+        if np.sum(np.where(np.abs(gradients-prev_gradients) < tol, 0, 1)) == 0:
+            print('System optimum found:')
             print('Iteration %d: The total cost is %f, and the flow is ' % (k, obj_fun), x)
             G.SOflowsBPR[s][t] = x
             G.SOcostsBPR[s][t] = obj_fun
