@@ -13,8 +13,10 @@ def WElinearsolve(G, s, t, tol = 1e-12, maximum_iter = 10000, cutoff = None, a =
     """
 
     if cutoff is None:
-        print("Warning: cutoff not specified. it may take hugh memory to find all paths")
-        cutoff = min(G.adj.shape)
+        print("Cutoff not specified: take shortest path distance + 1 as cutoff")
+        cutoff = G._dijkstra(s, t) + 1 + 1
+        if cutoff == 1:
+            return
 
     allpaths = G.findallpaths(s, t, cutoff)
     
@@ -35,8 +37,10 @@ def SOlinearsolve(G, s, t, tol=1e-12, maximum_iter = 10000, cutoff = None, a = N
     """
 
     if cutoff is None:
-        print("Warning: cutoff not specified. it may take huge memory to find all paths")
-        cutoff = min(G.adj.shape)
+        print("Cutoff not specified: take shortest path distance + 1 as cutoff")
+        cutoff = G._dijkstra(s, t) + 1 + 1
+        if cutoff == 1:
+            return
 
     allpaths = G.findallpaths(s, t, cutoff)
 

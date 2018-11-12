@@ -13,9 +13,12 @@ def WEbprsolve(G, s, t, tol = 1e-8, maximum_iter = 10000, cutoff = None, a = Non
     gamma: descent speed
     """
 
-    if cutoff == None:
-        print("Warning: cutoff not specified. it may take hugh memory to find all paths")
-        cutoff = min(G.adj.shape)
+    if cutoff is None:
+        print("Cutoff not specified: take shortest path distance + 1 as cutoff")
+        cutoff = G._dijkstra(s, t) + 1 + 1
+        if cutoff == 1:
+            return
+    # find all paths
     allpaths = G.findallpaths(s, t, cutoff)
 
     if a is None:
@@ -40,9 +43,12 @@ def SObprsolve(G, s, t, tol=1e-8, maximum_iter = 10000, cutoff = None, a = None,
     """
 
 
-    if cutoff == None:
-        print("Warning: cutoff not specified. it may take hugh memory to find all paths")
-        cutoff = min(G.adj.shape)
+    if cutoff is None:
+        print("Cutoff not specified: take shortest path distance + 1 as cutoff")
+        cutoff = G._dijkstra(s, t) + 1 + 1
+        if cutoff == 1:
+            return
+    # find all paths
     allpaths = G.findallpaths(s, t, cutoff)
 
     if a is None:
