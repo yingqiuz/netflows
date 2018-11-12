@@ -26,6 +26,6 @@ for row in range(G_mouse.adj.shape[0]):
                 WEaffinesolve(G_mouse, row, col, tol=1e-7, cutoff=3, maximum_iter=100000)
                 
 import pickle
-with open('G_mouse_linear.pickle', 'wb') as f:
+with open('G_mouse.pickle', 'wb') as f:
     pickle.dump({'G_mouse':G_mouse}, f, protocol=pickle.HIGHEST_PROTOCOL)
     
