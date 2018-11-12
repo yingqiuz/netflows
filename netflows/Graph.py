@@ -112,8 +112,8 @@ class Graph:
         t: destination
         """
         if cutoff == None:
-            cutoff = self._dijkstra(s, t) + 1
-            if cutoff == 0:
+            cutoff = self._dijkstra(s, t) + 1 + 1
+            if cutoff == 1: # i.e. path length = 0
                 return False
         allpaths = []
         num_vertices = np.max(self.adj.shape)    
