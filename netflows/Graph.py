@@ -3,6 +3,8 @@
 from __future__ import print_function
 import numpy as np
 
+from heapq import heappop, heappush
+
 
 # In[52]:
 
@@ -47,6 +49,29 @@ class Graph:
         self.WEcostsLinear, self.WEcostsAffine, self.WEcostsBPR = [ [[[] for k in range(self.adj.shape[1])] for kk in range(self.adj.shape[0])] ] * 3
         self.SOcostsLinear, self.SOcostsAffine, self.SOcostsBPR = [ [[[] for k in range(self.adj.shape[1])] for kk in range(self.adj.shape[0])] ] * 3
 
+    def _dijkstra(self, s, t):
+        """
+        :param s: source
+        :param t: target
+        :return: shortest distant
+        """
+        q, seen = [(0, s)], set()
+
+        while q:
+            (distance, v) = heappop(q)
+            if v not in seen:
+                seen.add(v)
+                if v == t:
+                    return distance
+
+                for u in np.nonzero(self.adj[v]):
+                    if u not in seen:
+                        heappush(q, (distance + 1, u))
+
+        return -1
+
+
+
     def _findallpath_recursive(self, v, u, visited, path, allpaths, cutoff):
         """
         adj: adj matrix
@@ -87,7 +112,9 @@ class Graph:
         t: destination
         """
         if cutoff == None:
-            cutoff = np.max(self.adj.shape)
+            cutoff = self._dijkstra(s, t) + 1
+            if cutoff == 0:
+                return False
         allpaths = []
         num_vertices = np.max(self.adj.shape)    
         visited = [False] * (num_vertices) # all vertices are unvisited at the beginning 
@@ -96,4 +123,6 @@ class Graph:
         self._findallpath_recursive(s, t, visited, path, allpaths, cutoff)
         self.allpaths[s][t] = allpaths
         return allpaths
-    
+
+
+
