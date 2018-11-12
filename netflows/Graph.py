@@ -64,7 +64,7 @@ class Graph:
                 if v == t:
                     return distance
 
-                for u in np.nonzero(self.adj[v]):
+                for u in np.nonzero(self.adj[v])[0]:
                     if u not in seen:
                         heappush(q, (distance + 1, u))
 
