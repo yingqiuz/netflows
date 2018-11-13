@@ -7,7 +7,7 @@ from netflows.funcs import SOlinearsolve, SOaffinesolve, SObprsolve
 
 # load mouse data
 import pickle
-with open('human033.pickle', 'rb') as f:
+with open('human033_conn.pickle', 'rb') as f:
     human033 = pickle.load(f)
     
 human033_adj = human033['human033_adj']
