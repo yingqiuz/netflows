@@ -43,11 +43,19 @@ class Graph:
 
         self.allpaths = [[[] for k in range(self.adj.shape[1])] for kk in range(self.adj.shape[0])] # store all paths in a 3D list
         self.WEflowsLinear, self.WEflowsAffine, self.WEflowsBPR = [ [[[] for k in range(self.adj.shape[1])] for kk in range(self.adj.shape[0])] ] * 3
-        self.WEflowsLinear_edge, self.WEflowsAffine_edge, self.WEflowsBPR_edge = [ [[[] for k in range(self.adj.shape[1])] for kk in range(self.adj.shape[0])] ] * 3        
+        self.WEflowsLinear_edge, self.WEflowsAffine_edge, self.WEflowsBPR_edge = [np.zeros(self.adj.shape)] * 3
+
         self.SOflowsLinear, self.SOflowsAffine, self.SOflowsBPR = [ [[[] for k in range(self.adj.shape[1])] for kk in range(self.adj.shape[0])] ] * 3
-        self.SOflowsLinear_edge, self.SOflowsAffine_edge, self.SOflowsBPR_edge = [ [[[] for k in range(self.adj.shape[1])] for kk in range(self.adj.shape[0])] ] * 3        
-        self.WEcostsLinear, self.WEcostsAffine, self.WEcostsBPR = [ [[[] for k in range(self.adj.shape[1])] for kk in range(self.adj.shape[0])] ] * 3
-        self.SOcostsLinear, self.SOcostsAffine, self.SOcostsBPR = [ [[[] for k in range(self.adj.shape[1])] for kk in range(self.adj.shape[0])] ] * 3
+        self.SOflowsLinear_edge, self.SOflowsAffine_edge, self.SOflowsBPR_edge = [np.zeros(self.adj.shape)] * 3
+
+        self.WEcostsLinear, self.WEcostsAffine, self.WEcostsBPR = np.zeros(self.adj.shape) #[ [[[] for k in range(self.adj.shape[1])] for kk in range(self.adj.shape[0])] ] * 3
+        self.WEcostsLinear_edge, self.WEcostsAffine_edge, self.WEcostsBPR_edge = [np.zeros(self.adj.shape)] * 3
+
+        self.SOcostsLinear, self.SOcostsAffine, self.SOcostsBPR = np.zeros(self.adj.shape) #[ [[[] for k in range(self.adj.shape[1])] for kk in range(self.adj.shape[0])] ] * 3
+        self.SOcostsLinear_edge, self.SOcostsAffine_edge, self.SOcostsBPR_edge = [np.zeros(self.adj.shape)] * 3
+
+        # how many single source-target pairs are calculated
+        self.total_pair = 0
 
     def _dijkstra(self, s, t):
         """
