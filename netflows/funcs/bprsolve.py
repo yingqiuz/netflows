@@ -20,8 +20,6 @@ def WEbprsolve(G, s, t, tol = 1e-8, maximum_iter = 10000, cutoff = None, a = Non
             return
     # find all paths
     allpaths = G.findallpaths(s, t, cutoff)
-    if len(allpaths) < 2:
-        return
 
     if a is None:
         a = G.adj_dist
@@ -52,8 +50,6 @@ def SObprsolve(G, s, t, tol=1e-8, maximum_iter = 10000, cutoff = None, a = None,
             return
     # find all paths
     allpaths = G.findallpaths(s, t, cutoff)
-    if len(allpaths) < 2:
-        return
 
     if a is None:
         a = G.adj_dist
@@ -97,6 +93,12 @@ def _WEbprsolve(G, s, t, tol, maximum_iter, allpaths, a, u):
     total_cost = (allflows *  BPR_cost(allflows, a, u)).sum()
                   
     print('The initial cost is %f, and the initial flow is ' % (total_cost), x)
+    if num_variables < 2:
+        G.WEflowsBPR[s, t] = 1
+        G.WEcostsBPR[s, t] = total_cost
+        G.WEflowsBPR_edge += allflows
+        return total_cost, x
+
     print('------solve the Wardrop Equilibrium------')
     gradients = np.array(
         [np.sum( BPR_cost(allflows, a, u) * (
@@ -152,9 +154,9 @@ def _WEbprsolve(G, s, t, tol, maximum_iter, allpaths, a, u):
         if np.sum(np.where(np.abs(gradients-prev_gradients) < tol, 0, 1)) == 0: # convergence
             print('Wardrop equilibrium found:')
             print('Iteration %d: The total cost is %f, and the flow is ' % (k, total_cost), x)
-            G.WEflowsBPR[s][t] = x
-            G.WEcostsBPR[s][t] = total_cost
-            G.WEflowsBPR_edge[s][t] = allflows
+            G.WEflowsBPR[s, t] = 1
+            G.WEcostsBPR[s, t] = total_cost
+            G.WEflowsBPR_edge += allflows
             return total_cost, x
 
         gamma = np.inner(x[:-1] - prev_x[:-1], gradients - prev_gradients) / \
@@ -196,6 +198,12 @@ def _SObprsolve(G, s, t, tol, maximum_iter, allpaths, a, u):
     obj_fun = BPR_SO_obj(allflows, a, u).sum() # objective function is the total cost
                   
     print('The initial cost is %f, and the initial flow is ' % (obj_fun), x)
+    if num_variables < 2:
+        G.SOflowsAffine[s, t] = 1
+        G.SOcostsAffine[s, t] = obj_fun
+        G.SOflowsAffine_edge += allflows
+        return obj_fun, x
+
     print('------solve the system optimal flow------')
                   
     gradients = np.array(
@@ -259,9 +267,9 @@ def _SObprsolve(G, s, t, tol, maximum_iter, allpaths, a, u):
         if np.sum(np.where(np.abs(gradients-prev_gradients) < tol, 0, 1)) == 0:
             print('System optimum found:')
             print('Iteration %d: The total cost is %f, and the flow is ' % (k, obj_fun), x)
-            G.SOflowsBPR[s][t] = x
-            G.SOcostsBPR[s][t] = obj_fun
-            G.SOflowsBPR_edge[s][t] = allflows
+            G.SOflowsBPR[s, t] = 1
+            G.SOcostsBPR[s, t] = obj_fun
+            G.SOflowsBPR_edge += allflows
             return obj_fun, x
                   
         # new step size

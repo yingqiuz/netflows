@@ -20,8 +20,6 @@ def WEaffinesolve(G, s, t, tol = 1e-12, maximum_iter = 100000, cutoff = None, a 
             return
     # find all paths
     allpaths = G.findallpaths(s, t, cutoff)
-    if len(allpaths) < 2:
-        return
 
     if a is None:
         a = G.rpl_weights
@@ -49,8 +47,6 @@ def SOaffinesolve(G, s, t, tol=1e-12, maximum_iter = 100000, cutoff = None, a = 
             return
     # find all paths
     allpaths = G.findallpaths(s, t, cutoff)
-    if len(allpaths) < 2:
-        return
 
     if a is None:
         a = G.rpl_weights
@@ -97,6 +93,13 @@ def _WEaffinesolve(G, s, t, tol, maximum_iter, allpaths, a, a0):
     #total_traveltime = np.sum( affine_cost(allflows, G.adj_dist, a0=a0)) useless for now...
     
     print('The initial cost is %f, and the initial flow is ' % (total_cost), x)
+
+    if num_variables < 2:
+        G.WEflowsAffine[s, t] = 1
+        G.WEcostsAffine[s, t] = total_cost
+        G.WEflowsAffine_edge += allflows
+        return total_cost, x
+
     print('------solve the Wardrop Equilibrium------')
     # initial gradients
     gradients = np.array(
@@ -155,9 +158,9 @@ def _WEaffinesolve(G, s, t, tol, maximum_iter, allpaths, a, a0):
         if np.where(np.abs(gradients - prev_gradients) < tol, 0, 1).sum() == 0: # convergence
             print('Wardrop equilibrium found:')
             print('Iteration %d: The total cost is %f, and the flow is ' % (k, total_cost), x)
-            G.WEflowsAffine[s][t] = x
-            G.WEcostsAffine[s][t] = total_cost
-            G.WEflowsAffine_edge[s][t] = allflows
+            G.WEflowsAffine[s, t] = 1
+            G.WEcostsAffine[s, t] = total_cost
+            G.WEflowsAffine_edge += allflows
             return total_cost, x
         
         # new step size
@@ -198,6 +201,12 @@ def _SOaffinesolve(G, s, t, tol, maximum_iter, allpaths, a, a0):
     obj_fun = affine_SO_obj(allflows, a, a0).sum()  # objective function is the total cost function
   
     print('The initial cost is %f, and the initial flow is ' % (obj_fun), x)
+    if num_variables < 2:
+        G.SOflowsAffine[s, t] = 1
+        G.SOcostsAffine[s, t] = obj_fun
+        G.SOflowsAffine_edge += allflows
+        return obj_fun, x
+
     print('------solve the system optimal flow------')
 
     # initial gradients
@@ -266,9 +275,9 @@ def _SOaffinesolve(G, s, t, tol, maximum_iter, allpaths, a, a0):
         if np.where(np.abs(gradients - prev_gradients) < tol, 0, 1).sum() == 0:
             print('System optimum found:')
             print('Iteration %d: The total cost is %f, and the flow is ' % (k, obj_fun), x)
-            G.SOflowsAffine[s][t] = x
-            G.SOcostsAffine[s][t] = obj_fun
-            G.SOflowsAffine_edge[s][t] = allflows
+            G.SOflowsAffine[s, t] = 1
+            G.SOcostsAffine[s, t] = obj_fun
+            G.SOflowsAffine_edge += allflows
             return obj_fun, x
 
         # update step size
