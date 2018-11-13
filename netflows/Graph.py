@@ -124,5 +124,17 @@ class Graph:
         self.allpaths[s][t] = allpaths
         return allpaths
 
+    def construct_path_arrays(self, s, t):
+
+        path_arrays = np.empty((0, self.adj.shape[0], self.adj.shape[1]))  # list of matrix to store path flows
+
+        for path in self.allpaths[s][t]:
+            path_array_tmp = np.zeros(self.adj.shape)
+            index_x = [path[k] for k in range(len(path) - 1)]  # x index of the adj matrix
+            index_y = [path[k] for k in range(1, len(path))]  # y index of the adj matrix
+            path_array_tmp[index_x, index_y] = 1
+            path_arrays = np.append(path_arrays, path_array_tmp[np.newaxis, :], axis=0)
+
+        return path_arrays
 
 
