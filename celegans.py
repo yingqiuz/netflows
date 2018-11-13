@@ -1,0 +1,44 @@
+from netflows import Graph
+import numpy as np
+from scipy.io import loadmat
+
+from netflows.funcs import WElinearsolve, WEaffinesolve, WEbprsolve
+from netflows.funcs import SOlinearsolve, SOaffinesolve, SObprsolve
+
+import pickle
+
+with open('celegans_conn.pickle', 'rb') as f:
+    celegans = pickle.load(f)
+
+celegans_adj1 = celegans['celegans_adj_1']
+celegans_adj2 = celegans['celegans_adj_2']
+celegans_dist = celegans['celegans_dist']
+
+G_celegans1 = Graph(adj=celegans_adj1, dist=celegans_dist, weights=celegans_adj1)
+
+for row in range(G_celegans1.adj.shape[0]):
+    for col in range(G_celegans1.adj.shape[1]):
+        if row == col:
+            continue
+        else:
+            print('now computing the WE flow of node pair (%d, %d)' % (row, col))
+            if G_celegans1.findallpaths(row, col):
+                WElinearsolve(G_celegans1, row, col, tol=1e-7, maximum_iter=100000)
+                WEaffinesolve(G_celegans1, row, col, tol=1e-7, maximum_iter=100000)
+
+G_celegans2 = Graph(adj=celegans_adj2, dist=celegans_dist, weights=celegans_adj2)
+
+for row in range(G_celegans2.adj.shape[0]):
+    for col in range(G_celegans2.adj.shape[1]):
+        if row == col:
+            continue
+        else:
+            print('now computing the WE flow of node pair (%d, %d)' % (row, col))
+            if G_celegans2.findallpaths(row, col):
+                WElinearsolve(G_celegans2, row, col, tol=1e-7, maximum_iter=100000)
+                WEaffinesolve(G_celegans2, row, col, tol=1e-7, maximum_iter=100000)
+
+with open('G_celegans.pickle', 'wb') as f:
+    pickle.dump({'G_celegans1': G_celegans1, 'G_celegans2':G_celegans2}, f)
+
+
