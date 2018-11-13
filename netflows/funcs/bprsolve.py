@@ -20,6 +20,8 @@ def WEbprsolve(G, s, t, tol = 1e-8, maximum_iter = 10000, cutoff = None, a = Non
             return
     # find all paths
     allpaths = G.findallpaths(s, t, cutoff)
+    if len(allpaths) < 2:
+        return
 
     if a is None:
         a = G.adj_dist
@@ -50,6 +52,8 @@ def SObprsolve(G, s, t, tol=1e-8, maximum_iter = 10000, cutoff = None, a = None,
             return
     # find all paths
     allpaths = G.findallpaths(s, t, cutoff)
+    if len(allpaths) < 2:
+        return
 
     if a is None:
         a = G.adj_dist

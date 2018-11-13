@@ -15,10 +15,12 @@ def WElinearsolve(G, s, t, tol = 1e-12, maximum_iter = 10000, cutoff = None, a =
     if cutoff is None:
         print("Cutoff not specified: take shortest path distance + 1 as cutoff")
         cutoff = G._dijkstra(s, t) + 1 + 1
-        if cutoff == 1:
+        if cutoff < 3:
             return
 
     allpaths = G.findallpaths(s, t, cutoff)
+    if len(allpaths) < 2:
+        return
     
     if a is None:
         a = G.dist_weight_ratio
@@ -39,10 +41,12 @@ def SOlinearsolve(G, s, t, tol=1e-12, maximum_iter = 10000, cutoff = None, a = N
     if cutoff is None:
         print("Cutoff not specified: take shortest path distance + 1 as cutoff")
         cutoff = G._dijkstra(s, t) + 1 + 1
-        if cutoff == 1:
+        if cutoff < 3:
             return
 
     allpaths = G.findallpaths(s, t, cutoff)
+    if len(allpaths) < 2:
+        return
 
     if a is None:
         a = G.dist_weight_ratio
