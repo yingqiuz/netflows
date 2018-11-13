@@ -22,9 +22,8 @@ for row in range(G_celegans1.adj.shape[0]):
             continue
         else:
             print('now computing the WE flow of node pair (%d, %d)' % (row, col))
-            if G_celegans1.findallpaths(row, col):
-                WElinearsolve(G_celegans1, row, col, tol=1e-7, maximum_iter=100000)
-                WEaffinesolve(G_celegans1, row, col, tol=1e-7, maximum_iter=100000)
+            WElinearsolve(G_celegans1, row, col, tol=1e-7, maximum_iter=100000, cutoff=None)
+            WEaffinesolve(G_celegans1, row, col, tol=1e-7, maximum_iter=100000, cutoff=None)
 
 G_celegans2 = Graph(adj=celegans_adj2, dist=celegans_dist, weights=celegans_adj2)
 
@@ -34,9 +33,8 @@ for row in range(G_celegans2.adj.shape[0]):
             continue
         else:
             print('now computing the WE flow of node pair (%d, %d)' % (row, col))
-            if G_celegans2.findallpaths(row, col):
-                WElinearsolve(G_celegans2, row, col, tol=1e-7, maximum_iter=100000)
-                WEaffinesolve(G_celegans2, row, col, tol=1e-7, maximum_iter=100000)
+            WElinearsolve(G_celegans2, row, col, tol=1e-7, maximum_iter=100000, cutoff=None)
+            WEaffinesolve(G_celegans2, row, col, tol=1e-7, maximum_iter=100000, cutoff=None)
 
 with open('G_celegans.pickle', 'wb') as f:
     pickle.dump({'G_celegans1': G_celegans1, 'G_celegans2':G_celegans2}, f)

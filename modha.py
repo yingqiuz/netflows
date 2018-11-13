@@ -20,9 +20,8 @@ for row in range(G_modha.adj.shape[0]):
             continue
         else:
             print('now computing the WE flow of node pair (%d, %d)' % (row, col))
-            if G_modha.findallpaths(row, col):
-                WElinearsolve(G_modha, row, col, tol=1e-7, maximum_iter=100000)
-                WEaffinesolve(G_modha, row, col, tol=1e-7, maximum_iter=100000)
+            WElinearsolve(G_modha, row, col, tol=1e-7, maximum_iter=100000)
+            WEaffinesolve(G_modha, row, col, tol=1e-7, maximum_iter=100000)
                 
 with open('G_modha.pickle', 'wb') as f:
     pickle.dump({'G_modha':G_modha}, f)
