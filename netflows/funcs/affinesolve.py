@@ -140,7 +140,7 @@ def _WEaffinesolve(G, s, t, tol, maximum_iter, allpaths, a, a0):
         diff_value = obj_fun - prev_obj_fun #useless.....
         total_cost = (allflows * affine_cost(allflows, a, a0)).sum()
         
-        print('Iteration %d: The total cost is %f, and the flow is ' % (k, total_cost), x)
+        #print('Iteration %d: The total cost is %f, and the flow is ' % (k, total_cost), x)
         # new gradients and stepsize
         gradients = np.array(
             [np.sum( affine_cost(allflows, a, a0) * (
@@ -245,7 +245,7 @@ def _SOaffinesolve(G, s, t, tol, maximum_iter, allpaths, a, a0):
         allflows = np.sum(path_arrays * x.reshape(num_variables, 1, 1), axis=0)
         obj_fun = affine_SO_obj(allflows, a, a0).sum()
         diff_value = obj_fun - prev_obj_fun
-        print('Iteration %d: The total cost is %f, and the flow is ' % (k, obj_fun), x)
+        #print('Iteration %d: The total cost is %f, and the flow is ' % (k, obj_fun), x)
 
         # update gradients and step size
         gradients = np.array(

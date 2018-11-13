@@ -136,7 +136,7 @@ def _WEbprsolve(G, s, t, tol, maximum_iter, allpaths, a, u):
 
         total_cost = (allflows *  BPR_cost(allflows, a, u)).sum()
 
-        print('Iteration %d: The total cost is %f, and the flow is ' % (k, total_cost), x)
+        #print('Iteration %d: The total cost is %f, and the flow is ' % (k, total_cost), x)
         # new gradients
         gradients = np.array(
             [np.sum( BPR_cost(allflows, a, u) * (
@@ -236,7 +236,7 @@ def _SObprsolve(G, s, t, tol, maximum_iter, allpaths, a, u):
         allflows = np.sum(path_arrays * x.reshape(num_variables, 1, 1), axis=0)
         obj_fun = BPR_SO_obj(allflows, a, u).sum()
 
-        print('Iteration %d: The total cost is %f, and the flow is ' % (k, obj_fun), x)
+        #print('Iteration %d: The total cost is %f, and the flow is ' % (k, obj_fun), x)
                   
         # update gradients
         gradients = np.array(
