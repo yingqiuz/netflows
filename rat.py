@@ -5,12 +5,11 @@ from scipy.io import loadmat
 from netflows.funcs import WElinearsolve, WEaffinesolve, WEbprsolve
 from netflows.funcs import SOlinearsolve, SOaffinesolve, SObprsolve
 
-data = loadmat('/Users/yingqiuzheng/Desktop/Research/selfish_routing/data/G.mat')
-data = data['G'][0][0]
-
-# load rat data
-rat = data[2][0][0]
-rat_adj = rat[0]
+import pickle
+with open('rat_conn.pickle', 'rb') as f:
+    rat = pickle.load(f)
+    
+rat_adj = rat['rat_adj']
 
 G_rat = Graph(adj = rat_adj, dist=np.ones(rat_adj.shape), weights=rat_adj)
 

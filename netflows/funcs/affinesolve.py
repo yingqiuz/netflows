@@ -4,7 +4,7 @@ from netflows.funcs.gradfuncs import we_affine_grad,so_affine_grad
 
 import numpy as np
 
-def WEaffinesolve(G, s, t, tol = 1e-12, maximum_iter = 10000, cutoff = None, a = None, a0 = None):
+def WEaffinesolve(G, s, t, tol = 1e-12, maximum_iter = 100000, cutoff = None, a = None, a0 = None):
     """
     single pair Wardrop Equilibrium flow
     s: source
@@ -30,7 +30,7 @@ def WEaffinesolve(G, s, t, tol = 1e-12, maximum_iter = 10000, cutoff = None, a =
 
     return _WEaffinesolve(G, s, t, tol, maximum_iter, allpaths, a, a0)
 
-def SOaffinesolve(G, s, t, tol=1e-12, maximum_iter = 10000, cutoff = None, a = None, a0 = None):
+def SOaffinesolve(G, s, t, tol=1e-12, maximum_iter = 100000, cutoff = None, a = None, a0 = None):
     """
     :param G:
     :param s:
@@ -222,14 +222,14 @@ def _SOaffinesolve(G, s, t, tol, maximum_iter, allpaths, a, a0):
         prev_obj_fun = np.copy(obj_fun)
         prev_x = np.copy(x)
         prev_gradients = np.copy(gradients)
-        
+
         # update x
         x[:-1] = prev_x[:-1] - gamma * gradients
         x[-1] = 1 - np.sum(x[:-1])  # the flow in the last path
-
         # if at least one of the flows is negative, change the gradients
         if np.sum(np.where(x < 0, 1, 0)) > 0:  # flow in at least one path is negtive
             gradients[x[:-1]< 0 ] =  prev_x[:-1][x[:-1]<0] / gamma
+
             x[:-1] = prev_x[:-1] - gamma * gradients
             x[-1] = 1 - np.sum(x[:-1])  # the flow in the last path
             # if the flow on the last path is still negative
