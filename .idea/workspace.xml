@@ -2,9 +2,7 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="12d2d747-a25b-4562-a91c-5913d8d6682c" name="Default Changelist" comment="">
-      <change beforePath="$PROJECT_DIR$/celegans.py" beforeDir="false" afterPath="$PROJECT_DIR$/celegans.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/modha.py" beforeDir="false" afterPath="$PROJECT_DIR$/modha.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/rat.py" beforeDir="false" afterPath="$PROJECT_DIR$/rat.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/mouse_conn.pickle" beforeDir="false" afterPath="$PROJECT_DIR$/mouse_conn.pickle" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/test.ipynb" beforeDir="false" afterPath="$PROJECT_DIR$/test.ipynb" afterDir="false" />
     </list>
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
@@ -61,7 +59,7 @@
       <file pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/netflows/funcs/affinesolve.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="56">
+            <state relative-caret-position="-880">
               <caret line="32" column="59" selection-start-line="32" selection-start-column="59" selection-end-line="32" selection-end-column="59" />
               <folding>
                 <element signature="e#0#38#0" expanded="true" />
@@ -105,7 +103,7 @@
           </provider>
         </entry>
       </file>
-      <file pinned="false" current-in-tab="true">
+      <file pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/rat.py">
           <provider selected="true" editor-type-id="text-editor">
             <state relative-caret-position="238">
@@ -117,10 +115,11 @@
           </provider>
         </entry>
       </file>
-      <file pinned="false" current-in-tab="false">
+      <file pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/mouse.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="-200">
+            <state relative-caret-position="225">
+              <caret line="15" column="68" lean-forward="true" selection-start-line="8" selection-end-line="15" selection-end-column="68" />
               <folding>
                 <element signature="e#0#26#0" expanded="true" />
               </folding>
@@ -480,7 +479,7 @@
     <frame x="0" y="23" width="1280" height="727" extended-state="0" />
     <editor active="true" />
     <layout>
-      <window_info active="true" content_ui="combo" id="Project" order="0" visible="true" weight="0.2536349" />
+      <window_info content_ui="combo" id="Project" order="0" visible="true" weight="0.2536349" />
       <window_info id="Structure" order="1" side_tool="true" weight="0.25" />
       <window_info id="Favorites" order="2" side_tool="true" />
       <window_info anchor="bottom" id="Message" order="0" />
@@ -494,7 +493,7 @@
       <window_info anchor="bottom" id="Version Control" order="8" show_stripe_button="false" />
       <window_info anchor="bottom" id="Database Changes" order="9" show_stripe_button="false" />
       <window_info anchor="bottom" id="Terminal" order="10" weight="0.32941177" />
-      <window_info anchor="bottom" id="Python Console" order="11" visible="true" weight="0.40944883" />
+      <window_info active="true" anchor="bottom" id="Python Console" order="11" visible="true" weight="0.40944883" />
       <window_info anchor="bottom" id="Event Log" order="12" side_tool="true" weight="0.32941177" />
       <window_info anchor="right" id="Commander" internal_type="SLIDING" order="0" type="SLIDING" weight="0.4" />
       <window_info anchor="right" id="Ant Build" order="1" weight="0.25" />
@@ -617,16 +616,6 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/netflows/funcs/affinesolve.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="56">
-          <caret line="32" column="59" selection-start-line="32" selection-start-column="59" selection-end-line="32" selection-end-column="59" />
-          <folding>
-            <element signature="e#0#38#0" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/netflows/funcs/linearsolve.py">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="44">
@@ -650,15 +639,6 @@
     <entry file="file://$PROJECT_DIR$/human033.py">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="-97">
-          <folding>
-            <element signature="e#0#26#0" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/mouse.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="-200">
           <folding>
             <element signature="e#0#26#0" expanded="true" />
           </folding>
@@ -689,6 +669,26 @@
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="238">
           <caret line="21" column="83" lean-forward="true" selection-start-line="21" selection-start-column="12" selection-end-line="21" selection-end-column="83" />
+          <folding>
+            <element signature="e#0#26#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/netflows/funcs/affinesolve.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="-880">
+          <caret line="32" column="59" selection-start-line="32" selection-start-column="59" selection-end-line="32" selection-end-column="59" />
+          <folding>
+            <element signature="e#0#38#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/mouse.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="225">
+          <caret line="15" column="68" lean-forward="true" selection-start-line="8" selection-end-line="15" selection-end-column="68" />
           <folding>
             <element signature="e#0#26#0" expanded="true" />
           </folding>
