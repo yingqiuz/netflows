@@ -19,7 +19,7 @@ for row in range(G_rat.adj.shape[0]):
             continue
         else:
             print('now computing the WE flow of node pair (%d, %d)' % (row, col))
-            WElinearsolve(G_rat, row, col, tol=1e-7, cutoff=4, maximum_iter=100000)
+            WElinearsolve(G_rat, row, col, tol=1e-7, cutoff=None, maximum_iter=100000)
                 
                 
                 
