@@ -10,7 +10,7 @@ import pickle
 with open('rat_null.pickle', 'rb') as f:
     rat_null = pickle.load(f)
 
-rat_adj = rat_null['rat_adj_rand']
+rat_adj = rat_null['rat_adj_rand'][0]
 
 G_rat = Graph(adj=rat_adj, dist=np.ones(rat_adj.shape), weights=rat_adj)
 
