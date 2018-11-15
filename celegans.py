@@ -23,7 +23,7 @@ for row in range(G_celegans1.adj.shape[0]):
         else:
             print('now computing the WE flow of node pair (%d, %d)' % (row, col))
             WElinearsolve(G_celegans1, row, col, tol=1e-7, maximum_iter=100000, cutoff=None)
-            WEaffinesolve(G_celegans1, row, col, tol=1e-7, maximum_iter=100000, cutoff=None)
+            #WEaffinesolve(G_celegans1, row, col, tol=1e-7, maximum_iter=100000, cutoff=None)
 
 G_celegans2 = Graph(adj=celegans_adj2, dist=celegans_dist, weights=celegans_adj2)
 

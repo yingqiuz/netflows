@@ -22,7 +22,7 @@ for row in range(G_mouse.adj.shape[0]):
         else:
             print('now computing the WE flow of node pair (%d, %d)' % (row, col))
             WElinearsolve(G_mouse, row, col, tol=1e-7, cutoff=None, maximum_iter=100000)
-            WEaffinesolve(G_mouse, row, col, tol=1e-7, cutoff=None, maximum_iter=100000)
+            #WEaffinesolve(G_mouse, row, col, tol=1e-7, cutoff=None, maximum_iter=100000)
                 
 with open('G_mouse.pickle', 'wb') as f:
     pickle.dump({'G_mouse':G_mouse}, f, protocol=pickle.HIGHEST_PROTOCOL)

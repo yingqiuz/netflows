@@ -43,4 +43,4 @@ celegans_dist = celegans[2]
 #%%capture
 G = Graph(adj = mouse_adj, dist=mouse_dist, weights=mouse_adj)
 #G.findallpaths(0, 3, cutoff=3)
-SOaffinesolve(G, 0, 67, tol=1e-8, cutoff=3)
+WEaffinesolve(G, 0, 67, tol=1e-8, cutoff=None)
