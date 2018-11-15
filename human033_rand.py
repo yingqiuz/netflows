@@ -11,7 +11,7 @@ import pickle
 with open('human033_null.pickle', 'rb') as f:
     human033 = pickle.load(f)
 
-human033_adj = human033['human033_adj_rand']
+human033_adj = human033['human033_adj_rand'][0]
 human033_dist = human033['human033_dist']
 
 G_human033 = Graph(adj=human033_adj, dist=human033_dist, weights=human033_adj)

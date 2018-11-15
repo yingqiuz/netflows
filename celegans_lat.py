@@ -11,7 +11,7 @@ with open('celegans_null.pickle', 'rb') as f:
     celegans = pickle.load(f)
 
 #celegans_adj1 = celegans['celegans_adj_1']
-celegans_adj2 = celegans['celegans_adj_2_lat']
+celegans_adj2 = celegans['celegans_adj_2_lat'][0]
 celegans_dist = celegans['celegans_dist']
 
 # G_celegans1 = Graph(adj=celegans_adj1, dist=celegans_dist, weights=celegans_adj1)

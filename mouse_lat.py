@@ -11,7 +11,7 @@ import pickle
 with open('mouse_null.pickle', 'rb') as f:
     mouse = pickle.load(f)
 
-mouse_adj = mouse['mouse_adj_lat']
+mouse_adj = mouse['mouse_adj_lat'][0]
 mouse_dist = mouse['mouse_dist']
 
 G_mouse = Graph(adj=mouse_adj, dist=mouse_dist, weights=mouse_adj)

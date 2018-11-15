@@ -10,7 +10,7 @@ import pickle
 with open('modha_null.pickle', 'rb') as f:
     modha = pickle.load(f)
 
-modha_adj = modha['modha_adj_rand']
+modha_adj = modha['modha_adj_rand'][0]
 modha_dist = modha['modha_dist']
 
 G_modha = Graph(adj=modha_adj, dist=modha_dist, weights=modha_adj)
