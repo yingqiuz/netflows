@@ -99,7 +99,7 @@ def _WEbprsolve(G, s, t, tol, maximum_iter, allpaths, a, u):
         G.WEcostsBPR[s, t] = total_cost_sum
         G.WEflowsBPR_edge += allflows
         G.WEcostsBPR_edge += total_cost
-        return total_cost_sum, x
+        return x, allflows, total_cost_sum, total_cost
 
     print('------solve the Wardrop Equilibrium------')
     gradients = np.array(
@@ -161,7 +161,7 @@ def _WEbprsolve(G, s, t, tol, maximum_iter, allpaths, a, u):
             G.WEcostsBPR[s, t] = total_cost_sum
             G.WEflowsBPR_edge += allflows
             G.WEcostsBPR_edge += total_cost
-            return total_cost_sum, x
+            return x, allflows, total_cost_sum, total_cost
 
         gamma = np.inner(x[:-1] - prev_x[:-1], gradients - prev_gradients) / \
                 np.inner(gradients - prev_gradients, gradients - prev_gradients)
@@ -207,7 +207,7 @@ def _SObprsolve(G, s, t, tol, maximum_iter, allpaths, a, u):
         G.SOcostsBPR[s, t] = obj_fun
         G.SOflowsBPR_edge += allflows
         G.SOcostsBPR_edge += total_cost
-        return obj_fun, x
+        return x, allflows, obj_fun, total_cost
 
     print('------solve the system optimal flow------')
                   
@@ -276,7 +276,7 @@ def _SObprsolve(G, s, t, tol, maximum_iter, allpaths, a, u):
             G.SOcostsBPR[s, t] = obj_fun
             G.SOflowsBPR_edge += allflows
             G.SOcostsBPR_edge += total_cost
-            return obj_fun, x
+            return x, allflows, obj_fun, total_cost
                   
         # new step size
         gamma = np.inner(x[:-1] - prev_x[:-1], gradients - prev_gradients) / \

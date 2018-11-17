@@ -100,7 +100,7 @@ def _WEaffinesolve(G, s, t, tol, maximum_iter, allpaths, a, a0):
         G.WEcostsAffine[s, t] = total_cost_sum
         G.WEflowsAffine_edge += allflows
         G.WEcostsAffine_edge += total_cost
-        return total_cost_sum, x
+        return x, allflows, total_cost_sum, total_cost
 
     print('------solve the Wardrop Equilibrium------')
     # initial gradients
@@ -165,7 +165,7 @@ def _WEaffinesolve(G, s, t, tol, maximum_iter, allpaths, a, a0):
             G.WEcostsAffine[s, t] = total_cost_sum
             G.WEflowsAffine_edge += allflows
             G.WEcostsAffine_edge += total_cost
-            return total_cost_sum, x
+            return x, allflows, total_cost_sum, total_cost
 
         # new step size
         gamma = np.inner(x[:-1] - prev_x[:-1], gradients - prev_gradients) / \
@@ -210,7 +210,7 @@ def _SOaffinesolve(G, s, t, tol, maximum_iter, allpaths, a, a0):
         G.SOcostsAffine[s, t] = obj_fun
         G.SOflowsAffine_edge += allflows
         G.SOcostsAffine_edge += total_cost
-        return obj_fun, x
+        return x, allflows, obj_fun, total_cost
 
     print('------solve the system optimal flow------')
 
@@ -285,7 +285,7 @@ def _SOaffinesolve(G, s, t, tol, maximum_iter, allpaths, a, a0):
             G.SOcostsAffine[s, t] = obj_fun
             G.SOflowsAffine_edge += allflows
             G.SOcostsAffine_edge += total_cost
-            return obj_fun, x
+            return x, allflows, obj_fun, total_cost
 
         # update step size
         gamma = np.inner(x[:-1] - prev_x[:-1], gradients - prev_gradients) / \

@@ -79,7 +79,7 @@ def _WElinearsolve(G, s, t, tol, maximum_iter, allpaths, a):
         G.WEcostsLinear[s, t] = total_cost_sum
         G.WEflowsLinear_edge += allflows
         G.WEcostsLinear_edge += total_cost
-        return total_cost_sum, x
+        return x, allflows, total_cost_sum, total_cost
 
     print('------solve the Wardrop Equilibrium------')
 
@@ -137,7 +137,7 @@ def _WElinearsolve(G, s, t, tol, maximum_iter, allpaths, a):
             G.WEflowsLinear_edge += allflows
             G.WEcostsLinear_edge += total_cost
             print('Iteration %d: The total cost is %f, and the flow is ' % (k, total_cost_sum), x)
-            return total_cost_sum, x
+            return x, allflows, total_cost_sum, total_cost
 
         gamma = np.inner(x[:-1] - prev_x[:-1], gradients - prev_gradients) / \
                 np.inner(gradients - prev_gradients, gradients - prev_gradients)
@@ -179,7 +179,7 @@ def _SOlinearsolve(G, s, t, tol, maximum_iter, allpaths, a):
         G.SOcostsLinear[s, t] = obj_fun
         G.SOflowsLinear_edge += allflows
         G.SOcostsLinear_edge += total_cost
-        return obj_fun, x
+        return x, allflows, obj_fun, total_cost
 
     print('------solve the system optimal flow------')
 
@@ -247,7 +247,7 @@ def _SOlinearsolve(G, s, t, tol, maximum_iter, allpaths, a):
             G.SOcostsLinear_edge += total_cost
             print('System optimum found:')
             print('Iteration %d: The total cost is %f, and the flow is ' % (k, obj_fun), x)
-            return obj_fun, x
+            return x, allflows, obj_fun, total_cost
 
         gamma = np.inner(x[:-1] - prev_x[:-1], gradients - prev_gradients) \
                 / np.inner(gradients - prev_gradients, gradients - prev_gradients)
