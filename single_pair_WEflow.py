@@ -20,7 +20,7 @@ def construct_data():
         with open('data/' + parameters['dist'] + '_dist.pickle', 'rb') as f:
             dist = pickle.load(f)
     except:
-        dist = np.zeros(adj.shape)
+        dist = np.ones(adj.shape)
 
     return adj, dist, parameters
 
