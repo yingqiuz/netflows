@@ -29,8 +29,8 @@ if __name__ == '__main__':
     adj, dist, parameters = construct_data()
     G = Graph(adj=adj, dist=dist, weights=adj)
 
-    s = parameters['source']
-    t = parameters['target']
+    s = parameters['s']
+    t = parameters['t']
     try:
         x, allflows, total_cost_sum, total_cost = WElinearsolve(G, int(s), int(t), cutoff=None, maximum_iter=100000,
                                                             tol=1e-8)
