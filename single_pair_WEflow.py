@@ -31,12 +31,15 @@ if __name__ == '__main__':
 
     s = parameters['source']
     t = parameters['target']
-
-    x, allflows, total_cost_sum, total_cost = WElinearsolve(G, int(s), int(t), cutoff=None, maximum_iter=100000,
+    try:
+        x, allflows, total_cost_sum, total_cost = WElinearsolve(G, int(s), int(t), cutoff=None, maximum_iter=100000,
                                                             tol=1e-8)
 
-    filename = 'results/' + parameters['adj'] + '_WE_' + s + '_' + t + '.pickle'
+        filename = 'results/' + parameters['adj'] + '_WE_' + s + '_' + t + '.pickle'
 
-    with open(filename, 'wb') as f:
-        pickle.dump({'allflows': allflows, 'total_cost_sum': total_cost_sum, 'total_cost': total_cost},
-                    f, protocol=pickle.HIGHEST_PROTOCOL)
+        with open(filename, 'wb') as f:
+            pickle.dump({'allflows': allflows, 'total_cost_sum': total_cost_sum, 'total_cost': total_cost},
+                        f, protocol=pickle.HIGHEST_PROTOCOL)
+
+    except:
+        print('no WE found')
