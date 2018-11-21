@@ -4,6 +4,9 @@ import pickle
 from netflows import Graph
 from netflows.funcs import WElinearsolve, WEaffinesolve, WEbprsolve
 
+import os
+import errno
+
 
 def construct_data():
     parameters = {}
@@ -35,7 +38,13 @@ if __name__ == '__main__':
         x, allflows, total_cost_sum, total_cost = WElinearsolve(G, int(s), int(t), cutoff=None, maximum_iter=100000,
                                                             tol=1e-8)
 
-        filename = 'results/' + parameters['adj'] + '_WE_' + s + '_' + t + '.pickle'
+        filename = 'results/' + parameters['adj'] + '/WE_' + s + '_' + t + '.pickle'
+        if not os.path.exists(os.path.dirname(filename)):
+            try:
+                os.makedirs(os.path.dirname(filename))
+            except OSError as exc:  # Guard against race condition
+                if exc.errno != errno.EEXIST:
+                    raise
 
         with open(filename, 'wb') as f:
             pickle.dump({'allflows': allflows, 'total_cost_sum': total_cost_sum, 'total_cost': total_cost},
