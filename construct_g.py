@@ -4,8 +4,7 @@
 import sys,os
 import numpy as np
 import pickle
-from netflows import Graph
-from netflows.funcs import WElinearsolve, WEaffinesolve, WEbprsolve
+
 
 def read_data(model):
     """
@@ -46,7 +45,6 @@ if __name__ == '__main__':
             total_flow_edge += allflows
             total_time += total_cost_sum
             total_time_edge += total_cost
-
 
     with open('total/' + model + '.pickle', 'wb') as f:
         pickle.dump({'total_flow':total_flow, 'total_flow_edge':total_flow_edge,
