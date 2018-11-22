@@ -1,20 +1,21 @@
-import sys
+#!/usr/bin/env python
+# -*- coding: utf-8 -*-
+
+import sys,os,errno
 import numpy as np
 import pickle
 from netflows import Graph
 from netflows.funcs import WElinearsolve, WEaffinesolve, WEbprsolve
 
-import os
-import errno
-
 
 def construct_data():
     parameters = {}
-    # python single_pair_flow.py adj=filename dist=filename source=s target=t
-    for user_input in sys.argv[1:]:
-        varname = user_input.split("=")[0]
-        varvalue = user_input.split("=")[1]
-        parameters[varname] = varvalue
+    # python single_pair_flow.py adjname distname source target
+    parameters['adj'] = sys.argv[1]
+    parameters['dist'] = sys.argv[2]
+    parameters['s'] = sys.argv[3]
+    parameters['t'] = sys.argv[4]
+
     # load adj data
     with open('data/' + parameters['adj'] + '_adj.pickle', 'rb') as f:
         adj = pickle.load(f)
