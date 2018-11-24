@@ -32,6 +32,7 @@ if __name__ == '__main__':
     total_time_edge = np.zeros(adj.shape)
 
     for fname in filelist:
+        print(fname)
         filename = 'results/' + model + '/' + fname
         with open(filename, 'rb') as f:
             data = pickle.load(f)
