@@ -30,6 +30,7 @@ if __name__ == '__main__':
     total_flow_edge = np.zeros(adj.shape)
     total_time = np.zeros(adj.shape)
     total_time_edge = np.zeros(adj.shape)
+    total_time_ratio = np.zeros(adj.shape)
 
     for fname in filelist:
         print(fname)
@@ -52,10 +53,12 @@ if __name__ == '__main__':
             total_flow_edge += allflows
             total_time[int(s), int(t)] = total_cost_sum
             total_time_edge += total_cost
+            total_time_ratio += total_cost / total_cost_sum
 
     with open('total/' + model + '.pickle', 'wb') as f:
         pickle.dump({'total_flow':total_flow, 'total_flow_edge':total_flow_edge,
-                     'total_time':total_time, 'total_time_edge':total_time_edge},
+                     'total_time':total_time, 'total_time_edge':total_time_edge,
+                     'total_time_ratio':total_time_ratio},
                     f, protocol=pickle.HIGHEST_PROTOCOL)
 
 
