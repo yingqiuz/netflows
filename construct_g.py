@@ -28,7 +28,7 @@ if __name__ == '__main__':
     # initialize total flow and cost
     total_flow = 0
     total_flow_edge = np.zeros(adj.shape)
-    total_time = 0
+    total_time = np.zeros(adj.shape)
     total_time_edge = np.zeros(adj.shape)
 
     for fname in filelist:
@@ -37,6 +37,12 @@ if __name__ == '__main__':
         with open(filename, 'rb') as f:
             data = pickle.load(f)
 
+        stpair = fname.split('_WE_')[1]
+        s = stpair.split('_')[0]
+        t = stpair.split('_')[1].split('.')[0]
+
+        print(s, t)
+
         allflows = data['allflows']
         total_cost_sum = data['total_cost_sum']
         total_cost = data['total_cost']
@@ -44,7 +50,7 @@ if __name__ == '__main__':
         if total_cost_sum > 0:
             total_flow += 1
             total_flow_edge += allflows
-            total_time += total_cost_sum
+            total_time[int(s), int(t)] = total_cost_sum
             total_time_edge += total_cost
 
     with open('total/' + model + '.pickle', 'wb') as f:
