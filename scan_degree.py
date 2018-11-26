@@ -277,21 +277,21 @@ def nodal_dir(G):
 
     in_density = G.adj_weights.sum(axis=0)
     out_density = G.adj_weights.sum(axis=1)
-    in_cost = G.wiring_cost(axis=0)
-    out_cost = G.wiring_cost(axis=1)
-    in_flow = G.WEflowsLinear_edge(axis=0)
-    out_flow = G.WEflowsLinear_edge(axis=1)
-    in_time = G.WEtimeLinear_ratio(axis = 0)
-    out_time = G.WEtimeLinear_ratio(axis = 1)
+    in_cost = G.wiring_cost.sum(axis=0)
+    out_cost = G.wiring_cost.sum(axis=1)
+    in_flow = G.WEflowsLinear_edge.sum(axis=0)
+    out_flow = G.WEflowsLinear_edge.sum(axis=1)
+    in_time = G.WEtimeLinear_ratio.sum(axis = 0)
+    out_time = G.WEtimeLinear_ratio.sum(axis = 1)
 
     in_density_normalized = G.adj_weights.sum(axis=0) / in_degree
     out_density_normalized = G.adj_weights.sum(axis=1) / out_degree
-    in_cost_normalized = G.wiring_cost(axis=0) / in_degree
-    out_cost_normalized = G.wiring_cost(axis=1) / out_degree
-    in_flow_normalized = G.WEflowsLinear_edge(axis=0) / in_degree
-    out_flow_normalized = G.WEflowsLinear_edge(axis=1) / out_degree
-    in_time_normalized = G.WEtimeLinear_ratio(axis=0) / in_degree
-    out_time_normalized = G.WEtimeLinear_ratio(axis=1) / out_degree
+    in_cost_normalized = G.wiring_cost.sum(axis=0) / in_degree
+    out_cost_normalized = G.wiring_cost.sum(axis=1) / out_degree
+    in_flow_normalized = G.WEflowsLinear_edge.sum(axis=0) / in_degree
+    out_flow_normalized = G.WEflowsLinear_edge.sum(axis=1) / out_degree
+    in_time_normalized = G.WEtimeLinear_ratio.sum(axis=0) / in_degree
+    out_time_normalized = G.WEtimeLinear_ratio.sum(axis=1) / out_degree
 
     hubs_density_ratio_in = np.empty((0, ))
     hubs_density_ratio_out = np.empty((0, ))
