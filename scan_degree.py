@@ -265,6 +265,7 @@ def edge_und(G):
                                  'non_rich_club_edge_time_ratio':non_rich_club_edge_time_ratio,
                                  'local_edge_time_ratio':local_edge_time_ratio},
                            index=range(degree.max()))
+    return df_edge
 
 
 def nodal_dir(G):
@@ -491,6 +492,7 @@ def nodal_dir(G):
                                   'non_hubs_nodal_time_ratio_in_normalized':non_hubs_nodal_time_ratio_in_normalized,
                                   'non_hubs_nodal_time_ratio_out_normalized':non_hubs_nodal_time_ratio_out_normalized},
                             index=range(max(in_degree.max(), out_degree.max())))
+    return df_nodal
 
 
 def edge_dir(G):
@@ -608,7 +610,7 @@ if __name__ == "__main__":
     G = load_g(model)
 
     # check if adj is symmetric
-    if np.allclose(G.adj_weights, G.adj_weights.T, atol=tol):
+    if np.allclose(G.adj_weights, G.adj_weights.T):
         df_nodal = nodal_und(G)
         df_edge = edge_und(G)
     else:
@@ -619,4 +621,4 @@ if __name__ == "__main__":
     with open('analysis/' + model + '_dfs.pickle', 'wb') as f:
         pickle.dump({'df_nodal':df_nodal, 'df_edge':df_edge}, f, protocol=pickle.HIGHEST_PROTOCOL)
 
-        
+
