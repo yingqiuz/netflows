@@ -55,7 +55,7 @@ if __name__ == '__main__':
             total_time_edge += total_cost
             total_time_ratio += total_cost / total_cost_sum
 
-    with open('total/' + model + '.pickle', 'wb') as f:
+    with open('total/' + model + '_raw.pickle', 'wb') as f:
         pickle.dump({'total_flow':total_flow, 'total_flow_edge':total_flow_edge,
                      'total_time':total_time, 'total_time_edge':total_time_edge,
                      'total_time_ratio':total_time_ratio},
