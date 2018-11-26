@@ -63,8 +63,10 @@ def nodal_und(G):
     non_hubs_nodal_time_ratio_out_normalized = np.empty((0,))
 
     for k in range(degree.max()):
+
         hubs = np.where(degree > k, 1, 0)
         non_hubs = np.where(degree <= k, 1, 0)
+
         # store degree threshold k
         hubs_count = np.append(hubs_count, hubs.sum())
         non_hubs_count = np.append(non_hubs_count, non_hubs.sum())
@@ -140,31 +142,31 @@ def nodal_und(G):
                                                              nodal_out_time_normalized[non_hubs == 1].sum() /
                                                              G.total_flow / non_hubs.sum())
 
-        df_nodal = pd.DataFrame(data={'hubs_count':hubs_count,
-                                      'non_hubs_count':non_hubs_count,
-                                      'hubs_density_ratio':hubs_density_ratio,
-                                      'hubs_nodal_cost_ratio':hubs_nodal_cost_ratio,
-                                      'hubs_flow_ratio':hubs_flow_ratio,
-                                      'hubs_nodal_time_ratio_in':hubs_nodal_time_ratio_in,
-                                      'hubs_nodal_time_ratio_out':hubs_nodal_time_ratio_out,
-                                      'hubs_density_ratio_normalized':hubs_density_ratio_normalized,
-                                      'hubs_nodal_cost_ratio_normalized':hubs_nodal_cost_ratio_normalized,
-                                      'hubs_flow_ratio_normalized':hubs_flow_ratio_normalized,
-                                      'hubs_nodal_time_ratio_in_normalized':hubs_nodal_time_ratio_in_normalized,
-                                      'hubs_nodal_time_ratio_out_normalized':hubs_nodal_time_ratio_out_normalized,
-                                      'non_hubs_density_ratio':non_hubs_density_ratio,
-                                      'non_hubs_nodal_cost_ratio':non_hubs_nodal_cost_ratio,
-                                      'non_hubs_flow_ratio':non_hubs_flow_ratio,
-                                      'non_hubs_nodal_time_ratio_in':non_hubs_nodal_time_ratio_in,
-                                      'non_hubs_nodal_time_ratio_out':non_hubs_nodal_time_ratio_out,
-                                      'non_hubs_density_ratio_normalized':non_hubs_density_ratio_normalized,
-                                      'non_hubs_nodal_cost_ratio_normalized':non_hubs_nodal_cost_ratio_normalized,
-                                      'non_hubs_flow_ratio_normalized':non_hubs_flow_ratio_normalized,
-                                      'non_hubs_nodal_time_ratio_in_normalized':non_hubs_nodal_time_ratio_in_normalized,
-                                      'non_hubs_nodal_time_ratio_out_normalized':non_hubs_nodal_time_ratio_out_normalized},
-                                index = range(degree.max()))
+    df_nodal = pd.DataFrame(data={'hubs_count':hubs_count,
+                                  'non_hubs_count':non_hubs_count,
+                                  'hubs_density_ratio':hubs_density_ratio,
+                                  'hubs_nodal_cost_ratio':hubs_nodal_cost_ratio,
+                                  'hubs_flow_ratio':hubs_flow_ratio,
+                                  'hubs_nodal_time_ratio_in':hubs_nodal_time_ratio_in,
+                                  'hubs_nodal_time_ratio_out':hubs_nodal_time_ratio_out,
+                                  'hubs_density_ratio_normalized':hubs_density_ratio_normalized,
+                                  'hubs_nodal_cost_ratio_normalized':hubs_nodal_cost_ratio_normalized,
+                                  'hubs_flow_ratio_normalized':hubs_flow_ratio_normalized,
+                                  'hubs_nodal_time_ratio_in_normalized':hubs_nodal_time_ratio_in_normalized,
+                                  'hubs_nodal_time_ratio_out_normalized':hubs_nodal_time_ratio_out_normalized,
+                                  'non_hubs_density_ratio':non_hubs_density_ratio,
+                                  'non_hubs_nodal_cost_ratio':non_hubs_nodal_cost_ratio,
+                                  'non_hubs_flow_ratio':non_hubs_flow_ratio,
+                                  'non_hubs_nodal_time_ratio_in':non_hubs_nodal_time_ratio_in,
+                                  'non_hubs_nodal_time_ratio_out':non_hubs_nodal_time_ratio_out,
+                                  'non_hubs_density_ratio_normalized':non_hubs_density_ratio_normalized,
+                                  'non_hubs_nodal_cost_ratio_normalized':non_hubs_nodal_cost_ratio_normalized,
+                                  'non_hubs_flow_ratio_normalized':non_hubs_flow_ratio_normalized,
+                                  'non_hubs_nodal_time_ratio_in_normalized':non_hubs_nodal_time_ratio_in_normalized,
+                                  'non_hubs_nodal_time_ratio_out_normalized':non_hubs_nodal_time_ratio_out_normalized},
+                            index = range(degree.max()))
 
-        return df_nodal
+    return df_nodal
 
 
 def edge_und(G):
