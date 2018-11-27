@@ -241,14 +241,14 @@ def edge_und(G):
                                           G.total_flow / local.sum())
 
         rich_club_edge_time_ratio = np.append(rich_club_edge_time_ratio,
-                                              G.WEcostsLinear_ratio[rich_club == 1].sum() /
+                                              G.WEtimeLinear_ratio[rich_club == 1].sum() /
                                               G.total_flow / rich_club.sum())
 
         non_rich_club_edge_time_ratio = np.append(non_rich_club_edge_time_ratio,
-                                                  G.WEcostsLinear_ratio[non_rich_club == 1].sum() /
+                                                  G.WEtimeLinear_ratio[non_rich_club == 1].sum() /
                                                   G.total_flow / non_rich_club.sum())
 
-        local_edge_time_ratio = np.append(local_edge_time_ratio, G.WEcostsLinear_ratio[local == 1].sum() /
+        local_edge_time_ratio = np.append(local_edge_time_ratio, G.WEtimeLinear_ratio[local == 1].sum() /
                                           G.total_flow / local.sum())
 
     df_edge = pd.DataFrame(data={'rich_club_count':rich_club_count,
@@ -574,15 +574,15 @@ def edge_dir(G):
                                           G.total_flow / local_edges.sum())
 
         rich_club_edge_time_ratio = np.append(rich_club_edge_time_ratio,
-                                              G.WEcostsLinear_ratio[rich_club_edges == 1].sum() /
+                                              G.WEtimeLinear_ratio[rich_club_edges == 1].sum() /
                                               G.total_flow / rich_club_edges.sum())
 
         non_rich_club_edge_time_ratio = np.append(non_rich_club_edge_time_ratio,
-                                                  G.WEcostsLinear_ratio[non_rich_club_edges == 1].sum() /
+                                                  G.WEtimeLinear_ratio[non_rich_club_edges == 1].sum() /
                                                   G.total_flow / non_rich_club_edges.sum())
 
         local_edge_time_ratio = np.append(local_edge_time_ratio,
-                                          G.WEcostsLinear_ratio[local_edges == 1].sum() /
+                                          G.WEtimeLinear_ratio[local_edges == 1].sum() /
                                           G.total_flow / local_edges.sum())
 
     df_edge = pd.DataFrame(data={'rich_club_count': rich_club_count,
