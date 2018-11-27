@@ -166,6 +166,16 @@ def nodal_und(G):
                                   'non_hubs_nodal_time_ratio_out_normalized':non_hubs_nodal_time_ratio_out_normalized},
                             index = range(degree.max()))
 
+    df_nodal['hubs_nodal_cost_time_ratio_in_normalized'] = df_nodal['hubs_nodal_cost_ratio_normalized'] / \
+                                                           df_nodal['hubs_nodal_time_ratio_in_normalized']
+    df_nodal['non_hubs_nodal_cost_time_ratio_in_normalized'] = df_nodal['non_hubs_nodal_cost_ratio_normalized'] / \
+                                                               df_nodal['non_hubs_nodal_time_ratio_in_normalized']
+
+    df_nodal['hubs_nodal_cost_time_ratio_out_normalized'] = df_nodal['hubs_nodal_cost_ratio_normalized'] / \
+                                                             df_nodal['hubs_nodal_time_ratio_out_normalized']
+    df_nodal['non_hubs_nodal_cost_time_ratio_out_normalized'] = df_nodal['non_hubs_nodal_cost_ratio_normalized'] / \
+                                                                 df_nodal['non_hubs_nodal_time_ratio_out_normalized']
+
     return df_nodal
 
 
@@ -267,6 +277,16 @@ def edge_und(G):
                                  'non_rich_club_edge_time_ratio':non_rich_club_edge_time_ratio,
                                  'local_edge_time_ratio':local_edge_time_ratio},
                            index=range(degree.max()))
+
+    df_edge['rich_club_edge_cost_time_ratio'] = df_edge['rich_club_edge_cost_ratio'] / \
+                                                df_edge['rich_club_edge_time_ratio']
+
+    df_edge['non_rich_club_edge_cost_time_ratio'] = df_edge['non_rich_club_edge_cost_ratio'] / \
+                                                    df_edge['non_rich_club_edge_time_ratio']
+
+    df_edge['local_edge_cost_time_ratio'] = df_edge['local_edge_cost_ratio'] / \
+                                            df_edge['local_edge_time_ratio']
+
     return df_edge
 
 
@@ -500,6 +520,17 @@ def nodal_dir(G):
                                   'non_hubs_nodal_time_ratio_in_normalized':non_hubs_nodal_time_ratio_in_normalized,
                                   'non_hubs_nodal_time_ratio_out_normalized':non_hubs_nodal_time_ratio_out_normalized},
                             index=range(max(in_degree.max(), out_degree.max())))
+
+    df_nodal['hubs_nodal_cost_time_ratio_in_normalized'] = df_nodal['hubs_nodal_cost_ratio_in_normalized'] / \
+                                                           df_nodal['hubs_nodal_time_ratio_in_normalized']
+    df_nodal['non_hubs_nodal_cost_time_ratio_in_normalized'] = df_nodal['non_hubs_nodal_cost_ratio_in_normalized'] / \
+                                                               df_nodal['non_hubs_nodal_time_ratio_in_normalized']
+
+    df_nodal['hubs_nodal_cost_time_ratio_out_normalized'] = df_nodal['hubs_nodal_cost_ratio_out_normalized'] / \
+                                                            df_nodal['hubs_nodal_time_ratio_out_normalized']
+    df_nodal['non_hubs_nodal_cost_time_ratio_out_normalized'] = df_nodal['non_hubs_nodal_cost_ratio_out_normalized'] / \
+                                                                df_nodal['non_hubs_nodal_time_ratio_out_normalized']
+
     return df_nodal
 
 
@@ -607,6 +638,15 @@ def edge_dir(G):
                                      'non_rich_club_edge_time_ratio': non_rich_club_edge_time_ratio,
                                      'local_edge_time_ratio': local_edge_time_ratio},
                                index=range(max(in_degree.max(), out_degree.max())))
+
+    df_edge['rich_club_edge_cost_time_ratio'] = df_edge['rich_club_edge_cost_ratio'] / \
+                                                df_edge['rich_club_edge_time_ratio']
+
+    df_edge['non_rich_club_edge_cost_time_ratio'] = df_edge['non_rich_club_edge_cost_ratio'] / \
+                                                    df_edge['non_rich_club_edge_time_ratio']
+
+    df_edge['local_edge_cost_time_ratio'] = df_edge['local_edge_cost_ratio'] / \
+                                            df_edge['local_edge_time_ratio']
 
     return df_edge
 
