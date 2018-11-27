@@ -46,14 +46,20 @@ if __name__ == '__main__':
     for fname in filelist:
         print(fname)
         filename = 'results/' + model + '/' + fname
-        with open(filename, 'rb') as f:
-            data = pickle.load(f)
 
-        stpair = fname.split('_WE_')[1]
-        s = stpair.split('_')[0]
-        t = stpair.split('_')[1].split('.')[0]
+        try:
+            with open(filename, 'rb') as f:
+                data = pickle.load(f)
 
-        print(s, t)
+            stpair = fname.split('_WE_')[1]
+            s = stpair.split('_')[0]
+            t = stpair.split('_')[1].split('.')[0]
+
+            print(s, t)
+
+        except:
+            print('load file failure')
+            continue
 
         allflows = data['allflows']
         total_cost_sum = data['total_cost_sum']
