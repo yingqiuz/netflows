@@ -34,6 +34,10 @@ def create_distribution_nodal(model, num_perm_models):
 
         p_values = np.where(null_dist > df_nodal.as_matrix(columns=[col]), 1, 0).sum(axis = 1, dtype=np.float32) / num_perm_models
         df_nodal_p[col] = p_values
+        df_nodal_p[col + '_min'] = null_dist.min(axis = 1)
+        df_nodal_p[col + '_max'] = null_dist.max(axis = 1)
+        df_nodal_p[col + '_upper0.05'] = np.nanpercentile(null_dist, 95, axis = 1)
+        df_nodal_p[col + '_lower0.05'] = np.nanpercentile(null_dist, 5, axis = 1)
 
     return df_nodal_p
 
@@ -66,6 +70,10 @@ def create_distribution_edge(model, num_perm_models):
 
         p_values = np.where(null_dist > df_edge.as_matrix(columns=[col]), 1, 0).sum(axis=1, dtype=np.float32) / num_perm_models
         df_edge_p[col] = p_values
+        df_edge_p[col + '_min'] = null_dist.min(axis=1)
+        df_edge_p[col + '_max'] = null_dist.max(axis=1)
+        df_edge_p[col + '_upper0.05'] = np.nanpercentile(null_dist, 95, axis=1)
+        df_edge_p[col + '_lower0.05'] = np.nanpercentile(null_dist, 5, axis=1)
 
     return df_edge_p
 
