@@ -66,6 +66,6 @@ if __name__ == '__main__':
 
     rcc, p_vals = rich_club_detection(G.adj_weights, int(num_rand_nks), iter=5)
 
-    with open('analysis/' + model + '_rc.pickle', 'wb') as f:
+    with open('analysis/stats/' + model + '_rc.pickle', 'wb') as f:
         pickle.dump({'rcc':rcc, 'p_vals':p_vals}, f, protocol=pickle.HIGHEST_PROTOCOL)
 
