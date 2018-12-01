@@ -77,7 +77,22 @@ class Graph:
 
         return -1
 
+    def _dijkstra_weighted(self, s, t):
+        """find shortest path between s and t (weighted network)"""
+        q, seen = [(0, s)], set()
 
+        while q:
+            (distance, v) = heappop(q)
+            if v not in seen:
+                seen.add(v)
+                if v == t:
+                    return distance
+
+                for u in np.nonzero(self.adj[v])[0]:
+                    if u not in seen:
+                        heappush(q, (distance + self.dist_weight_ratio[v, u], u))
+
+        return -1
 
     def _findallpath_recursive(self, v, u, visited, path, allpaths, cutoff):
         """
