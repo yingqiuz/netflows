@@ -3,7 +3,8 @@ from netflows.funcs.costfuncs import linear_cost, linear_WE_obj, linear_SO_obj
 
 import numpy as np
 
-def WElinearsolve(G, s, t, tol = 1e-12, maximum_iter = 10000, cutoff = None, a = None):
+
+def WElinearsolve(G, s, t, tol=1e-12, maximum_iter=10000, cutoff=None, a=None):
     """
     single pair Wardrop Equilibrium flow
     s: source
@@ -25,7 +26,8 @@ def WElinearsolve(G, s, t, tol = 1e-12, maximum_iter = 10000, cutoff = None, a =
 
     return _WElinearsolve(G, s, t, tol, maximum_iter, allpaths, a)
 
-def SOlinearsolve(G, s, t, tol=1e-12, maximum_iter = 10000, cutoff = None, a = None):
+
+def SOlinearsolve(G, s, t, tol=1e-12, maximum_iter=10000, cutoff=None, a=None):
     """
     :param G:
     :param s:
@@ -48,6 +50,7 @@ def SOlinearsolve(G, s, t, tol=1e-12, maximum_iter = 10000, cutoff = None, a = N
         a = G.dist_weight_ratio
 
     return _SOlinearsolve(G, s, t, tol, maximum_iter, allpaths, a)
+
 
 def _WElinearsolve(G, s, t, tol, maximum_iter, allpaths, a):
 
@@ -75,10 +78,10 @@ def _WElinearsolve(G, s, t, tol, maximum_iter, allpaths, a):
     print('The initial cost is %f, and the initial flow is ' % (total_cost_sum), x)
 
     if num_variables < 2:
-        G.WEflowsLinear[s, t] = 1
-        G.WEcostsLinear[s, t] = total_cost_sum
-        G.WEflowsLinear_edge += allflows
-        G.WEcostsLinear_edge += total_cost
+        #G.WEflowsLinear[s, t] = 1
+        #G.WEcostsLinear[s, t] = total_cost_sum
+        #G.WEflowsLinear_edge += allflows
+        #G.WEcostsLinear_edge += total_cost
         return x, allflows, total_cost_sum, total_cost
 
     print('------solve the Wardrop Equilibrium------')
@@ -132,10 +135,10 @@ def _WElinearsolve(G, s, t, tol, maximum_iter, allpaths, a):
 
         if np.sum(np.where(np.abs(gradients-prev_gradients) < tol , 0, 1)) == 0:
             print('Wardrop equilibrium found:')
-            G.WEflowsLinear[s, t] = 1
-            G.WEcostsLinear[s, t] = total_cost_sum
-            G.WEflowsLinear_edge += allflows
-            G.WEcostsLinear_edge += total_cost
+            #G.WEflowsLinear[s, t] = 1
+            #G.WEcostsLinear[s, t] = total_cost_sum
+            #G.WEflowsLinear_edge += allflows
+            #G.WEcostsLinear_edge += total_cost
             print('Iteration %d: The total cost is %f, and the flow is ' % (k, total_cost_sum), x)
             return x, allflows, total_cost_sum, total_cost
 
@@ -175,10 +178,10 @@ def _SOlinearsolve(G, s, t, tol, maximum_iter, allpaths, a):
 
     print('The initial cost is %f, and the initial flow is ' % (obj_fun), x)
     if num_variables < 2:
-        G.SOflowsLinear[s, t] = 1
-        G.SOcostsLinear[s, t] = obj_fun
-        G.SOflowsLinear_edge += allflows
-        G.SOcostsLinear_edge += total_cost
+        #G.SOflowsLinear[s, t] = 1
+        #G.SOcostsLinear[s, t] = obj_fun
+        #G.SOflowsLinear_edge += allflows
+        #G.SOcostsLinear_edge += total_cost
         return x, allflows, obj_fun, total_cost
 
     print('------solve the system optimal flow------')
@@ -241,10 +244,10 @@ def _SOlinearsolve(G, s, t, tol, maximum_iter, allpaths, a):
         )
         
         if np.sum(np.where(np.abs(gradients-prev_gradients) < tol , 0, 1)) == 0:
-            G.SOflowsLinear[s, t] = 1
-            G.SOcostsLinear[s, t] = obj_fun
-            G.SOflowsLinear_edge += allflows
-            G.SOcostsLinear_edge += total_cost
+            #G.SOflowsLinear[s, t] = 1
+            #G.SOcostsLinear[s, t] = obj_fun
+            #G.SOflowsLinear_edge += allflows
+            #G.SOcostsLinear_edge += total_cost
             print('System optimum found:')
             print('Iteration %d: The total cost is %f, and the flow is ' % (k, obj_fun), x)
             return x, allflows, obj_fun, total_cost

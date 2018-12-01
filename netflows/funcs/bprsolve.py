@@ -4,7 +4,7 @@ from netflows.funcs.costfuncs import BPR_cost, BPR_WE_obj, BPR_SO_obj
 import numpy as np
 import scipy
 
-def WEbprsolve(G, s, t, tol = 1e-8, maximum_iter = 10000, cutoff = None, a = None, u = None):
+def WEbprsolve(G, s, t, tol=1e-8, maximum_iter=10000, cutoff=None, a=None, u=None):
     """
     single pair Wardrop Equilibrium flow
     s: source
@@ -31,7 +31,8 @@ def WEbprsolve(G, s, t, tol = 1e-8, maximum_iter = 10000, cutoff = None, a = Non
 
     return _WEbprsolve(G, s, t, tol, maximum_iter, allpaths, a, u)
 
-def SObprsolve(G, s, t, tol=1e-8, maximum_iter = 10000, cutoff = None, a = None, u = None):
+
+def SObprsolve(G, s, t, tol=1e-8, maximum_iter=10000, cutoff=None, a=None, u=None):
     """
     :param G:
     :param s:
@@ -41,7 +42,6 @@ def SObprsolve(G, s, t, tol=1e-8, maximum_iter = 10000, cutoff = None, a = None,
     :param cutoff:
     :return:
     """
-
 
     if cutoff is None:
         print("Cutoff not specified: take shortest path distance + 1 as cutoff")
@@ -60,6 +60,7 @@ def SObprsolve(G, s, t, tol=1e-8, maximum_iter = 10000, cutoff = None, a = None,
         u = G.rpl_weights
 
     return _SObprsolve(G, s, t, tol, maximum_iter, allpaths, a, u)
+
 
 def _WEbprsolve(G, s, t, tol, maximum_iter, allpaths, a, u):
     """
@@ -95,10 +96,10 @@ def _WEbprsolve(G, s, t, tol, maximum_iter, allpaths, a, u):
                   
     print('The initial cost is %f, and the initial flow is ' % (total_cost_sum), x)
     if num_variables < 2:
-        G.WEflowsBPR[s, t] = 1
-        G.WEcostsBPR[s, t] = total_cost_sum
-        G.WEflowsBPR_edge += allflows
-        G.WEcostsBPR_edge += total_cost
+        #G.WEflowsBPR[s, t] = 1
+        #G.WEcostsBPR[s, t] = total_cost_sum
+        #G.WEflowsBPR_edge += allflows
+        #G.WEcostsBPR_edge += total_cost
         return x, allflows, total_cost_sum, total_cost
 
     print('------solve the Wardrop Equilibrium------')
@@ -157,10 +158,10 @@ def _WEbprsolve(G, s, t, tol, maximum_iter, allpaths, a, u):
         if np.sum(np.where(np.abs(gradients-prev_gradients) < tol, 0, 1)) == 0: # convergence
             print('Wardrop equilibrium found:')
             print('Iteration %d: The total cost is %f, and the flow is ' % (k, total_cost_sum), x)
-            G.WEflowsBPR[s, t] = 1
-            G.WEcostsBPR[s, t] = total_cost_sum
-            G.WEflowsBPR_edge += allflows
-            G.WEcostsBPR_edge += total_cost
+            #G.WEflowsBPR[s, t] = 1
+            #G.WEcostsBPR[s, t] = total_cost_sum
+            #G.WEflowsBPR_edge += allflows
+            #G.WEcostsBPR_edge += total_cost
             return x, allflows, total_cost_sum, total_cost
 
         gamma = np.inner(x[:-1] - prev_x[:-1], gradients - prev_gradients) / \
@@ -203,10 +204,10 @@ def _SObprsolve(G, s, t, tol, maximum_iter, allpaths, a, u):
                   
     print('The initial cost is %f, and the initial flow is ' % (obj_fun), x)
     if num_variables < 2:
-        G.SOflowsBPR[s, t] = 1
-        G.SOcostsBPR[s, t] = obj_fun
-        G.SOflowsBPR_edge += allflows
-        G.SOcostsBPR_edge += total_cost
+        #G.SOflowsBPR[s, t] = 1
+        #G.SOcostsBPR[s, t] = obj_fun
+        #G.SOflowsBPR_edge += allflows
+        #G.SOcostsBPR_edge += total_cost
         return x, allflows, obj_fun, total_cost
 
     print('------solve the system optimal flow------')
@@ -272,10 +273,10 @@ def _SObprsolve(G, s, t, tol, maximum_iter, allpaths, a, u):
         if np.sum(np.where(np.abs(gradients-prev_gradients) < tol, 0, 1)) == 0:
             print('System optimum found:')
             print('Iteration %d: The total cost is %f, and the flow is ' % (k, obj_fun), x)
-            G.SOflowsBPR[s, t] = 1
-            G.SOcostsBPR[s, t] = obj_fun
-            G.SOflowsBPR_edge += allflows
-            G.SOcostsBPR_edge += total_cost
+            #G.SOflowsBPR[s, t] = 1
+            #G.SOcostsBPR[s, t] = obj_fun
+            #G.SOflowsBPR_edge += allflows
+            #G.SOcostsBPR_edge += total_cost
             return x, allflows, obj_fun, total_cost
                   
         # new step size

@@ -15,26 +15,26 @@ class Graph:
         cost_func: a string that specifies cost function. support: linear, affine, BRP, MM1
         """
         # weighted adj matrix
-        self.adj = np.array(adj).T
+        self.adj = np.array(adj)
 
         self.adj = np.where(self.adj != 0, 1, 0) # adjacency matrix
 
-        self.weights = np.array(weights, dtype=np.float).T
-        self.adj_weights = np.array(weights, dtype=np.float).T * self.adj# weighted matrix * self
+        self.weights = np.array(weights, dtype=np.float)
+        self.adj_weights = np.array(weights, dtype=np.float) * self.adj# weighted matrix * self
 
         # distance matrix
-        self.dist = np.array(dist, dtype=np.float).T
+        self.dist = np.array(dist, dtype=np.float)
         self.adj_dist = self.dist * self.adj
         # wiring cost
         # self.wiring_cost = np.zeros(self.adj.shape)
-        self.wiring_cost = self.dist * self.adj_weights
+        #self.wiring_cost = self.dist * self.adj_weights
 
         # wiring cost
         self.wiring_cost = self.adj_dist * self.adj_weights
 
         # reciprocal of weights
         self.rpl_weights = np.zeros(self.adj.shape)
-        self.rpl_weights[self.weights!=0] = 1 / self.weights[self.weights!=0]
+        self.rpl_weights[self.weights != 0] = 1 / self.weights[self.weights != 0]
 
         # distance weight ratio
         self.dist_weight_ratio = self.adj_dist * self.rpl_weights
@@ -43,18 +43,18 @@ class Graph:
 
         self.allpaths = [[[] for k in range(self.adj.shape[1])] for kk in range(self.adj.shape[0])] # store all paths in a 3D list
         #self.WEflowsLinear, self.WEflowsAffine, self.WEflowsBPR = [ [[[] for k in range(self.adj.shape[1])] for kk in range(self.adj.shape[0])] ] * 3
-        self.WEflowsLinear, self.WEflowsAffine, self.WEflowsBPR = np.zeros((3, self.adj.shape[0], self.adj.shape[1]))
-        self.WEflowsLinear_edge, self.WEflowsAffine_edge, self.WEflowsBPR_edge = np.zeros((3, self.adj.shape[0], self.adj.shape[1]))
+        #self.WEflowsLinear, self.WEflowsAffine, self.WEflowsBPR = np.zeros((3, self.adj.shape[0], self.adj.shape[1]))
+        #self.WEflowsLinear_edge, self.WEflowsAffine_edge, self.WEflowsBPR_edge = np.zeros((3, self.adj.shape[0], self.adj.shape[1]))
 
         #self.SOflowsLinear, self.SOflowsAffine, self.SOflowsBPR = [ [[[] for k in range(self.adj.shape[1])] for kk in range(self.adj.shape[0])] ] * 3
-        self.SOflowsLinear, self.SOflowsAffine, self.SOflowsBPR = np.zeros((3, self.adj.shape[0], self.adj.shape[1]))
-        self.SOflowsLinear_edge, self.SOflowsAffine_edge, self.SOflowsBPR_edge = np.zeros((3, self.adj.shape[0], self.adj.shape[1]))
+        #self.SOflowsLinear, self.SOflowsAffine, self.SOflowsBPR = np.zeros((3, self.adj.shape[0], self.adj.shape[1]))
+        #self.SOflowsLinear_edge, self.SOflowsAffine_edge, self.SOflowsBPR_edge = np.zeros((3, self.adj.shape[0], self.adj.shape[1]))
 
-        self.WEcostsLinear, self.WEcostsAffine, self.WEcostsBPR = np.zeros((3, self.adj.shape[0], self.adj.shape[1]))#[ [[[] for k in range(self.adj.shape[1])] for kk in range(self.adj.shape[0])] ] * 3
-        self.WEcostsLinear_edge, self.WEcostsAffine_edge, self.WEcostsBPR_edge = np.zeros((3, self.adj.shape[0], self.adj.shape[1]))
+        #self.WEcostsLinear, self.WEcostsAffine, self.WEcostsBPR = np.zeros((3, self.adj.shape[0], self.adj.shape[1]))#[ [[[] for k in range(self.adj.shape[1])] for kk in range(self.adj.shape[0])] ] * 3
+        #self.WEcostsLinear_edge, self.WEcostsAffine_edge, self.WEcostsBPR_edge = np.zeros((3, self.adj.shape[0], self.adj.shape[1]))
 
-        self.SOcostsLinear, self.SOcostsAffine, self.SOcostsBPR = np.zeros((3, self.adj.shape[0], self.adj.shape[1])) #[ [[[] for k in range(self.adj.shape[1])] for kk in range(self.adj.shape[0])] ] * 3
-        self.SOcostsLinear_edge, self.SOcostsAffine_edge, self.SOcostsBPR_edge = np.zeros((3, self.adj.shape[0], self.adj.shape[1]))
+        #self.SOcostsLinear, self.SOcostsAffine, self.SOcostsBPR = np.zeros((3, self.adj.shape[0], self.adj.shape[1])) #[ [[[] for k in range(self.adj.shape[1])] for kk in range(self.adj.shape[0])] ] * 3
+        #self.SOcostsLinear_edge, self.SOcostsAffine_edge, self.SOcostsBPR_edge = np.zeros((3, self.adj.shape[0], self.adj.shape[1]))
 
     def _dijkstra(self, s, t):
         """
