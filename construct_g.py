@@ -51,7 +51,7 @@ if __name__ == '__main__':
             with open(filename, 'rb') as f:
                 data = pickle.load(f)
 
-            stpair = fname.split('_WE_')[1]
+            stpair = fname.split('WE_')[1]
             s = stpair.split('_')[0]
             t = stpair.split('_')[1].split('.')[0]
 
