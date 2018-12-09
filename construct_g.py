@@ -19,7 +19,7 @@ def read_data(model):
         adj = pickle.load(f)
 
     try :
-        with open('data/' + model + '_dist.pickle', 'rb') as f:
+        with open('data/' + model.split('_')[0] + '_dist.pickle', 'rb') as f:
             dist = pickle.load(f)
     except:
         dist = np.ones(adj.shape)
