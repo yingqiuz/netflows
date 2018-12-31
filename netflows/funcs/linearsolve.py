@@ -55,6 +55,7 @@ def SOlinearsolve(G, s, t, tol=1e-12, maximum_iter=10000, cutoff=None, a=None):
 def _WElinearsolve(G, s, t, tol, maximum_iter, allpaths, a):
 
     num_variables = len(allpaths) # the number of paths from s to t
+    print('there is a total of ' + str(num_variables) + ' paths')
 
     # x is the flow vector (path formulation)
     x = np.ones((num_variables, )) / num_variables # initial value
