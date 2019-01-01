@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-
+# -*- coding: utf-8 -*-
 """
 Setup script for netflows
 
@@ -10,7 +10,7 @@ python setup.py install
 
 import os
 import sys
-from setuptools import setup, find_packages
+import setuptools
 
 
 if sys.argv[-1] == 'setup.py':
@@ -22,4 +22,29 @@ if sys.version_info[:2] < (3, 5):
           sys.version_info[:2])
     sys.exit(-1)
 
+# write the version information
+from .netflows import info
 
+# get long description from README
+curr_path = os.path.dirname(__file__)
+with open(os.path.join(curr_path, info.__longdesc__), "r") as fh:
+    long_description = fh.read()
+
+if __name__ == "__main__":
+
+    setuptools.setup(
+        name=info.__packagename__,
+        version=info.__version__,
+        author=info.__author__,
+        author_email=info.__email__,
+        description=info.__description__,
+        long_description=long_description,
+        long_description_content_type=info.__longdesctype__,
+        url=info.__url__,
+        packages=setuptools.find_packages(exclude=['netflows/tests']),
+        classifiers=info.CLASSIFIERS,
+        install_requires=info.REQUIRES,
+        extras_requires=info.EXTRAS_REQUIRE,
+        test_requires=info.TESTS_REQUIRE,
+        license=info.__license__,
+    )
