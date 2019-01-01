@@ -1,0 +1,17 @@
+*.pyc
+__pycache__
+*~
+.DS_Store
+.coverage
+dist/
+build/
+_build/
+_static/
+*.egg-info/
+.pytest_cache/
+.cache/
+.vscode/
+
+# PyCharm project file
+.idea
+
