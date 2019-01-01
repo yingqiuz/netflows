@@ -1,5 +1,5 @@
 *.pyc
-__pycache__
+__pycache__/
 *~
 .DS_Store
 .coverage
@@ -13,5 +13,5 @@ _static/
 .vscode/
 
 # PyCharm project file
-.idea
+.idea/
 
