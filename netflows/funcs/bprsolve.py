@@ -1,28 +1,45 @@
-from __future__ import absolute_import
-from netflows.funcs.costfuncs import BPR_cost, BPR_WE_obj, BPR_SO_obj
+# -*- coding: utf-8 -*-
+"""
+solve wardrop equilibrium or system optimal flow for affine cost functions a*t + a0
+"""
 
+from netflows.utils import bpr_cost, bpr_so_obj
 import numpy as np
-import scipy
+from tqdm import tqdm
+
 
 def wardrop_equilibrium_bpr_solve(G, s, t, tol=1e-8, maximum_iter=10000, cutoff=None, a=None, u=None):
     """
-    single pair Wardrop Equilibrium flow
-    s: source
-    t: destination
-    tol: tolerance
-    gamma: descent speed
+    The function to solve Wardrop Equilibrium flow for a single source target pair under BPR cost function setting.
+    Usage:
+
+    :param G: Graph object, storing the adjacency/weight/distance matrices
+    :param s: source node
+    :param t: target node
+    :param tol: tolerance for convergence
+    :param maximum_iter: maximum iteration times
+    :param cutoff: a scalar value that defines maximal (binary) path length, namely,
+        flows can only use paths shorter than the cutoff value
+    :param a: the parameter of affine cost function, default is distance
+    :param u: the parameter of affine cost function, default is 1/weight
+    :return: a tuple (x, allflows, total_cost_sum, total_cost).
+        x: the vector storing flows on each path (path formulation)
+        allflows: the matrix storing flows on each edge (edge formulation)
+        total_cost_sum: total travel time for all flows from source to target
+        total_cost: the matrix storing travel time on each edge (edge formulation)
     """
 
+    # find all possible paths from s to t that are shorter than cutoff
     if cutoff is None:
         print("Cutoff not specified: take shortest path distance + 1 as cutoff")
-        cutoff = G._dijkstra(s, t) + 1 + 1
+        cutoff = G.dijkstra(s, t) + 1 + 1
         if cutoff == 1:
             return
-    # find all paths
     allpaths = G.findallpaths(s, t, cutoff)
 
     if a is None:
         a = G.adj_dist
+
     # binarize dist matrix
     a[G.adj == 0] = 0
 
@@ -34,27 +51,37 @@ def wardrop_equilibrium_bpr_solve(G, s, t, tol=1e-8, maximum_iter=10000, cutoff=
 
 def system_optimal_bpr_solve(G, s, t, tol=1e-8, maximum_iter=10000, cutoff=None, a=None, u=None):
     """
-    :param G:
-    :param s:
-    :param t:
-    :param tol:
-    :param maximum_iter:
-    :param cutoff:
-    :return:
+    The function to solve System Optimal flow for a single source target pair under BPR cost function setting.
+    Usage:
+
+    :param G: Graph object, storing the adjacency/weight/distance matrices
+    :param s: source node
+    :param t: target node
+    :param tol: tolerance for convergence
+    :param maximum_iter: maximum iteration times
+    :param cutoff: a scalar value that defines maximal (binary) path length, namely,
+        flows can only use paths shorter than the cutoff value
+    :param a: the parameter of affine cost function, default is distance
+    :param u: the parameter of affine cost function, default is 1/weight
+    :return: a tuple (x, allflows, total_cost_sum, total_cost).
+        x: the vector storing flows on each path (path formulation)
+        allflows: the matrix storing flows on each edge (edge formulation)
+        total_cost_sum: total travel time for all flows from source to target
+        total_cost: the matrix storing travel time on each edge (edge formulation)
     """
 
+    # find all possible paths from s to t that are shorter than cutoff
     if cutoff is None:
         print("Cutoff not specified: take shortest path distance + 1 as cutoff")
-        cutoff = G._dijkstra(s, t) + 1 + 1
+        cutoff = G.dijkstra(s, t) + 1 + 1
         if cutoff == 1:
             return
-    # find all paths
     allpaths = G.findallpaths(s, t, cutoff)
 
     if a is None:
         a = G.adj_dist
     # binarize dist matrix
-    a[G.adj == 0 ] = 0
+    a[G.adj == 0] = 0
 
     if u is None:
         u = G.rpl_weights
@@ -63,23 +90,18 @@ def system_optimal_bpr_solve(G, s, t, tol=1e-8, maximum_iter=10000, cutoff=None,
 
 
 def _wardrop_equilibrium_bpr_solve(G, s, t, tol, maximum_iter, allpaths, a, u):
-    """
-    single pair Wardrop Equilibrium flow, BPR cost function
-    s: source
-    t: destination
-    tol: tolerance
-    gamma: descent speed
-    """
 
     num_variables = len(allpaths)  # the number of paths from s to t
+    print('A total of %d paths found from %d to %d' % (num_variables, int(s), int(t)))
 
     # x is the flow vector (path formulation)
     x = np.ones((num_variables,)) / num_variables  # initial value
+
     # find equilibrium -- convex optimization
     # map to matrix
     path_arrays = np.empty((0, G.adj.shape[0], G.adj.shape[1]))  # list of matrix to store path flows
-
-    for path in allpaths:
+    print('constructing edge formulations...')
+    for path in tqdm(allpaths, total=num_variables):
         path_array_tmp = np.zeros(G.adj.shape)
         index_x = [path[k] for k in range(len(path) - 1)]  # x index of the adj matrix
         index_y = [path[k] for k in range(1, len(path))]  # y index of the adj matrix
@@ -88,36 +110,34 @@ def _wardrop_equilibrium_bpr_solve(G, s, t, tol, maximum_iter, allpaths, a, u):
 
     # element (i, j) is the total flow on edge (i,j)    
     allflows = np.sum(path_arrays * x.reshape(num_variables, 1, 1), axis=0)
-    allflows[G.adj == 0] = 0 #seems unnecessary... ?
+    allflows[G.adj == 0] = 0
 
-    #obj_fun = BPR_WE_obj(allflows, a, weights).sum()
-    total_cost = allflows * BPR_cost(allflows, a, u)
+    total_cost = allflows * bpr_cost(allflows, a, u)
     total_cost_sum = total_cost.sum()
-                  
-    print('The initial cost is %f, and the initial flow is ' % (total_cost_sum), x)
+
+    print('The initial flow (path formulation) is ', x)
+    print('The initial cost is %f' % total_cost_sum)
+    print('------------solving the Wardrop Equilibrium-------------')
+
     if num_variables < 2:
-        #G.WEflowsBPR[s, t] = 1
-        #G.WEcostsBPR[s, t] = total_cost_sum
-        #G.WEflowsBPR_edge += allflows
-        #G.WEcostsBPR_edge += total_cost
+        print('Wardrop Equilibrium flow found:', x)
+        print('The total travel time is %f' % total_cost_sum)
         return x, allflows, total_cost_sum, total_cost
 
-    print('------solve the Wardrop Equilibrium------')
     gradients = np.array(
-        [np.sum( BPR_cost(allflows, a, u) * (
+        [np.sum(bpr_cost(allflows, a, u) * (
                     path_arrays[k] * np.where(path_arrays[-1] == 0, 1, 0) - np.where(path_arrays[k] == 0, 1, 0) *
                     path_arrays[-1]))
          for k in range(num_variables - 1)]
     )
     
     # initial step size determination
-    gamma1 = np.min(np.abs( x[:-1] / gradients ))
-    gamma2 = np.min(np.abs( (1 - x[:-1]) / gradients) )
+    gamma1 = np.min(np.abs(x[:-1] / gradients))
+    gamma2 = np.min(np.abs((1 - x[:-1]) / gradients))
     gamma = min(gamma1, gamma2) * 2 / 3
 
     for k in range(maximum_iter):  # maximal iteration 10000
 
-        #prev_obj_fun = np.copy(obj_fun)
         prev_x = np.copy(x)
         prev_gradients = np.copy(gradients)
 
@@ -143,55 +163,46 @@ def _wardrop_equilibrium_bpr_solve(G, s, t, tol, maximum_iter, allpaths, a, u):
         # update allflows and costs
         allflows = np.sum(path_arrays * x.reshape(num_variables, 1, 1), axis=0)
 
-        total_cost = allflows * BPR_cost(allflows, a, u)
+        total_cost = allflows * bpr_cost(allflows, a, u)
         total_cost_sum = total_cost.sum()
 
-        #print('Iteration %d: The total cost is %f, and the flow is ' % (k, total_cost), x)
         # new gradients
         gradients = np.array(
-            [np.sum( BPR_cost(allflows, a, u) * (
+            [np.sum(bpr_cost(allflows, a, u) * (
                         path_arrays[k] * np.where(path_arrays[-1] == 0, 1, 0) - np.where(path_arrays[k] == 0, 1, 0) *
                         path_arrays[-1]))
              for k in range(num_variables - 1)]
         )
         
-        if np.sum(np.where(np.abs(gradients-prev_gradients) < tol, 0, 1)) == 0: # convergence
-            print('Wardrop equilibrium found:')
-            print('Iteration %d: The total cost is %f, and the flow is ' % (k, total_cost_sum), x)
-            #G.WEflowsBPR[s, t] = 1
-            #G.WEcostsBPR[s, t] = total_cost_sum
-            #G.WEflowsBPR_edge += allflows
-            #G.WEcostsBPR_edge += total_cost
+        if np.sum(np.where(np.abs(gradients-prev_gradients) < tol, 0, 1)) == 0:  # test convergence
+            print('Wardrop Equilibrium flow found:', x)
+            print('Iteration %d: the total travel time is %f' % (k, total_cost_sum))
             return x, allflows, total_cost_sum, total_cost
 
-        gamma = np.inner(x[:-1] - prev_x[:-1], gradients - prev_gradients) / \
-                np.inner(gradients - prev_gradients, gradients - prev_gradients)
+        gamma = np.inner(
+            x[:-1] - prev_x[:-1], gradients - prev_gradients
+        ) / np.inner(
+            gradients - prev_gradients, gradients - prev_gradients
+        )
 
-    print('global minimum not found')
+    print('Wardrop Equilibrium flow not found')
     return
 
 
 def _system_optimal_bpr_solve(G, s, t, tol, maximum_iter, allpaths, a, u):
-    """
-    :param G:
-    :param s:
-    :param t:
-    :param tol:
-    :param maximum_iter:
-    :param allpaths:
-    :param u:
-    :return:
-    """
+
     num_variables = len(allpaths)  # the number of paths from s to t
+    print('A total of %d paths found from %d to %d' % (num_variables, int(s), int(t)))
 
     # x is the flow vector (path formulation)
     x = np.ones((num_variables,)) / num_variables  # initial value
+
     # find equilibrium -- convex optimization
     # map to matrix
     path_arrays = np.empty((0,   G.adj.shape[0],   G.adj.shape[1]))  # list of matrix to store path flows
-
-    for path in allpaths:
-        path_array_tmp = np.zeros(  G.adj.shape)
+    print('constructing edge formulations...')
+    for path in tqdm(allpaths, total=num_variables):
+        path_array_tmp = np.zeros(G.adj.shape)
         index_x = [path[k] for k in range(len(path) - 1)]  # x index of the adj matrix
         index_y = [path[k] for k in range(1, len(path))]  # y index of the adj matrix
         path_array_tmp[index_x, index_y] = 1
@@ -199,21 +210,20 @@ def _system_optimal_bpr_solve(G, s, t, tol, maximum_iter, allpaths, a, u):
 
     # element (i, j) is the total flow on edge (i,j)    
     allflows = np.sum(path_arrays * x.reshape(num_variables, 1, 1), axis=0)
-    total_cost = allflows * BPR_cost(allflows, a, u)
-    obj_fun = BPR_SO_obj(allflows, a, u).sum() # objective function is the total cost
-                  
-    print('The initial cost is %f, and the initial flow is ' % (obj_fun), x)
+    total_cost = allflows * bpr_cost(allflows, a, u)
+    obj_fun = bpr_so_obj(allflows, a, u).sum()  # objective function is the total cost
+
+    print('The initial flow (path formulation) is ', x)
+    print('The initial cost is %f' % obj_fun)
+    print('------solve the system optimal flow------')
+
     if num_variables < 2:
-        #G.SOflowsBPR[s, t] = 1
-        #G.SOcostsBPR[s, t] = obj_fun
-        #G.SOflowsBPR_edge += allflows
-        #G.SOcostsBPR_edge += total_cost
+        print('System Optimal flow found:', x)
+        print('The total travel time is %f' % obj_fun)
         return x, allflows, obj_fun, total_cost
 
-    print('------solve the system optimal flow------')
-                  
     gradients = np.array(
-        [np.sum( BPR_cost(allflows, a, u) * (
+        [np.sum(bpr_cost(allflows, a, u) * (
                     path_arrays[k] * np.where(path_arrays[-1] == 0, 1, 0) - np.where(path_arrays[k] == 0, 1, 0) *
                     path_arrays[-1]))
          for k in range(num_variables - 1)]
@@ -252,13 +262,12 @@ def _system_optimal_bpr_solve(G, s, t, tol, maximum_iter, allpaths, a, u):
                 x[-1] = 1 - np.sum(x[:-1])  # the flow in the last path
 
         allflows = np.sum(path_arrays * x.reshape(num_variables, 1, 1), axis=0)
-        obj_fun = BPR_SO_obj(allflows, a, u).sum()
-        total_cost = allflows * BPR_cost(allflows, a, u)
-        #print('Iteration %d: The total cost is %f, and the flow is ' % (k, obj_fun), x)
-                  
+        obj_fun = bpr_so_obj(allflows, a, u).sum()
+        total_cost = allflows * bpr_cost(allflows, a, u)
+
         # update gradients
         gradients = np.array(
-            [np.sum( BPR_cost(allflows, a, u) * (
+            [np.sum(bpr_cost(allflows, a, u) * (
                         path_arrays[k] * np.where(path_arrays[-1] == 0, 1, 0) - np.where(path_arrays[k] == 0, 1, 0) *
                         path_arrays[-1]))
              for k in range(num_variables - 1)]
@@ -271,17 +280,16 @@ def _system_optimal_bpr_solve(G, s, t, tol, maximum_iter, allpaths, a, u):
 
         # convergence?
         if np.sum(np.where(np.abs(gradients-prev_gradients) < tol, 0, 1)) == 0:
-            print('System optimum found:')
-            print('Iteration %d: The total cost is %f, and the flow is ' % (k, obj_fun), x)
-            #G.SOflowsBPR[s, t] = 1
-            #G.SOcostsBPR[s, t] = obj_fun
-            #G.SOflowsBPR_edge += allflows
-            #G.SOcostsBPR_edge += total_cost
+            print('System Optimal flow found:', x)
+            print('Iteration %d: the total travel time is %f' % (k, obj_fun))
             return x, allflows, obj_fun, total_cost
                   
         # new step size
-        gamma = np.inner(x[:-1] - prev_x[:-1], gradients - prev_gradients) / \
-                np.inner(gradients - prev_gradients, gradients - prev_gradients)
+        gamma = np.inner(
+            x[:-1] - prev_x[:-1], gradients - prev_gradients
+        ) / np.inner(
+            gradients - prev_gradients, gradients - prev_gradients
+        )
 
     print('global minimum not found')
     return
