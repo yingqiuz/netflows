@@ -4,7 +4,7 @@ from netflows.funcs.costfuncs import BPR_cost, BPR_WE_obj, BPR_SO_obj
 import numpy as np
 import scipy
 
-def WEbprsolve(G, s, t, tol=1e-8, maximum_iter=10000, cutoff=None, a=None, u=None):
+def wardrop_equilibrium_bpr_solve(G, s, t, tol=1e-8, maximum_iter=10000, cutoff=None, a=None, u=None):
     """
     single pair Wardrop Equilibrium flow
     s: source
@@ -29,10 +29,10 @@ def WEbprsolve(G, s, t, tol=1e-8, maximum_iter=10000, cutoff=None, a=None, u=Non
     if u is None:
         u = G.rpl_weights
 
-    return _WEbprsolve(G, s, t, tol, maximum_iter, allpaths, a, u)
+    return _wardrop_equilibrium_bpr_solve(G, s, t, tol, maximum_iter, allpaths, a, u)
 
 
-def SObprsolve(G, s, t, tol=1e-8, maximum_iter=10000, cutoff=None, a=None, u=None):
+def system_optimal_bpr_solve(G, s, t, tol=1e-8, maximum_iter=10000, cutoff=None, a=None, u=None):
     """
     :param G:
     :param s:
@@ -59,10 +59,10 @@ def SObprsolve(G, s, t, tol=1e-8, maximum_iter=10000, cutoff=None, a=None, u=Non
     if u is None:
         u = G.rpl_weights
 
-    return _SObprsolve(G, s, t, tol, maximum_iter, allpaths, a, u)
+    return _system_optimal_bpr_solve(G, s, t, tol, maximum_iter, allpaths, a, u)
 
 
-def _WEbprsolve(G, s, t, tol, maximum_iter, allpaths, a, u):
+def _wardrop_equilibrium_bpr_solve(G, s, t, tol, maximum_iter, allpaths, a, u):
     """
     single pair Wardrop Equilibrium flow, BPR cost function
     s: source
@@ -171,7 +171,7 @@ def _WEbprsolve(G, s, t, tol, maximum_iter, allpaths, a, u):
     return
 
 
-def _SObprsolve(G, s, t, tol, maximum_iter, allpaths, a, u):
+def _system_optimal_bpr_solve(G, s, t, tol, maximum_iter, allpaths, a, u):
     """
     :param G:
     :param s:

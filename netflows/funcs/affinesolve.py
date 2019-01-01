@@ -5,7 +5,7 @@ from netflows.funcs.gradfuncs import we_affine_grad,so_affine_grad
 import numpy as np
 
 
-def WEaffinesolve(G, s, t, tol=1e-12, maximum_iter=100000, cutoff=None, a=None, a0=None):
+def wardrop_equilibrium_affine_solve(G, s, t, tol=1e-12, maximum_iter=100000, cutoff=None, a=None, a0=None):
     """
     single pair Wardrop Equilibrium flow
     s: source
@@ -28,10 +28,10 @@ def WEaffinesolve(G, s, t, tol=1e-12, maximum_iter=100000, cutoff=None, a=None, 
     if a0 is None:
         a0 = G.adj_dist
 
-    return _WEaffinesolve(G, s, t, tol, maximum_iter, allpaths, a, a0)
+    return _wardrop_equilibrium_affine_solve(G, s, t, tol, maximum_iter, allpaths, a, a0)
 
 
-def SOaffinesolve(G, s, t, tol=1e-12, maximum_iter=100000, cutoff=None, a=None, a0=None):
+def system_optimal_affine_solve(G, s, t, tol=1e-12, maximum_iter=100000, cutoff=None, a=None, a0=None):
     """
     :param G:
     :param s:
@@ -56,10 +56,10 @@ def SOaffinesolve(G, s, t, tol=1e-12, maximum_iter=100000, cutoff=None, a=None, 
     if a0 is None:
         a0 = G.adj_dist
 
-    return _SOaffinesolve(G, s, t, tol, maximum_iter, allpaths, a, a0)
+    return _system_optimal_affine_solve(G, s, t, tol, maximum_iter, allpaths, a, a0)
 
 
-def _WEaffinesolve(G, s, t, tol, maximum_iter, allpaths, a, a0):
+def _wardrop_equilibrium_affine_solve(G, s, t, tol, maximum_iter, allpaths, a, a0):
     """
     :param G:
     :param s:
@@ -178,7 +178,7 @@ def _WEaffinesolve(G, s, t, tol, maximum_iter, allpaths, a, a0):
     return
 
 
-def _SOaffinesolve(G, s, t, tol, maximum_iter, allpaths, a, a0):
+def _system_optimal_affine_solve(G, s, t, tol, maximum_iter, allpaths, a, a0):
     """
     single pair System Optimal flow, affine cost function
     s: source

@@ -4,7 +4,7 @@ from netflows.funcs.costfuncs import linear_cost, linear_WE_obj, linear_SO_obj
 import numpy as np
 
 
-def WElinearsolve(G, s, t, tol=1e-12, maximum_iter=10000, cutoff=None, a=None):
+def wardrop_equilibrium_linear_solve(G, s, t, tol=1e-12, maximum_iter=10000, cutoff=None, a=None):
     """
     single pair Wardrop Equilibrium flow
     s: source
@@ -24,10 +24,10 @@ def WElinearsolve(G, s, t, tol=1e-12, maximum_iter=10000, cutoff=None, a=None):
     if a is None:
         a = G.dist_weight_ratio
 
-    return _WElinearsolve(G, s, t, tol, maximum_iter, allpaths, a)
+    return _wardrop_equilibrium_linear_solve(G, s, t, tol, maximum_iter, allpaths, a)
 
 
-def SOlinearsolve(G, s, t, tol=1e-12, maximum_iter=10000, cutoff=None, a=None):
+def system_optimal_linear_solve(G, s, t, tol=1e-12, maximum_iter=10000, cutoff=None, a=None):
     """
     :param G:
     :param s:
@@ -49,10 +49,10 @@ def SOlinearsolve(G, s, t, tol=1e-12, maximum_iter=10000, cutoff=None, a=None):
     if a is None:
         a = G.dist_weight_ratio
 
-    return _SOlinearsolve(G, s, t, tol, maximum_iter, allpaths, a)
+    return _system_optimal_linear_solve(G, s, t, tol, maximum_iter, allpaths, a)
 
 
-def _WElinearsolve(G, s, t, tol, maximum_iter, allpaths, a):
+def _wardrop_equilibrium_linear_solve(G, s, t, tol, maximum_iter, allpaths, a):
 
     num_variables = len(allpaths) # the number of paths from s to t
     print('there is a total of ' + str(num_variables) + ' paths')
@@ -149,7 +149,7 @@ def _WElinearsolve(G, s, t, tol, maximum_iter, allpaths, a):
     print('global minimum not found')
     return
 
-def _SOlinearsolve(G, s, t, tol, maximum_iter, allpaths, a):
+def _system_optimal_linear_solve(G, s, t, tol, maximum_iter, allpaths, a):
     """
     single pair System Optimal flow
     s: source
