@@ -10,7 +10,7 @@ from tqdm import tqdm
 
 def wardrop_equilibrium_affine_solve(G, s, t, tol=1e-12, maximum_iter=100000, cutoff=None, a=None, a0=None):
     """
-    The function to solve Wardrop Equilibrium flow for a single source target pair under linear cost function setting.
+    The function to solve Wardrop Equilibrium flow for a single source target pair under affine cost function setting.
     Usage:
 
     :param G: Graph object, storing the adjacency/weight/distance matrices
@@ -49,7 +49,7 @@ def wardrop_equilibrium_affine_solve(G, s, t, tol=1e-12, maximum_iter=100000, cu
 
 def system_optimal_affine_solve(G, s, t, tol=1e-12, maximum_iter=100000, cutoff=None, a=None, a0=None):
     """
-    The function to solve Wardrop Equilibrium flow for a single source target pair under linear cost function setting.
+    The function to solve Wardrop Equilibrium flow for a single source target pair under affine cost function setting.
     Usage:
 
     :param G: Graph object, storing the adjacency/weight/distance matrices
