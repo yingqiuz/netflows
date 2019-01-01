@@ -1,4 +1,9 @@
-from netflows.funcs.costfuncs import *
-from netflows.funcs.linearsolve import *
-from netflows.funcs.affinesolve import *
-from netflows.funcs.bprsolve import *
+__all__ = [
+    'WElinearsolve', 'SOlinearsolve', 'WEaffinesolve',
+    'SOaffinesolve', 'WEbprsolve', 'SObprsolve'
+]
+
+from .linearsolve import WElinearsolve, SOlinearsolve
+from .affinesolve import WEaffinesolve, SOaffinesolve
+from .bprsolve import WEbprsolve, SObprsolve
+
