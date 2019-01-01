@@ -20,9 +20,10 @@ TBC
 
 __all__ = [
     '__author__', '__description__', '__email__', '__license__',
-    '__packagename__','__url__', '__version__',
-    'Graph', 'WElinearsolve', 'SOlinearsolve', 'WEaffinesolve',
-    'SOaffinesolve', 'WEbprsolve', 'SObprsolve'
+    '__packagename__','__url__', '__version__', 'Graph',
+    'wardrop_equilibrium_linear_solve', 'system_optimal_linear_solve',
+    'wardrop_equilibrium_affine_solve', 'system_optimal_affine_solve',
+    'wardrop_equilibrium_bpr_solve', 'system_optimal_bpr_solve'
 ]
 
 from .info import (
@@ -37,12 +38,9 @@ from .info import (
 
 from .Graph import Graph
 from .funcs import (
-    WElinearsolve,
-    SOlinearsolve,
-    WEaffinesolve,
-    SOaffinesolve,
-    WEbprsolve,
-    SObprsolve
+    wardrop_equilibrium_linear_solve, system_optimal_linear_solve,
+    wardrop_equilibrium_affine_solve, system_optimal_affine_solve,
+    wardrop_equilibrium_bpr_solve, system_optimal_bpr_solve
 )
 
 
