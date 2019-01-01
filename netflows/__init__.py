@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 """
 netflows
 ========
@@ -17,18 +18,31 @@ License
 TBC
 """
 
-from __future__ import absolute_import
+__all__ = [
+    '__author__', '__description__', '__email__', '__license__',
+    '__packagename__','__url__', '__version__',
+    'Graph', 'WElinearsolve', 'SOlinearsolve', 'WEaffinesolve',
+    'SOaffinesolve', 'WEbprsolve', 'SObprsolve'
+]
 
-import sys
-if sys.version_info[:2] < (2, 7):
-    s = "Python 2.7 or later is required for netflows (%d.%d detected). "
-    raise ImportError(m % sys.version_info)
-del sys
+from .info import (
+    __version__,
+    __author__,
+    __description__,
+    __email__,
+    __license__,
+    __packagename__,
+    __url__
+)
 
-# release data
-# TBC
-
-from netflows.Graph import Graph
-import netflows.funcs
+from .Graph import Graph
+from .funcs import (
+    WElinearsolve,
+    SOlinearsolve,
+    WEaffinesolve,
+    SOaffinesolve,
+    WEbprsolve,
+    SObprsolve
+)
 
 
