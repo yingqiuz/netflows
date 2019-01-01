@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 """
-solve wardrop equilibrium or system optimal flow for linear cost functions k*t
+solve wardrop equilibrium or system optimal flow for linear cost functions a*t
 """
 
 from netflows.utils import linear_cost, linear_so_obj
