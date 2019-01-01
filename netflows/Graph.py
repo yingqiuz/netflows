@@ -1,12 +1,8 @@
-# coding: utf-8
+# -*- coding: utf-8 -*-
 
-from __future__ import print_function
 import numpy as np
-
 from heapq import heappop, heappush
 
-
-# In[52]:
 
 class Graph:
     def __init__(self, adj=0, dist=0, weights=0):
@@ -14,20 +10,18 @@ class Graph:
         adj: adjacency mat
         cost_func: a string that specifies cost function. support: linear, affine, BRP, MM1
         """
+
         # weighted adj matrix
         self.adj = np.array(adj)
 
-        self.adj = np.where(self.adj != 0, 1, 0) # adjacency matrix
+        self.adj = np.where(self.adj != 0, 1, 0)  # adjacency matrix
 
         self.weights = np.array(weights, dtype=np.float)
-        self.adj_weights = np.array(weights, dtype=np.float) * self.adj# weighted matrix * self
+        self.adj_weights = np.array(weights, dtype=np.float) * self.adj  # weighted matrix * self
 
         # distance matrix
         self.dist = np.array(dist, dtype=np.float)
         self.adj_dist = self.dist * self.adj
-        # wiring cost
-        # self.wiring_cost = np.zeros(self.adj.shape)
-        #self.wiring_cost = self.dist * self.adj_weights
 
         # wiring cost
         self.wiring_cost = self.adj_dist * self.adj_weights
@@ -40,23 +34,10 @@ class Graph:
         self.dist_weight_ratio = self.adj_dist * self.rpl_weights
 
         # initialize arrays to store flows and costs
+        # store all paths in a 3D list
+        self.allpaths = [[[] for _ in range(self.adj.shape[1])] for _ in range(self.adj.shape[0])]
 
-        self.allpaths = [[[] for k in range(self.adj.shape[1])] for kk in range(self.adj.shape[0])] # store all paths in a 3D list
-        #self.WEflowsLinear, self.WEflowsAffine, self.WEflowsBPR = [ [[[] for k in range(self.adj.shape[1])] for kk in range(self.adj.shape[0])] ] * 3
-        #self.WEflowsLinear, self.WEflowsAffine, self.WEflowsBPR = np.zeros((3, self.adj.shape[0], self.adj.shape[1]))
-        #self.WEflowsLinear_edge, self.WEflowsAffine_edge, self.WEflowsBPR_edge = np.zeros((3, self.adj.shape[0], self.adj.shape[1]))
-
-        #self.SOflowsLinear, self.SOflowsAffine, self.SOflowsBPR = [ [[[] for k in range(self.adj.shape[1])] for kk in range(self.adj.shape[0])] ] * 3
-        #self.SOflowsLinear, self.SOflowsAffine, self.SOflowsBPR = np.zeros((3, self.adj.shape[0], self.adj.shape[1]))
-        #self.SOflowsLinear_edge, self.SOflowsAffine_edge, self.SOflowsBPR_edge = np.zeros((3, self.adj.shape[0], self.adj.shape[1]))
-
-        #self.WEcostsLinear, self.WEcostsAffine, self.WEcostsBPR = np.zeros((3, self.adj.shape[0], self.adj.shape[1]))#[ [[[] for k in range(self.adj.shape[1])] for kk in range(self.adj.shape[0])] ] * 3
-        #self.WEcostsLinear_edge, self.WEcostsAffine_edge, self.WEcostsBPR_edge = np.zeros((3, self.adj.shape[0], self.adj.shape[1]))
-
-        #self.SOcostsLinear, self.SOcostsAffine, self.SOcostsBPR = np.zeros((3, self.adj.shape[0], self.adj.shape[1])) #[ [[[] for k in range(self.adj.shape[1])] for kk in range(self.adj.shape[0])] ] * 3
-        #self.SOcostsLinear_edge, self.SOcostsAffine_edge, self.SOcostsBPR_edge = np.zeros((3, self.adj.shape[0], self.adj.shape[1]))
-
-    def _dijkstra(self, s, t):
+    def dijkstra(self, s, t):
         """
         :param s: source
         :param t: target
@@ -77,7 +58,7 @@ class Graph:
 
         return -1
 
-    def _dijkstra_weighted(self, s, t):
+    def dijkstra_weighted(self, s, t):
         """find shortest path between s and t (weighted network)"""
         q, seen = [(0, s)], set()
 
@@ -95,52 +76,44 @@ class Graph:
         return -1
 
     def _findallpath_recursive(self, v, u, visited, path, allpaths, cutoff):
-        """
-        adj: adj matrix
-        s: source
-        t: destination
-        visited: vertices that have been visited
-        path: temporary path
-        allpaths: all paths...
-        """
-        # mark u as visited
+
         visited[v] = True
         path.append(v)
         
         if len(path) < cutoff:
             if v == u:  # if the current vertice is the destination
-                allpaths.append(path[:]) # creat deep copy of path
-                #print(path)
-            
+                allpaths.append(path[:])  # creat deep copy of path
+
             elif v < self.adj.shape[0]:  # if not
-                for k in np.nonzero(self.adj[v])[0]: # traverse the vertices next to v
-                    if visited[k] == False:
+                for k in np.nonzero(self.adj[v])[0]:  # traverse the vertices next to v
+                    if not visited[k]:
                         self._findallpath_recursive(k, u, visited, path, allpaths, cutoff)
                         
-        elif v == u: # len(path == cutoff)
+        elif v == u:  # len(path == cutoff)
             allpaths.append(path[:])
-            #print(path)
-            
             
         # mark u as unvisited
         visited[v] = False
         path.pop()
     
-    def findallpaths(self, s, t, cutoff = None):
+    def findallpaths(self, s, t, cutoff=None):
         """
-        find all possible paths from source s to destination t
-        adj: adj matrix
-        s: source
-        t: destination
+        find all possible paths shorter than cutoff from source s to target t
+        :param s: source node
+        :param t: target node
+        :param cutoff: a scalar value
+        :return: a list of the paths from s to t
         """
-        if cutoff == None:
-            cutoff = self._dijkstra(s, t) + 1 + 1
-            if cutoff == 1: # i.e. path length = 0
+
+        if cutoff is None:
+            cutoff = self.dijkstra(s, t) + 1 + 1
+            if cutoff == 1:  # i.e. path length = 0
                 return False
+
         allpaths = []
         num_vertices = np.max(self.adj.shape)    
-        visited = [False] * (num_vertices) # all vertices are unvisited at the beginning 
-        path = [] # temp path
+        visited = [False] * num_vertices  # all vertices are unvisited at the beginning
+        path = []  # temp path
     
         self._findallpath_recursive(s, t, visited, path, allpaths, cutoff)
         self.allpaths[s][t] = allpaths
@@ -158,5 +131,3 @@ class Graph:
             path_arrays = np.append(path_arrays, path_array_tmp[np.newaxis, :], axis=0)
 
         return path_arrays
-
-
