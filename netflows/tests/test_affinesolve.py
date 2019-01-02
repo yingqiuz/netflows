@@ -33,7 +33,7 @@ def test_we_affine(test_graph):
     if not np.allclose(x, WE_FLOW, rtol=1e-8):
         errors.append("WE flow is incorrect")
 
-    if not np.abs(total_cost_sum - WE_FLOW) < WE_COST * 1e-8:
+    if not np.abs(total_cost_sum - WE_COST) < WE_COST * 1e-8:
         errors.append("WE travel time is incorrect")
 
     assert not errors, "errors occurred:\n{}".format("\n".join(errors))
