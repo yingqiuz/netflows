@@ -30,7 +30,7 @@ def test_we_affine(test_graph):
     )
     errors = []
 
-    if not np.abs(x - WE_FLOW).sum() < (x * 1e-8).sum():
+    if not np.allclose(x, WE_FLOW, rtol=1e-8):
         errors.append("WE flow is incorrect")
 
     if not np.abs(total_cost_sum - WE_FLOW) < WE_COST * 1e-8:
@@ -45,7 +45,7 @@ def test_so_affine(test_graph):
     )
     errors = []
 
-    if not np.abs(x - SO_FLOW).sum() < (x * 1e-8).sum():
+    if not np.allclose(x, SO_FLOW, rtol=1e-8):
         errors.append("SO flow is incorrect")
 
     if not np.abs(obj_fun - SO_COST) < SO_COST * 1e-8:

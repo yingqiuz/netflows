@@ -16,15 +16,15 @@ def test_graph():
 
 
 def test_adj(test_graph):
-    assert test_graph.adj == ADJ_MAT
+    assert np.array_equal(test_graph.adj, ADJ_MAT)
 
 
 def test_weight_adj(test_graph):
-    assert test_graph.adj_weights == ADJ_MAT * WEIGHT_MAT
+    assert np.array_equal(test_graph.adj_weights, ADJ_MAT * WEIGHT_MAT)
 
 
 def test_dist_adj(test_graph):
-    assert test_graph.adj_dist == ADJ_MAT * DIST_MAT
+    assert np.array_equal(test_graph.adj_dist, ADJ_MAT * DIST_MAT)
 
 
 def test_find_all_paths(test_graph):
