@@ -1,6 +1,6 @@
 # netflows
 
-This package finds optimal traffic assignment on networks to minimize total travel cost of all users (System Optimal flow), or estimates excessive travel cost due to lack of coordination if users choose their routes selfishly.
+This package finds optimal traffic assignment on networks to minimize total travel cost of all users, or estimates excessive travel cost due to lack of coordination if users choose their routes selfishly.
 
 [![Build Status](https://travis-ci.com/yingqiuz/netflows.svg?token=GCAiuUe1sWERsysgW6zt&branch=master)](https://travis-ci.com/yingqiuz/netflows)
 
