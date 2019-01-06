@@ -36,7 +36,7 @@ from .info import (
     __url__
 )
 
-from .Graph import Graph
+from .create import create_graph
 from .funcs import (
     wardrop_equilibrium_linear_solve, system_optimal_linear_solve,
     wardrop_equilibrium_affine_solve, system_optimal_affine_solve,

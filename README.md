@@ -76,12 +76,12 @@ python setup.py install
 To find all paths that are shorter than k steps (i.e., binary distance) from a source node *s* to a target node *t*, 
 run the following:
 ```python
-from netflows import Graph
+from netflows import create_graph
 
 # create the Graph object
-G = Graph(adj=adjacency_matrix, dist=distance_matrix, weights=weight_matrix)
+my_graph = create_graph(adj=adjacency_matrix, dist=distance_matrix, weights=weight_matrix)
 # find all possible paths below k steps from source node s to target node t
-allpaths = G.findallpaths(s, t, cutoff=k)
+allpaths = my_graph.findallpaths(s, t, cutoff=k)
 ``` 
 `allpaths`is  a list of all the possible paths from *s* to *k* shorter than *k*. 
 Each element is a list storing the nodes' indices in the order that the users traverse from *s* to *t*. 
@@ -91,12 +91,12 @@ element *i, j* denotes the directionality from *i* to *j*.
 ### Find shortest paths
 To find the shortest path from *s* to *t*:
 ```python
-d = G.dijkstra(s, t)
+d = my_graph.dijkstra(s, t)
 ```
 which returns the binary shortest distance from *s* to *t*, 
 or the weighted version:
 ```python
-d = G.dijkstra_weighted(s, t)
+d = my_graph.dijkstra_weighted(s, t)
 ```
 
 ### Find System Optimal flow
@@ -105,7 +105,7 @@ To find the system optimal flow assignment that minimizes the total travel cost 
 from netflows import system_optimal_linear_solve
 
 # find the optimal flow assignment and the total travel cost
-flows_path_formulation, flows_edge_formulation, total_travel_cost, edge_travel_cost = system_optimal_linear_solve(G, s, t, tol=1e-8, maximum_iter=100000, cutoff=k)
+flows_path_formulation, flows_edge_formulation, total_travel_cost, edge_travel_cost = system_optimal_linear_solve(my_graph, s, t, tol=1e-8, maximum_iter=100000, cutoff=k)
 ```
 `flows_path_formulation` is a list of flows corresponding to the elements in `allpaths`. `flows_edge_formulation` is a matrix with element *i, j* storing the flow on edge *(i, j)*. `total_travel_cost` is the total travel cost incurred by all the users (a scalar value), and `edge_travel_cost`is a matrix with element *i, j* storing the travel cost on edge *(i, j)* incurred by the users that traverse this edge.
 
@@ -117,7 +117,7 @@ To estimate the travel cost due to lack of coordination (i.e., to find the Wardr
 from netflows import wardrop_equilibrium_linear_solve
 
 # find the WE flow assignment and the total travel cost
-flows_path_formulation, flows_edge_formulation, total_travel_cost, edge_travel_cost = wardrop_equilibrium_linear_solve(G, s, t, tol=1e-8, maximum_iter=100000, cutoff=k)
+flows_path_formulation, flows_edge_formulation, total_travel_cost, edge_travel_cost = wardrop_equilibrium_linear_solve(my_graph, s, t, tol=1e-8, maximum_iter=100000, cutoff=k)
 ```
 Likewise, `flows_path_formulation` is a list of flows corresponding to the elements in `allpaths`. `flows_edge_formulation` is a matrix with element *i, j* storing the flow on edge *(i, j)*. `total_travel_cost` is the total travel cost incurred by all the users (a scalar value), and `edge_travel_cost`is a matrix with element *i, j* storing the travel cost on edge *(i, j)* incurred by the users that traverse this edge.
 
@@ -127,7 +127,7 @@ Aso supported: `wardrop_equilibrium_affine_solve`, `wardrop_equilibrium_bpr_solv
 We welcome all bug reports, suggestions and changes! 
 If you are interested in getting involved, 
 please refer to [CONTRIBUTING](https://github.com/yingqiuz/netflows/blob/master/CONTRIBUTING.md) and [CODE_OF_CONDUCT](https://github.com/yingqiuz/netflows/blob/master/CODE_OF_CONDUCT.md) for the guidelines, fork the repository on GitHub, 
-and create a pull request.
+and create a pull request. Thank you!
 
 ## Reference
 \[1\] Wardrop, J. G. (1952, June). Some theoretical aspects of road traffic research. In Inst Civil Engineers Proc London/UK/.
