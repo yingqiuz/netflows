@@ -15,7 +15,7 @@ or estimates excessive travel cost due to lack of coordination if users choose t
   + [Find shortest paths](https://github.com/yingqiuz/netflows#find-shortest-paths)
   + [Find System Optimal flow](https://github.com/yingqiuz/netflows#system-optimal-flow)
   + [Find Wardrop Equilibrium flow](https://github.com/yingqiuz/netflows#wardrop-equilibrium-flow)
-* [Contributing](https://github.com/yingqiuz/netflows#contributing)
+* [Getting involved](https://github.com/yingqiuz/netflows#getting-involved)
 * [Reference](https://github.com/yingqiuz/netflows#reference)
 
 ## Overview
@@ -45,9 +45,9 @@ estimate the associated travel cost on each road and in total! You can also alte
 
 However, in the absence of global coordination, drivers choose their routes selfishly, only interested in minimizing their own travel cost. 
 Then it comes to the term, Wardrop Equilibrium, which is a type of Nash Equlibrium of the drivers' competition in finding the most economic routes. 
-At Wardrop Equilibrium, "The journey times on all the routes actually used are equal, and less than those which would be experienced by a single vehicle on any unused route" \[Wardrop 1952\]. 
+At Wardrop Equilibrium, "The journey times on all the routes actually used are equal, and less than those which would be experienced by a single vehicle on any unused route" [[1](https://github.com/yingqiuz/netflows#reference)]. 
 The Wardrop Equilibrium flow is not optimal in the sense of global travel cost due to lack of coordination, but it is useful in estimating the real-time traffic flow and cost, and in designing new road networks 
-(as the selfish routing strategies may lead to Braess's paradox, in which adding extra road to alleviate congestion will actually increase the total travel cost).
+(as the selfish routing strategies may lead to Braess's paradox [[2](https://github.com/yingqiuz/netflows#reference)], in which adding extra road to alleviate congestion will actually increase the total travel cost).
 
 ### Path formulation and edge formulation
 At this point, it will be useful to clarify several terms, path formulation and edge formulation of traffic flow. In path formulation, we characterise the flow on each possible path 
@@ -123,10 +123,15 @@ Likewise, `flows_path_formulation` is a list of flows corresponding to the eleme
 
 Aso supported: `wardrop_equilibrium_affine_solve`, `wardrop_equilibrium_bpr_solve`.
 
-## Contributing
+## Getting involved
 We welcome all bug reports, suggestions and changes! 
 If you are interested in getting involved, 
-please refer to [Contributing](https://github.com/yingqiuz/netflows/blob/master/CONTRIBUTING.md) and [CODE_OF_CONDUCT](https://github.com/yingqiuz/netflows/blob/master/CODE_OF_CONDUCT.md) for the guidelines, fork the repository on GitHub, 
+please refer to [CONTRIBUTING](https://github.com/yingqiuz/netflows/blob/master/CONTRIBUTING.md) and [CODE_OF_CONDUCT](https://github.com/yingqiuz/netflows/blob/master/CODE_OF_CONDUCT.md) for the guidelines, fork the repository on GitHub, 
 and create a pull request.
 
 ## Reference
+\[1\] Wardrop, J. G. (1952, June). Some theoretical aspects of road traffic research. In Inst Civil Engineers Proc London/UK/.
+
+\[2\] Braess, D. (1968). Über ein Paradoxon aus der Verkehrsplanung. Unternehmensforschung, 12(1), 258-268.
+
+\[3\] Correa, José R., and Nicolás E. Stier-Moses. "Wardrop equilibria." Encyclopedia of Operations Research and Management Science. Wiley (2011).
