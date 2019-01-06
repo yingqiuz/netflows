@@ -17,6 +17,7 @@ which increases the likelihood of a congestion.
 Without a global coordinator, each driver is only interested in minimizing his or her own travel cost. 
 
 Here is an example:
+
 ![alt text](docs/WE_example.png)
 
 One unit of infinitely divisible commodities are being transported from *S* to *T*. 
@@ -45,6 +46,8 @@ At this point, it will be useful to clarify several terms, path formulation and 
 The package supports linear, affine and Bureau of Public Roads (BPR) cost functions.
 
 ![alt text](docs/costfuncs.png)
+
+If the parameters will be set to default values if not specified.
 
 ## Install
 Make sure you have Python>=3.5 installed. 
