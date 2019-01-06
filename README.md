@@ -7,7 +7,7 @@ This package finds optimal traffic assignment on networks to minimize total trav
 ## Overview
 Imagine we have a group of drivers transporting commodities from origin to a destination city. Each road is associated with a travel cost value (e.g. travel time spent on the road), which depends on the road's length, capacity, and the total traffic on it. Longer road length generally indicates higher travel cost, and so does lower capacity and more total traffic on the road, which increases the likelihood of a congestion. Without a global coordinator, each driver is only interested in minimizing his or her own travel cost. 
 
-How would you coordinate the traffic to minimize total travel cost of all the drivers?
+How would you coordinate the traffic to minimize total travel cost of all the drivers? Or, if the global coordinator is absent, how to estimate the travel cost incurred by the selfish routing strategies of the drivers?
 
 ### System Optimal flow and Wardrop Equilibrium flow
 
