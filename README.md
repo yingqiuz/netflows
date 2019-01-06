@@ -15,7 +15,7 @@ One unit of infinitely divisible commodities are being transported from *S* to *
 How would you coordinate the traffic to minimize total travel cost of all the drivers? Or, if the global coordinator is absent, how to estimate the travel cost incurred by the selfish routing strategies of the drivers?
 
 ### System Optimal flow and Wardrop Equilibrium flow
-
+A global coordinator seeks to minimize the total travel cost of all the drivers, namely, the total cost of transporting all the commodities from origin to destination. Fortunately, if the cost functions are convex, the total travel cost always has a global minimum. Our package can help you find the optimal traffic assignment and estimate the associated travel cost on each road and in total! You can also alter the network (i.e., adding an edge) and see how the assignment or the travel cost goes.
 
 
 ### Choice of cost functions
