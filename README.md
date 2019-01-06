@@ -5,7 +5,15 @@ This package finds optimal traffic assignment on networks to minimize total trav
 [![Build Status](https://travis-ci.com/yingqiuz/netflows.svg?token=GCAiuUe1sWERsysgW6zt&branch=master)](https://travis-ci.com/yingqiuz/netflows)
 
 ## Overview
+Imagine we have a group of drivers transporting commodities from origin to a destination city. Each road is associated with a travel cost value (e.g. travel time spent on the road), which depends on the road's length, capacity, and the total traffic on it. Longer road length generally indicates higher travel cost, and so does lower capacity and more total traffic on the road, which increases the likelihood of a congestion. Without a global coordinator, each driver is only interested in minimizing his or her own travel cost. 
 
+How would you coordinate the traffic to minimize total travel cost of all the drivers?
+
+### System Optimal flow and Wardrop Equilibrium flow
+
+
+
+### Choice of cost functions
 
 ## Install
 Make sure you have Python>=3.5 installed. To install this package, open a terminal and type the following:
