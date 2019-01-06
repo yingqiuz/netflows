@@ -28,7 +28,7 @@ allpaths = G.findallpaths(s, t, cutoff=k)
 ``` 
 `allpaths`is  a list of all the possible paths from *s* to *k* shorter than *k*. Each element is a list storing the nodes' indices in the order that the users traverse from *s* to *t*. **NB**: in the adjacency/distance/weight matrix, element *i, j* denotes the directionality from *i* to *j*.
 
-# find shortest paths
+### find shortest paths
 To find the shortest path from *s* to *t*:
 ```python
 d = G.dijkstra(s, t)
