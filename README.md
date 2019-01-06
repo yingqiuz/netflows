@@ -55,7 +55,7 @@ To estimate the travel cost due to lack of coordination (i.e., to find the Wardr
 ```python
 from netflows import wardrop_equilibrium_linear_solve
 
-# find the optimal flow assignment and the total travel cost
+# find the WE flow assignment and the total travel cost
 flows_path_formulation, flows_edge_formulation, total_travel_cost, edge_travel_cost = wardrop_equilibrium_linear_solve(G, s, t, tol=1e-8, maximum_iter=100000, cutoff=k)
 ```
 Likewise, `flows_path_formulation` is a list of flows corresponding to the elements in `allpaths`. `flows_edge_formulation` is a matrix with element *i, j* storing the flow on edge *(i, j)*. `total_travel_cost` is the total travel cost incurred by all the users (a scalar value), and `edge_travel_cost`is a matrix with element *i, j* storing the travel cost on edge *(i, j)* incurred by the users that traverse this edge.
