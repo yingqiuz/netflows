@@ -17,11 +17,10 @@ How would you coordinate the traffic to minimize total travel cost of all the dr
 ### System Optimal flow and Wardrop Equilibrium flow
 A global coordinator seeks to minimize the total travel cost of all the drivers, namely, the total cost of transporting all the commodities from origin to destination. Fortunately, if the cost functions are convex, the total travel cost always has a global minimum. Our package can help you find the optimal traffic assignment and estimate the associated travel cost on each road and in total! You can also alter the network (i.e., adding an edge) and see how the assignment or the travel cost goes.
 
-However, in the absence of global coordination, drivers choose their routes selfishly, only interested in minimizing their own travel cost. Then it comes to the term, Wardrop Equilibrium, which is a type of Nash Equlibrium of the drivers' competition in finding the most economic routes. At Wardrop Equilibrium, "The journey times on all the routes actually used are equal, and less than those which would be experienced by a single vehicle on any unused route" \[Wardrop 1952\]. The Wardrop Equilibrium flow is not optimal in the sense of global travel cost due to lack of coordination, but it is useful in estimating the cost in real traffic and in designing new roads.
-
-### Braess's paradox
+However, in the absence of global coordination, drivers choose their routes selfishly, only interested in minimizing their own travel cost. Then it comes to the term, Wardrop Equilibrium, which is a type of Nash Equlibrium of the drivers' competition in finding the most economic routes. At Wardrop Equilibrium, "The journey times on all the routes actually used are equal, and less than those which would be experienced by a single vehicle on any unused route" \[Wardrop 1952\]. The Wardrop Equilibrium flow is not optimal in the sense of global travel cost due to lack of coordination, but it is useful in estimating the real-time traffic flow and cost, and in designing new road networks as the selfish routing strategies may lead to Braess's paradox, in which adding extra road to alleviate congestion will actually increase the total travel cost.
 
 ### Path formulation and edge formulation
+
 
 ### Choice of cost functions
 
