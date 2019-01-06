@@ -6,6 +6,7 @@ This package finds optimal traffic assignment on networks to minimize total trav
 
 ## Overview
 
+
 ## Install
 Make sure you have Python>=3.5 installed. To install this package, open a terminal and type the following:
 
@@ -15,7 +16,7 @@ cd netflows
 python setup.py install
 ```
 
-## Usage
+## Examples
 
 ### find all possible paths
 To find all paths that are shorter than k steps (i.e., binary distance) from a source node *s* to a target node *t*, run the following:
@@ -24,6 +25,7 @@ from netflows import Graph
 
 # create the Graph object
 G = Graph(adj=adjacency_matrix, dist=distance_matrix, weights=weight_matrix)
+# find all possible paths below k steps from source node s to target node t
 allpaths = G.findallpaths(s, t, cutoff=k)
 ``` 
 `allpaths`is  a list of all the possible paths from *s* to *k* shorter than *k*. Each element is a list storing the nodes' indices in the order that the users traverse from *s* to *t*. **NB**: in the adjacency/distance/weight matrix, element *i, j* denotes the directionality from *i* to *j*.
@@ -62,3 +64,5 @@ Likewise, `flows_path_formulation` is a list of flows corresponding to the eleme
 
 Aso supported: `wardrop_equilibrium_affine_solve`, `wardrop_equilibrium_bpr_solve`.
 
+## Contributing
+We welcome all bug reports, suggestions and changes! If you are interested in getting involved, please refer to for the guidelines, fork the repository on GitHub, and create a pull request.
