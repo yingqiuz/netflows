@@ -42,7 +42,9 @@ At this point, it will be useful to clarify several terms, path formulation and 
 (i.e. sum of path flows is the total transportation demand from source to target). In edge formulation, we characterise the flow on each edge (i.e., the total traffic that the road accounts for).
 
 ### Choice of cost functions
-The package supports linear (![equation](http://www.sciweavers.org/tex2img.php?eq=%24c%28x%29%3Dkx%24&bc=White&fc=Black&im=jpg&fs=12&ff=arev&edit=)), affine and Bureau of Public Roads (BPR) cost functions.
+The package supports linear, affine and Bureau of Public Roads (BPR) cost functions.
+
+![alt text](docs/costfuncs.png)
 
 ## Install
 Make sure you have Python>=3.5 installed. 
