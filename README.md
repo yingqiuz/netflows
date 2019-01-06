@@ -5,6 +5,19 @@ or estimates excessive travel cost due to lack of coordination if users choose t
 
 [![Build Status](https://travis-ci.com/yingqiuz/netflows.svg?token=GCAiuUe1sWERsysgW6zt&branch=master)](https://travis-ci.com/yingqiuz/netflows)
 
+* [Overview](https://github.com/yingqiuz/netflows#overview)
+  + [System Optimal flow and Wardrop Equilibrium flow](https://github.com/yingqiuz/netflows#system-optimal-flow-and-wardrop-equilibrium-flow)
+  + [Path formulation and edge formulation](https://github.com/yingqiuz/netflows#path-formulation-and-edge-formulation)
+  + [Choice of cost functions](https://github.com/yingqiuz/netflows#choice-of-cost-functions)
+* [Install](https://github.com/yingqiuz/netflows#install)
+* [Examples](https://github.com/yingqiuz/netflows#examples)
+  + [Find all possible paths](https://github.com/yingqiuz/netflows#find-all-possible-paths)
+  + [Find shortest paths](https://github.com/yingqiuz/netflows#find-shortest-paths)
+  + [Find System Optimal flow](https://github.com/yingqiuz/netflows#system-optimal-flow)
+  + [Find Wardrop Equilibrium flow](https://github.com/yingqiuz/netflows#wardrop-equilibrium-flow)
+* [Contributing](https://github.com/yingqiuz/netflows#contributing)
+* [Reference](https://github.com/yingqiuz/netflows#reference)
+
 ## Overview
 Imagine we have a group of drivers transporting commodities from origin to a destination city. 
 Each road is associated with a travel cost value 
@@ -16,9 +29,7 @@ and so does lower capacity and more total traffic on the road,
 which increases the likelihood of a congestion. 
 Without a global coordinator, each driver is only interested in minimizing his or her own travel cost. 
 
-Here is an example:
-
-![alt text](docs/WE_example.png)
+Here is an example: ![alt text](docs/WE_example.png)
 
 One unit of infinitely divisible commodities are being transported from *S* to *T*. 
 There are three possible paths, *S*-\>*A*-\>*T*, *S*-\>*B*-\>*T*, and *S*-\>*A*-\>*B*-\>*T*. Having the cost functions c(f) and real-time traffic in mind, drivers are under constant competition to choose the most efficient routes that minimize their own travel cost. 
@@ -61,7 +72,7 @@ python setup.py install
 
 ## Examples
 
-### find all possible paths
+### Find all possible paths
 To find all paths that are shorter than k steps (i.e., binary distance) from a source node *s* to a target node *t*, 
 run the following:
 ```python
@@ -77,7 +88,7 @@ Each element is a list storing the nodes' indices in the order that the users tr
 **NB**: in the adjacency/distance/weight matrix, 
 element *i, j* denotes the directionality from *i* to *j*.
 
-### find shortest paths
+### Find shortest paths
 To find the shortest path from *s* to *t*:
 ```python
 d = G.dijkstra(s, t)
@@ -88,7 +99,7 @@ or the weighted version:
 d = G.dijkstra_weighted(s, t)
 ```
 
-### System Optimal flow
+### Find System Optimal flow
 To find the system optimal flow assignment that minimizes the total travel cost of all the network users:
 ```python
 from netflows import system_optimal_linear_solve
@@ -100,7 +111,7 @@ flows_path_formulation, flows_edge_formulation, total_travel_cost, edge_travel_c
 
 Also supported: `system_optimal_affine_solve`, `system_optimal_bpr_solve`.
 
-### Wardrop Equilibrium flow
+### Find Wardrop Equilibrium flow
 To estimate the travel cost due to lack of coordination (i.e., to find the Wardrop Equilibrium flow):
 ```python
 from netflows import wardrop_equilibrium_linear_solve
@@ -115,5 +126,7 @@ Aso supported: `wardrop_equilibrium_affine_solve`, `wardrop_equilibrium_bpr_solv
 ## Contributing
 We welcome all bug reports, suggestions and changes! 
 If you are interested in getting involved, 
-please refer to for the guidelines, fork the repository on GitHub, 
+please refer to [Contributing](https://github.com/yingqiuz/netflows/blob/master/CONTRIBUTING.md) and [CODE_OF_CONDUCT](https://github.com/yingqiuz/netflows/blob/master/CODE_OF_CONDUCT.md) for the guidelines, fork the repository on GitHub, 
 and create a pull request.
+
+## Reference
