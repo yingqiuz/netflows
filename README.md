@@ -10,6 +10,8 @@ Imagine we have a group of drivers transporting commodities from origin to a des
 Here is an example:
 ![alt text](docs/WE_example.png)
 
+One unit of infinitely divisible commodities are being transported from *S* to *T*. There are three possible paths, *S*-\>*A*-\>*T*, *S*-\>*B*-\>*T*, and *S*-\>*A*-\>*B*-\>*T*. Having the cost functions c(f) and real-time traffic in mind, drivers are under constant competition to choose the most efficient routes that minimize their own travel cost. 
+
 How would you coordinate the traffic to minimize total travel cost of all the drivers? Or, if the global coordinator is absent, how to estimate the travel cost incurred by the selfish routing strategies of the drivers?
 
 ### System Optimal flow and Wardrop Equilibrium flow
