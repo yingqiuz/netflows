@@ -11,6 +11,7 @@ _static/
 .pytest_cache/
 .cache/
 .vscode/
+*.png
 
 # PyCharm project file
 .idea/
