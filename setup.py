@@ -23,7 +23,9 @@ if sys.version_info[:2] < (3, 5):
     sys.exit(-1)
 
 # write the version information
-from .netflows import info
+sys.path.insert(0, 'netflows')
+import info
+sys.path.pop(0)
 
 # get long description from README
 curr_path = os.path.dirname(__file__)
