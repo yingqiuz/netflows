@@ -76,10 +76,10 @@ python setup.py install
 To find all paths that are shorter than k steps (i.e., binary distance) from a source node *s* to a target node *t*, 
 run the following:
 ```python
-from netflows import create_graph
+from netflows import CreateGraph
 
 # create the Graph object
-my_graph = create_graph(adj=adjacency_matrix, dist=distance_matrix, weights=weight_matrix)
+my_graph = CreateGraph(adj=adjacency_matrix, dist=distance_matrix, weights=weight_matrix)
 # find all possible paths below k steps from source node s to target node t
 allpaths = my_graph.findallpaths(s, t, cutoff=k)
 ``` 

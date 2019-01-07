@@ -4,11 +4,12 @@ import numpy as np
 from heapq import heappop, heappush
 
 
-class create_graph:
+class CreateGraph:
     def __init__(self, adj=0, dist=0, weights=0):
         """
         adj: adjacency mat
-        cost_func: a string that specifies cost function. support: linear, affine, BRP, MM1
+        cost_func: a string that specifies cost function.
+        supported: linear, affine, BRP, MM1
         """
 
         # weighted adj matrix
@@ -17,7 +18,7 @@ class create_graph:
         self.adj = np.where(self.adj != 0, 1, 0)  # adjacency matrix
 
         self.weights = np.array(weights, dtype=np.float)
-        self.adj_weights = np.array(weights, dtype=np.float) * self.adj  # weighted matrix * self
+        self.adj_weights = np.array(weights, dtype=np.float) * self.adj
 
         # distance matrix
         self.dist = np.array(dist, dtype=np.float)
@@ -35,7 +36,9 @@ class create_graph:
 
         # initialize arrays to store flows and costs
         # store all paths in a 3D list
-        self.allpaths = [[[] for _ in range(self.adj.shape[1])] for _ in range(self.adj.shape[0])]
+        self.allpaths = [
+            [[] for _ in range(self.adj.shape[1])] for _ in range(self.adj.shape[0])
+        ]
 
     def dijkstra(self, s, t):
         """
@@ -87,7 +90,9 @@ class create_graph:
             elif v < self.adj.shape[0]:  # if not
                 for k in np.nonzero(self.adj[v])[0]:  # traverse the vertices next to v
                     if not visited[k]:
-                        self._findallpath_recursive(k, u, visited, path, allpaths, cutoff)
+                        self._findallpath_recursive(
+                            k, u, visited, path, allpaths, cutoff
+                        )
                         
         elif v == u:  # len(path == cutoff)
             allpaths.append(path[:])
@@ -111,8 +116,10 @@ class create_graph:
                 return False
 
         allpaths = []
-        num_vertices = np.max(self.adj.shape)    
-        visited = [False] * num_vertices  # all vertices are unvisited at the beginning
+        num_vertices = np.max(self.adj.shape)
+
+        # all vertices are unvisited at the beginning
+        visited = [False] * num_vertices
         path = []  # temp path
     
         self._findallpath_recursive(s, t, visited, path, allpaths, cutoff)
@@ -121,12 +128,15 @@ class create_graph:
 
     def construct_path_arrays(self, s, t):
 
-        path_arrays = np.empty((0, self.adj.shape[0], self.adj.shape[1]))  # list of matrix to store path flows
+        # list of matrix to store path flows
+        path_arrays = np.empty((0, self.adj.shape[0], self.adj.shape[1]))
 
         for path in self.allpaths[s][t]:
             path_array_tmp = np.zeros(self.adj.shape)
-            index_x = [path[k] for k in range(len(path) - 1)]  # x index of the adj matrix
-            index_y = [path[k] for k in range(1, len(path))]  # y index of the adj matrix
+            # x index of the adj matrix
+            index_x = [path[k] for k in range(len(path) - 1)]
+            # y index of the adj matrix
+            index_y = [path[k] for k in range(1, len(path))]
             path_array_tmp[index_x, index_y] = 1
             path_arrays = np.append(path_arrays, path_array_tmp[np.newaxis, :], axis=0)
 
