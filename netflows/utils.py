@@ -148,7 +148,7 @@ def so_bpr_grad(x, a, u, path_arrays, num_variables):
                 path_arrays[-1]))
          for k in range(num_variables - 1)]
     ) + np.array(
-        [np.sum(allflows * a * (0.6 * (allflows / u) ** 3 / u) * (
+        [np.sum(allflows * a * (0.6 * (allflows * u) ** 3 * u) * (
                 path_arrays[k] * np.where(path_arrays[-1] == 0, 1, 0) - np.where(path_arrays[k] == 0, 1, 0) *
                 path_arrays[-1]))
          for k in range(num_variables - 1)]
