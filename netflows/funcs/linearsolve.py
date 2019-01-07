@@ -110,7 +110,7 @@ def _wardrop_equilibrium_linear_solve(G, s, t, tol, maximum_iter, allpaths, a):
         print('The total travel time is %f' % total_cost_sum)
         return x, allflows, total_cost_sum, total_cost
 
-    gradients = we_linear_grad(x, a, path_arrays, num_variables)
+    gradients = we_linear_grad(allflows, a, path_arrays, num_variables)
 
     # initial step size determination
     gamma1 = np.min(np.abs(x[:-1] / gradients))
@@ -146,7 +146,7 @@ def _wardrop_equilibrium_linear_solve(G, s, t, tol, maximum_iter, allpaths, a):
         total_cost_sum = total_cost.sum()
 
         # new gradients and step size
-        gradients = we_linear_grad(x, a, path_arrays, num_variables)
+        gradients = we_linear_grad(allflows, a, path_arrays, num_variables)
 
         if np.sum(np.where(np.abs(gradients-prev_gradients) < tol, 0, 1)) == 0:
             print('Wardrop Equilibrium flow found:', x)
@@ -197,7 +197,7 @@ def _system_optimal_linear_solve(G, s, t, tol, maximum_iter, allpaths, a):
         print('The total travel time is %f' % obj_fun)
         return x, allflows, obj_fun, total_cost
 
-    gradients = so_linear_grad(x, a, path_arrays, num_variables)
+    gradients = so_linear_grad(allflows, a, path_arrays, num_variables)
 
     # initial step size determination
     gamma1 = np.min(np.abs(x[:-1]/gradients))
@@ -231,7 +231,7 @@ def _system_optimal_linear_solve(G, s, t, tol, maximum_iter, allpaths, a):
         obj_fun = linear_so_obj(allflows, a).sum()
 
         # new gradients and gamma 
-        gradients = so_linear_grad(x, a, path_arrays, num_variables)
+        gradients = so_linear_grad(allflows, a, path_arrays, num_variables)
         
         if np.sum(np.where(np.abs(gradients-prev_gradients) < tol, 0, 1)) == 0:
             print('System Optimal flow found:', x)

@@ -124,7 +124,7 @@ def _wardrop_equilibrium_bpr_solve(G, s, t, tol, maximum_iter, allpaths, a, u):
         print('The total travel time is %f' % total_cost_sum)
         return x, allflows, total_cost_sum, total_cost
 
-    gradients = we_bpr_grad(x, a, u, path_arrays, num_variables)
+    gradients = we_bpr_grad(allflows, a, u, path_arrays, num_variables)
     
     # initial step size determination
     gamma1 = np.min(np.abs(x[:-1] / gradients))
@@ -162,7 +162,7 @@ def _wardrop_equilibrium_bpr_solve(G, s, t, tol, maximum_iter, allpaths, a, u):
         total_cost_sum = total_cost.sum()
 
         # new gradients
-        gradients = we_bpr_grad(x, a, u, path_arrays, num_variables)
+        gradients = we_bpr_grad(allflows, a, u, path_arrays, num_variables)
         
         if np.sum(np.where(np.abs(gradients-prev_gradients) < tol, 0, 1)) == 0:  # test convergence
             print('Wardrop Equilibrium flow found:', x)
@@ -212,7 +212,7 @@ def _system_optimal_bpr_solve(G, s, t, tol, maximum_iter, allpaths, a, u):
         print('The total travel time is %f' % obj_fun)
         return x, allflows, obj_fun, total_cost
 
-    gradients = so_bpr_grad(x, a, u, path_arrays, num_variables)
+    gradients = so_bpr_grad(allflows, a, u, path_arrays, num_variables)
 
     # initial step size
     gamma1 = np.min(np.abs(x[:-1] / gradients))
@@ -246,7 +246,7 @@ def _system_optimal_bpr_solve(G, s, t, tol, maximum_iter, allpaths, a, u):
         total_cost = allflows * bpr_cost(allflows, a, u)
 
         # update gradients
-        gradients = so_bpr_grad(x, a, u, path_arrays, num_variables)
+        gradients = so_bpr_grad(allflows, a, u, path_arrays, num_variables)
 
         # convergence?
         if np.sum(np.where(np.abs(gradients-prev_gradients) < tol, 0, 1)) == 0:

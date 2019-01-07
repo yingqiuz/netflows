@@ -119,7 +119,7 @@ def _wardrop_equilibrium_affine_solve(G, s, t, tol, maximum_iter, allpaths, a, a
         return x, allflows, total_cost_sum, total_cost
 
     # initial gradients
-    gradients = we_affine_grad(x, a, a0, path_arrays, num_variables)
+    gradients = we_affine_grad(allflows, a, a0, path_arrays, num_variables)
 
     # initial estimation of step size gamma
     gamma1 = np.min(np.abs(x[:-1] / gradients))
@@ -156,7 +156,7 @@ def _wardrop_equilibrium_affine_solve(G, s, t, tol, maximum_iter, allpaths, a, a
         total_cost_sum = total_cost.sum()
         
         # new gradients and stepsize
-        gradients = we_affine_grad(x, a, a0, path_arrays, num_variables)
+        gradients = we_affine_grad(allflows, a, a0, path_arrays, num_variables)
         
         if np.where(np.abs(gradients - prev_gradients) < tol, 0, 1).sum() == 0:  # convergence
             print('Wardrop Equilibrium flow found:', x)
@@ -207,7 +207,7 @@ def _system_optimal_affine_solve(G, s, t, tol, maximum_iter, allpaths, a, a0):
         return x, allflows, obj_fun, total_cost
 
     # initial gradients
-    gradients = so_affine_grad(x, a, a0, path_arrays, num_variables)
+    gradients = so_affine_grad(allflows, a, a0, path_arrays, num_variables)
 
     # initial step size determination
     gamma1 = np.min(np.abs(x[:-1] / gradients))
@@ -247,7 +247,7 @@ def _system_optimal_affine_solve(G, s, t, tol, maximum_iter, allpaths, a, a0):
         total_cost = allflows * affine_cost(allflows, a, a0)
 
         # update gradients and step size
-        gradients = so_affine_grad(x, a, a0, path_arrays, num_variables)
+        gradients = so_affine_grad(allflows, a, a0, path_arrays, num_variables)
 
         if np.where(np.abs(gradients - prev_gradients) < tol, 0, 1).sum() == 0:
             print('System Optimal flow found:', x)
