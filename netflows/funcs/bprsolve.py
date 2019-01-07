@@ -8,12 +8,13 @@ import numpy as np
 from tqdm import tqdm
 
 
-def wardrop_equilibrium_bpr_solve(G, s, t, tol=1e-8, maximum_iter=10000, cutoff=None, a=None, u=None):
+def wardrop_equilibrium_bpr_solve(graph_object, s, t, tol=1e-8, maximum_iter=10000, cutoff=None, a=None, u=None):
     """
-    The function to solve Wardrop Equilibrium flow for a single source target pair under BPR cost function setting.
+    The function to solve Wardrop Equilibrium flow for a single source target pair
+    under BPR cost function setting.
     Usage:
 
-    :param G: Graph object, storing the adjacency/weight/distance matrices
+    :param graph_object: Graph object, storing the adjacency/weight/distance matrices
     :param s: source node
     :param t: target node
     :param tol: tolerance for convergence
@@ -32,29 +33,30 @@ def wardrop_equilibrium_bpr_solve(G, s, t, tol=1e-8, maximum_iter=10000, cutoff=
     # find all possible paths from s to t that are shorter than cutoff
     if cutoff is None:
         print("Cutoff not specified: take shortest path distance + 1 as cutoff")
-        cutoff = G.dijkstra(s, t) + 1 + 1
+        cutoff = graph_object.dijkstra(s, t) + 1 + 1
         if cutoff == 1:
             return
-    allpaths = G.findallpaths(s, t, cutoff)
+    allpaths = graph_object.findallpaths(s, t, cutoff)
 
     if a is None:
-        a = G.adj_dist
+        a = graph_object.adj_dist
 
     # binarize dist matrix
-    a[G.adj == 0] = 0
+    a[graph_object.adj == 0] = 0
 
     if u is None:
-        u = G.rpl_weights
+        u = graph_object.rpl_weights
 
-    return _wardrop_equilibrium_bpr_solve(G, s, t, tol, maximum_iter, allpaths, a, u)
+    return _wardrop_equilibrium_bpr_solve(graph_object, s, t, tol, maximum_iter, allpaths, a, u)
 
 
-def system_optimal_bpr_solve(G, s, t, tol=1e-8, maximum_iter=10000, cutoff=None, a=None, u=None):
+def system_optimal_bpr_solve(graph_object, s, t, tol=1e-8, maximum_iter=10000, cutoff=None, a=None, u=None):
     """
-    The function to solve System Optimal flow for a single source target pair under BPR cost function setting.
+    The function to solve System Optimal flow for a single source target pair
+    under BPR cost function setting.
     Usage:
 
-    :param G: Graph object, storing the adjacency/weight/distance matrices
+    :param graph_object: Graph object, storing the adjacency/weight/distance matrices
     :param s: source node
     :param t: target node
     :param tol: tolerance for convergence
@@ -73,23 +75,23 @@ def system_optimal_bpr_solve(G, s, t, tol=1e-8, maximum_iter=10000, cutoff=None,
     # find all possible paths from s to t that are shorter than cutoff
     if cutoff is None:
         print("Cutoff not specified: take shortest path distance + 1 as cutoff")
-        cutoff = G.dijkstra(s, t) + 1 + 1
+        cutoff = graph_object.dijkstra(s, t) + 1 + 1
         if cutoff == 1:
             return
-    allpaths = G.findallpaths(s, t, cutoff)
+    allpaths = graph_object.findallpaths(s, t, cutoff)
 
     if a is None:
-        a = G.adj_dist
+        a = graph_object.adj_dist
     # binarize dist matrix
-    a[G.adj == 0] = 0
+    a[graph_object.adj == 0] = 0
 
     if u is None:
-        u = G.rpl_weights
+        u = graph_object.rpl_weights
 
-    return _system_optimal_bpr_solve(G, s, t, tol, maximum_iter, allpaths, a, u)
+    return _system_optimal_bpr_solve(graph_object, s, t, tol, maximum_iter, allpaths, a, u)
 
 
-def _wardrop_equilibrium_bpr_solve(G, s, t, tol, maximum_iter, allpaths, a, u):
+def _wardrop_equilibrium_bpr_solve(graph_object, s, t, tol, maximum_iter, allpaths, a, u):
 
     num_variables = len(allpaths)  # the number of paths from s to t
     print('A total of %d paths found from %d to %d' % (num_variables, int(s), int(t)))
@@ -99,10 +101,10 @@ def _wardrop_equilibrium_bpr_solve(G, s, t, tol, maximum_iter, allpaths, a, u):
 
     # find equilibrium -- convex optimization
     # map to matrix
-    path_arrays = np.empty((0, G.adj.shape[0], G.adj.shape[1]))  # list of matrix to store path flows
+    path_arrays = np.empty((0, graph_object.adj.shape[0], graph_object.adj.shape[1]))
     print('constructing edge formulations...')
     for path in tqdm(allpaths, total=num_variables):
-        path_array_tmp = np.zeros(G.adj.shape)
+        path_array_tmp = np.zeros(graph_object.adj.shape)
         index_x = [path[k] for k in range(len(path) - 1)]  # x index of the adj matrix
         index_y = [path[k] for k in range(1, len(path))]  # y index of the adj matrix
         path_array_tmp[index_x, index_y] = 1
@@ -110,7 +112,7 @@ def _wardrop_equilibrium_bpr_solve(G, s, t, tol, maximum_iter, allpaths, a, u):
 
     # element (i, j) is the total flow on edge (i,j)    
     allflows = np.sum(path_arrays * x.reshape(num_variables, 1, 1), axis=0)
-    allflows[G.adj == 0] = 0
+    allflows[graph_object.adj == 0] = 0
 
     total_cost = allflows * bpr_cost(allflows, a, u)
     total_cost_sum = total_cost.sum()
@@ -179,7 +181,7 @@ def _wardrop_equilibrium_bpr_solve(G, s, t, tol, maximum_iter, allpaths, a, u):
     return
 
 
-def _system_optimal_bpr_solve(G, s, t, tol, maximum_iter, allpaths, a, u):
+def _system_optimal_bpr_solve(graph_object, s, t, tol, maximum_iter, allpaths, a, u):
 
     num_variables = len(allpaths)  # the number of paths from s to t
     print('A total of %d paths found from %d to %d' % (num_variables, int(s), int(t)))
@@ -189,10 +191,10 @@ def _system_optimal_bpr_solve(G, s, t, tol, maximum_iter, allpaths, a, u):
 
     # find equilibrium -- convex optimization
     # map to matrix
-    path_arrays = np.empty((0,   G.adj.shape[0],   G.adj.shape[1]))  # list of matrix to store path flows
+    path_arrays = np.empty((0,   graph_object.adj.shape[0],   graph_object.adj.shape[1]))
     print('constructing edge formulations...')
     for path in tqdm(allpaths, total=num_variables):
-        path_array_tmp = np.zeros(G.adj.shape)
+        path_array_tmp = np.zeros(graph_object.adj.shape)
         index_x = [path[k] for k in range(len(path) - 1)]  # x index of the adj matrix
         index_y = [path[k] for k in range(1, len(path))]  # y index of the adj matrix
         path_array_tmp[index_x, index_y] = 1

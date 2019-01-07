@@ -9,13 +9,14 @@ from tqdm import tqdm
 
 
 def wardrop_equilibrium_affine_solve(
-        G, s, t, tol=1e-12, maximum_iter=100000, cutoff=None, a=None, a0=None
+        graph_object, s, t, tol=1e-12, maximum_iter=100000, cutoff=None, a=None, a0=None
 ):
     """
-    The function to solve Wardrop Equilibrium flow for a single source target pair under affine cost function setting.
+    The function to solve Wardrop Equilibrium flow for a single source target pair
+    under affine cost function setting.
     Usage:
 
-    :param G: Graph object, storing the adjacency/weight/distance matrices
+    :param graph_object: Graph object, storing the adjacency/weight/distance matrices
     :param s: source node
     :param t: target node
     :param tol: tolerance for convergence
@@ -34,27 +35,28 @@ def wardrop_equilibrium_affine_solve(
     # find all possible paths from s to t that are shorter than cutoff
     if cutoff is None:
         print("Cutoff not specified: shortest path distance + 1 taken as cutoff")
-        cutoff = G.dijkstra(s, t) + 1 + 1
+        cutoff = graph_object.dijkstra(s, t) + 1 + 1
         if cutoff < 3:
             return
     # find all paths
-    allpaths = G.findallpaths(s, t, cutoff)
-
+    allpaths = graph_object.findallpaths(s, t, cutoff)
+    
     if a is None:
-        a = G.rpl_weights
+        a = graph_object.rpl_weights
 
     if a0 is None:
-        a0 = G.adj_dist
+        a0 = graph_object.adj_dist
 
-    return _wardrop_equilibrium_affine_solve(G, s, t, tol, maximum_iter, allpaths, a, a0)
+    return _wardrop_equilibrium_affine_solve(graph_object, s, t, tol, maximum_iter, allpaths, a, a0)
 
 
-def system_optimal_affine_solve(G, s, t, tol=1e-12, maximum_iter=100000, cutoff=None, a=None, a0=None):
+def system_optimal_affine_solve(graph_object, s, t, tol=1e-12, maximum_iter=100000, cutoff=None, a=None, a0=None):
     """
-    The function to solve Wardrop Equilibrium flow for a single source target pair under affine cost function setting.
+    The function to solve Wardrop Equilibrium flow for a single source target pair
+    under affine cost function setting.
     Usage:
 
-    :param G: Graph object, storing the adjacency/weight/distance matrices
+    :param graph_object: Graph object, storing the adjacency/weight/distance matrices
     :param s: source node
     :param t: target node
     :param tol: tolerance for convergence
@@ -72,23 +74,23 @@ def system_optimal_affine_solve(G, s, t, tol=1e-12, maximum_iter=100000, cutoff=
 
     if cutoff is None:
         print("Cutoff not specified: take shortest path distance + 1 as cutoff")
-        cutoff = G.dijkstra(s, t) + 1 + 1
+        cutoff = graph_object.dijkstra(s, t) + 1 + 1
         if cutoff < 3:
             return
 
     # find all paths
-    allpaths = G.findallpaths(s, t, cutoff)
+    allpaths = graph_object.findallpaths(s, t, cutoff)
 
     if a is None:
-        a = G.rpl_weights
+        a = graph_object.rpl_weights
 
     if a0 is None:
-        a0 = G.adj_dist
+        a0 = graph_object.adj_dist
 
-    return _system_optimal_affine_solve(G, s, t, tol, maximum_iter, allpaths, a, a0)
+    return _system_optimal_affine_solve(graph_object, s, t, tol, maximum_iter, allpaths, a, a0)
 
 
-def _wardrop_equilibrium_affine_solve(G, s, t, tol, maximum_iter, allpaths, a, a0):
+def _wardrop_equilibrium_affine_solve(graph_object, s, t, tol, maximum_iter, allpaths, a, a0):
 
     num_variables = len(allpaths)  # the number of paths from s to t
     print('A total of %d paths found from %d to %d' % (num_variables, int(s), int(t)))
@@ -97,10 +99,10 @@ def _wardrop_equilibrium_affine_solve(G, s, t, tol, maximum_iter, allpaths, a, a
     x = np.ones((num_variables,)) / num_variables  # initial value
     # find equilibrium -- convex optimization
     # map to matrix
-    path_arrays = np.empty((0, G.adj.shape[0], G.adj.shape[1]))  # list of matrix to store path flows
+    path_arrays = np.empty((0, graph_object.adj.shape[0], graph_object.adj.shape[1]))
     print('constructing edge formulations...')
     for path in tqdm(allpaths, total=num_variables):
-        path_array_tmp = np.zeros(G.adj.shape)
+        path_array_tmp = np.zeros(graph_object.adj.shape)
         index_x = [path[k] for k in range(len(path) - 1)]  # x index of the adj matrix
         index_y = [path[k] for k in range(1, len(path))]  # y index of the adj matrix
         path_array_tmp[index_x, index_y] = 1
@@ -176,7 +178,7 @@ def _wardrop_equilibrium_affine_solve(G, s, t, tol, maximum_iter, allpaths, a, a
     return
 
 
-def _system_optimal_affine_solve(G, s, t, tol, maximum_iter, allpaths, a, a0):
+def _system_optimal_affine_solve(graph_object, s, t, tol, maximum_iter, allpaths, a, a0):
 
     num_variables = len(allpaths)  # the number of paths from s to t
     print('A total of %d paths found from %d to %d' % (num_variables, int(s), int(t)))
@@ -185,10 +187,10 @@ def _system_optimal_affine_solve(G, s, t, tol, maximum_iter, allpaths, a, a0):
     x = np.ones((num_variables,)) / num_variables  # initial value
     # find equilibrium -- convex optimization
     # map to matrix
-    path_arrays = np.empty((0, G.adj.shape[0], G.adj.shape[1]))  # list of matrix to store path flows
+    path_arrays = np.empty((0, graph_object.adj.shape[0], graph_object.adj.shape[1]))
     print('constructing edge formulations...')
     for path in tqdm(allpaths, total=num_variables):
-        path_array_tmp = np.zeros(G.adj.shape)
+        path_array_tmp = np.zeros(graph_object.adj.shape)
         index_x = [path[k] for k in range(len(path) - 1)]  # x index of the adj matrix
         index_y = [path[k] for k in range(1, len(path))]  # y index of the adj matrix
         path_array_tmp[index_x, index_y] = 1
