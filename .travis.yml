@@ -15,6 +15,6 @@ script:
   # * E501 - line length limit
   # * E123 - indentation on data structures
   # * W504 - line break after binary operator
-  - flake8 . --ignore=F403,E501,E123,E128,W504 --exclude=docs,build
+  - flake8 . --ignore=E402,E501 --exclude=docs,build
 after_success:
   - coveralls
