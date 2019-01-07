@@ -1,4 +1,5 @@
 language: python
+sudo: false
 python:
   - "3.5"
   - "3.6"
@@ -6,6 +7,9 @@ python:
 # command to install dependencies
 install:
   - pip install -r requirements.txt
+  - pip install coveralls
 # command to run tests
 script:
   - pytest
+after_success:
+  - coveralls
