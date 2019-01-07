@@ -159,7 +159,7 @@ def _wardrop_equilibrium_affine_solve(
                 # define new gradients, increase negative ones
                 # reduce the amount proportional to the original
                 gradients[gradients < 0] += (np.abs(x[-1]) / gamma) * (
-                        gradients[gradients < 0] / gradients[gradients < 0].sum()
+                    gradients[gradients < 0] / gradients[gradients < 0].sum()
                 )
                 x[:-1] = prev_x[:-1] - gamma * gradients
                 x[-1] = 1 - np.sum(x[:-1])  # the flow in the last path
@@ -248,9 +248,9 @@ def _system_optimal_affine_solve(graph_object, s, t, tol, maximum_iter, allpaths
                 # how much increase to make sure they are within the constraints?
                 # reduce the amount proportional to the original
                 gradients[gradients < 0] += (
-                                                    np.abs(x[-1]) / gamma
-                                            ) * (
-                        gradients[gradients < 0] / gradients[gradients < 0].sum()
+                    np.abs(x[-1]) / gamma
+                ) * (
+                    gradients[gradients < 0] / gradients[gradients < 0].sum()
                 )
                 x[:-1] = prev_x[:-1] - gamma * gradients
                 x[-1] = 1 - np.sum(x[:-1])  # the flow in the last path

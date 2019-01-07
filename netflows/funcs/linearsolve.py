@@ -102,7 +102,7 @@ def _wardrop_equilibrium_linear_solve(graph_object, s, t, tol, maximum_iter, all
     print('constructing edge formulations...')
     for path in tqdm(allpaths, total=num_variables):
         path_array_tmp = np.zeros(graph_object.adj.shape)
-        index_x = [path[k] for k in range(len(path)-1)]  # x index of the adj matrix
+        index_x = [path[k] for k in range(len(path) - 1)]  # x index of the adj matrix
         index_y = [path[k] for k in range(1, len(path))]  # y index of the adj matrix
         path_array_tmp[index_x, index_y] = 1
         path_arrays = np.append(path_arrays, path_array_tmp[np.newaxis, :], axis=0)
@@ -146,7 +146,7 @@ def _wardrop_equilibrium_linear_solve(graph_object, s, t, tol, maximum_iter, all
                 # how much increase to make sure they are within the constraints?
                 # reduce the amount proportional to the original
                 gradients[gradients < 0] += (np.abs(x[-1]) / gamma) * (
-                        gradients[gradients < 0] / gradients[gradients < 0].sum())
+                    gradients[gradients < 0] / gradients[gradients < 0].sum())
                 x[:-1] = prev_x[:-1] - gamma * gradients
                 x[-1] = 1 - np.sum(x[:-1])  # the flow in the last path
 
@@ -158,7 +158,7 @@ def _wardrop_equilibrium_linear_solve(graph_object, s, t, tol, maximum_iter, all
         # new gradients and step size
         gradients = we_linear_grad(allflows, a, path_arrays, num_variables)
 
-        if np.sum(np.where(np.abs(gradients-prev_gradients) < tol, 0, 1)) == 0:
+        if np.sum(np.where(np.abs(gradients - prev_gradients) < tol, 0, 1)) == 0:
             print('Wardrop Equilibrium flow found:', x)
             print('Iteration %d: the total travel time is %f' % (k, total_cost_sum))
             return x, allflows, total_cost_sum, total_cost
@@ -210,7 +210,7 @@ def _system_optimal_linear_solve(graph_object, s, t, tol, maximum_iter, allpaths
     gradients = so_linear_grad(allflows, a, path_arrays, num_variables)
 
     # initial step size determination
-    gamma1 = np.min(np.abs(x[:-1]/gradients))
+    gamma1 = np.min(np.abs(x[:-1] / gradients))
     gamma2 = np.min(np.abs((1 - x[:-1]) / gradients))
     gamma = min(gamma1, gamma2) * 2 / 3
 
@@ -232,7 +232,7 @@ def _system_optimal_linear_solve(graph_object, s, t, tol, maximum_iter, allpaths
                 # how much increase to make sure they are within the constraints?
                 # reduce the amount proportional to the original
                 gradients[gradients < 0] += (np.abs(x[-1]) / gamma) * (
-                        gradients[gradients < 0] / gradients[gradients < 0].sum())
+                    gradients[gradients < 0] / gradients[gradients < 0].sum())
                 x[:-1] = prev_x[:-1] - gamma * gradients
                 x[-1] = 1 - np.sum(x[:-1])  # the flow in the last path
 
@@ -243,7 +243,7 @@ def _system_optimal_linear_solve(graph_object, s, t, tol, maximum_iter, allpaths
         # new gradients and gamma
         gradients = so_linear_grad(allflows, a, path_arrays, num_variables)
 
-        if np.sum(np.where(np.abs(gradients-prev_gradients) < tol, 0, 1)) == 0:
+        if np.sum(np.where(np.abs(gradients - prev_gradients) < tol, 0, 1)) == 0:
             print('System Optimal flow found:', x)
             print('Iteration %d: the total travel time is %f' % (k, obj_fun))
             return x, allflows, obj_fun, total_cost

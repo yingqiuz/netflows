@@ -15,7 +15,7 @@ import setuptools
 
 if sys.argv[-1] == 'setup.py':
     print("To install, run 'python setup.py install'")
-    print()	
+    print()
 
 if sys.version_info[:2] < (3, 5):
     print("netflows requires Python 3.5 or later (%d.%d detected)." %

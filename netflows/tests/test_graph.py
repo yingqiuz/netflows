@@ -6,7 +6,7 @@ from netflows import CreateGraph
 
 ADJ_MAT = np.array([[0, 1, 1, 0], [0, 0, 1, 1], [0, 0, 0, 1], [0, 0, 0, 0]])
 DIST_MAT = np.array([[0, 0, 1, 0], [0, 0, 0, 2], [0, 0, 0, 0], [0, 0, 0, 0]])
-WEIGHT_MAT = np.array([[0, 1, 0, 0], [0, 0, 1, 0], [0, 0, 0, 1/2], [0, 0, 0, 0]])
+WEIGHT_MAT = np.array([[0, 1, 0, 0], [0, 0, 1, 0], [0, 0, 0, 1 / 2], [0, 0, 0, 0]])
 
 
 @pytest.fixture

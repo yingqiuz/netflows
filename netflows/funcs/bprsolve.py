@@ -157,7 +157,7 @@ def _wardrop_equilibrium_bpr_solve(graph_object, s, t, tol, maximum_iter, allpat
                 # how much increase to make sure they are within the constraints?
                 # reduce the amount proportional to the original
                 gradients[gradients < 0] += (np.abs(x[-1]) / gamma) * (
-                        gradients[gradients < 0] / gradients[gradients < 0].sum())
+                    gradients[gradients < 0] / gradients[gradients < 0].sum())
                 x[:-1] = prev_x[:-1] - gamma * gradients
                 x[-1] = 1 - np.sum(x[:-1])  # the flow in the last path
 
@@ -170,7 +170,7 @@ def _wardrop_equilibrium_bpr_solve(graph_object, s, t, tol, maximum_iter, allpat
         # new gradients
         gradients = we_bpr_grad(allflows, a, u, path_arrays, num_variables)
 
-        if np.sum(np.where(np.abs(gradients-prev_gradients) < tol, 0, 1)) == 0:  # test convergence
+        if np.sum(np.where(np.abs(gradients - prev_gradients) < tol, 0, 1)) == 0:  # test convergence
             print('Wardrop Equilibrium flow found:', x)
             print('Iteration %d: the total travel time is %f' % (k, total_cost_sum))
             return x, allflows, total_cost_sum, total_cost
@@ -243,7 +243,7 @@ def _system_optimal_bpr_solve(graph_object, s, t, tol, maximum_iter, allpaths, a
                 # how much increase to make sure they are within the constraints?
                 # reduce the amount proportional to the original
                 gradients[gradients < 0] += (np.abs(x[-1]) / gamma) * (
-                        gradients[gradients < 0] / gradients[gradients < 0].sum())
+                    gradients[gradients < 0] / gradients[gradients < 0].sum())
                 x[:-1] = prev_x[:-1] - gamma * gradients
                 x[-1] = 1 - np.sum(x[:-1])  # the flow in the last path
 
@@ -255,7 +255,7 @@ def _system_optimal_bpr_solve(graph_object, s, t, tol, maximum_iter, allpaths, a
         gradients = so_bpr_grad(allflows, a, u, path_arrays, num_variables)
 
         # convergence?
-        if np.sum(np.where(np.abs(gradients-prev_gradients) < tol, 0, 1)) == 0:
+        if np.sum(np.where(np.abs(gradients - prev_gradients) < tol, 0, 1)) == 0:
             print('System Optimal flow found:', x)
             print('Iteration %d: the total travel time is %f' % (k, obj_fun))
             return x, allflows, obj_fun, total_cost
