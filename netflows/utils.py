@@ -82,74 +82,112 @@ def mm1_so_obj(flow_mat, weight_mat):
 # gradients function
 def we_affine_grad(allflows, a, a0, path_arrays, num_variables):
     gradients = np.array(
-        [np.sum(affine_cost(allflows, a, a0) * (
-                path_arrays[k] * np.where(path_arrays[-1] == 0, 1, 0) - np.where(path_arrays[k] == 0, 1, 0) *
-                path_arrays[-1]))
-         for k in range(num_variables - 1)]
+        [
+            np.sum(
+                affine_cost(allflows, a, a0) * (
+                        path_arrays[k] * np.where(path_arrays[-1] == 0, 1, 0) -
+                        np.where(path_arrays[k] == 0, 1, 0) * path_arrays[-1]
+                )
+            ) for k in range(num_variables - 1)
+        ]
     )
     return gradients
 
 
 def so_affine_grad(allflows, a, a0, path_arrays, num_variables):
     gradients = np.array(
-        [np.sum(affine_cost(allflows, a, a0) * (
-                path_arrays[k] * np.where(path_arrays[-1] == 0, 1, 0) - np.where(path_arrays[k] == 0, 1, 0) *
-                path_arrays[-1]))
-         for k in range(num_variables - 1)]
+        [
+            np.sum(
+                affine_cost(allflows, a, a0) * (
+                        path_arrays[k] * np.where(path_arrays[-1] == 0, 1, 0) -
+                        np.where(path_arrays[k] == 0, 1, 0) * path_arrays[-1]
+                )
+            ) for k in range(num_variables - 1)
+        ]
     ) + np.array(
-        [np.sum(allflows * a * (
-                path_arrays[k] * np.where(path_arrays[-1] == 0, 1, 0) - np.where(path_arrays[k] == 0, 1, 0) *
-                path_arrays[-1]))
-         for k in range(num_variables - 1)]
+        [
+            np.sum(
+                allflows * a * (
+                        path_arrays[k] * np.where(path_arrays[-1] == 0, 1, 0) -
+                        np.where(path_arrays[k] == 0, 1, 0) * path_arrays[-1]
+                )
+            ) for k in range(num_variables - 1)
+        ]
     )
     return gradients
 
 
 def we_linear_grad(allflows, a, path_arrays, num_variables):
     gradients = np.array(
-        [np.sum(linear_cost(allflows, a) * (
-                path_arrays[k] * np.where(path_arrays[-1] == 0, 1, 0) - np.where(path_arrays[k] == 0, 1, 0) *
-                path_arrays[-1]))
-         for k in range(num_variables - 1)]
+        [
+            np.sum(
+                linear_cost(allflows, a) * (
+                        path_arrays[k] * np.where(path_arrays[-1] == 0, 1, 0) -
+                        np.where(path_arrays[k] == 0, 1, 0) * path_arrays[-1]
+                )
+            ) for k in range(num_variables - 1)
+        ]
     )
     return gradients
 
 
 def so_linear_grad(allflows, a, path_arrays, num_variables):
     gradients = np.array(
-        [np.sum(linear_cost(allflows, a) * (
-                path_arrays[k] * np.where(path_arrays[-1] == 0, 1, 0) - np.where(path_arrays[k] == 0, 1, 0) *
-                path_arrays[-1]))
-         for k in range(num_variables - 1)]
+        [
+            np.sum(
+                linear_cost(allflows, a) * (
+                        path_arrays[k] * np.where(path_arrays[-1] == 0, 1, 0) -
+                        np.where(path_arrays[k] == 0, 1, 0) * path_arrays[-1]
+                )
+            ) for k in range(num_variables - 1)
+         ]
     ) + np.array(
-        [np.sum(allflows * a * (
-                path_arrays[k] * np.where(path_arrays[-1] == 0, 1, 0) - np.where(path_arrays[k] == 0, 1, 0) *
-                path_arrays[-1]))
-         for k in range(num_variables - 1)]
+        [
+            np.sum(
+                allflows * a * (
+                        path_arrays[k] * np.where(path_arrays[-1] == 0, 1, 0) -
+                        np.where(path_arrays[k] == 0, 1, 0) * path_arrays[-1]
+                )
+            ) for k in range(num_variables - 1)
+        ]
     )
     return gradients
 
 
 def we_bpr_grad(allflows, a, u, path_arrays, num_variables):
     gradients = np.array(
-        [np.sum(bpr_cost(allflows, a, u) * (
-                path_arrays[k] * np.where(path_arrays[-1] == 0, 1, 0) - np.where(path_arrays[k] == 0, 1, 0) *
-                path_arrays[-1]))
-         for k in range(num_variables - 1)]
+        [
+            np.sum(
+                bpr_cost(allflows, a, u) * (
+                        path_arrays[k] * np.where(path_arrays[-1] == 0, 1, 0) -
+                        np.where(path_arrays[k] == 0, 1, 0) * path_arrays[-1]
+                )
+            ) for k in range(num_variables - 1)
+        ]
     )
     return gradients
 
 
 def so_bpr_grad(allflows, a, u, path_arrays, num_variables):
     gradients = np.array(
-        [np.sum(bpr_cost(allflows, a, u) * (
-                path_arrays[k] * np.where(path_arrays[-1] == 0, 1, 0) - np.where(path_arrays[k] == 0, 1, 0) *
-                path_arrays[-1]))
-         for k in range(num_variables - 1)]
+        [
+            np.sum(
+                bpr_cost(allflows, a, u) * (
+                        path_arrays[k] * np.where(path_arrays[-1] == 0, 1, 0) -
+                        np.where(path_arrays[k] == 0, 1, 0) * path_arrays[-1]
+                )
+            ) for k in range(num_variables - 1)
+        ]
     ) + np.array(
-        [np.sum(allflows * a * (0.6 * (allflows * u) ** 3 * u) * (
-                path_arrays[k] * np.where(path_arrays[-1] == 0, 1, 0) - np.where(path_arrays[k] == 0, 1, 0) *
-                path_arrays[-1]))
-         for k in range(num_variables - 1)]
+        [
+            np.sum(
+                allflows * a * (
+                        0.6 * (allflows * u) ** 3 * u
+                ) * (
+                        path_arrays[k] * np.where(path_arrays[-1] == 0, 1, 0) -
+                        np.where(path_arrays[k] == 0, 1, 0) * path_arrays[-1]
+                )
+            ) for k in range(num_variables - 1)
+        ]
     )
     return gradients

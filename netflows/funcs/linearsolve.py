@@ -8,7 +8,9 @@ import numpy as np
 from tqdm import tqdm
 
 
-def wardrop_equilibrium_linear_solve(graph_object, s, t, tol=1e-8, maximum_iter=10000, cutoff=None, a=None):
+def wardrop_equilibrium_linear_solve(
+        graph_object, s, t, tol=1e-8, maximum_iter=10000, cutoff=None, a=None
+):
     """
     The function to solve Wardrop Equilibrium flow for a single source target pair
     under linear cost function setting.
@@ -41,10 +43,14 @@ def wardrop_equilibrium_linear_solve(graph_object, s, t, tol=1e-8, maximum_iter=
     if a is None:
         a = graph_object.dist_weight_ratio
 
-    return _wardrop_equilibrium_linear_solve(graph_object, s, t, tol, maximum_iter, allpaths, a)
+    return _wardrop_equilibrium_linear_solve(
+        graph_object, s, t, tol, maximum_iter, allpaths, a
+    )
 
 
-def system_optimal_linear_solve(graph_object, s, t, tol=1e-8, maximum_iter=10000, cutoff=None, a=None):
+def system_optimal_linear_solve(
+        graph_object, s, t, tol=1e-8, maximum_iter=10000, cutoff=None, a=None
+):
     """
     The function to solve system optimal flow for a single source target pair
     under linear cost function setting.
@@ -77,7 +83,9 @@ def system_optimal_linear_solve(graph_object, s, t, tol=1e-8, maximum_iter=10000
     if a is None:
         a = graph_object.dist_weight_ratio
 
-    return _system_optimal_linear_solve(graph_object, s, t, tol, maximum_iter, allpaths, a)
+    return _system_optimal_linear_solve(
+        graph_object, s, t, tol, maximum_iter, allpaths, a
+    )
 
 
 def _wardrop_equilibrium_linear_solve(graph_object, s, t, tol, maximum_iter, allpaths, a):

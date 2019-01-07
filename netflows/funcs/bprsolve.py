@@ -8,7 +8,9 @@ import numpy as np
 from tqdm import tqdm
 
 
-def wardrop_equilibrium_bpr_solve(graph_object, s, t, tol=1e-8, maximum_iter=10000, cutoff=None, a=None, u=None):
+def wardrop_equilibrium_bpr_solve(
+        graph_object, s, t, tol=1e-8, maximum_iter=10000, cutoff=None, a=None, u=None
+):
     """
     The function to solve Wardrop Equilibrium flow for a single source target pair
     under BPR cost function setting.
@@ -50,7 +52,9 @@ def wardrop_equilibrium_bpr_solve(graph_object, s, t, tol=1e-8, maximum_iter=100
     return _wardrop_equilibrium_bpr_solve(graph_object, s, t, tol, maximum_iter, allpaths, a, u)
 
 
-def system_optimal_bpr_solve(graph_object, s, t, tol=1e-8, maximum_iter=10000, cutoff=None, a=None, u=None):
+def system_optimal_bpr_solve(
+        graph_object, s, t, tol=1e-8, maximum_iter=10000, cutoff=None, a=None, u=None
+):
     """
     The function to solve System Optimal flow for a single source target pair
     under BPR cost function setting.

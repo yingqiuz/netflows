@@ -47,10 +47,14 @@ def wardrop_equilibrium_affine_solve(
     if a0 is None:
         a0 = graph_object.adj_dist
 
-    return _wardrop_equilibrium_affine_solve(graph_object, s, t, tol, maximum_iter, allpaths, a, a0)
+    return _wardrop_equilibrium_affine_solve(
+        graph_object, s, t, tol, maximum_iter, allpaths, a, a0
+    )
 
 
-def system_optimal_affine_solve(graph_object, s, t, tol=1e-12, maximum_iter=100000, cutoff=None, a=None, a0=None):
+def system_optimal_affine_solve(
+        graph_object, s, t, tol=1e-12, maximum_iter=100000, cutoff=None, a=None, a0=None
+):
     """
     The function to solve Wardrop Equilibrium flow for a single source target pair
     under affine cost function setting.
@@ -87,10 +91,14 @@ def system_optimal_affine_solve(graph_object, s, t, tol=1e-12, maximum_iter=1000
     if a0 is None:
         a0 = graph_object.adj_dist
 
-    return _system_optimal_affine_solve(graph_object, s, t, tol, maximum_iter, allpaths, a, a0)
+    return _system_optimal_affine_solve(
+        graph_object, s, t, tol, maximum_iter, allpaths, a, a0
+    )
 
 
-def _wardrop_equilibrium_affine_solve(graph_object, s, t, tol, maximum_iter, allpaths, a, a0):
+def _wardrop_equilibrium_affine_solve(
+        graph_object, s, t, tol, maximum_iter, allpaths, a, a0
+):
 
     num_variables = len(allpaths)  # the number of paths from s to t
     print('A total of %d paths found from %d to %d' % (num_variables, int(s), int(t)))
@@ -128,7 +136,8 @@ def _wardrop_equilibrium_affine_solve(graph_object, s, t, tol, maximum_iter, all
     # initial estimation of step size gamma
     gamma1 = np.min(np.abs(x[:-1] / gradients))
     gamma2 = np.min(np.abs((1 - x[:-1]) / gradients))
-    gamma = min(gamma1, gamma2) * 2 / 3  # to make sure the flow on each path is positive after initial iteration
+    # to make sure the flow on each path is positive after initial iteration
+    gamma = min(gamma1, gamma2) * 2 / 3
 
     for k in tqdm(range(maximum_iter)):  # maximal iteration 10000
         prev_x = np.copy(x)
@@ -158,7 +167,6 @@ def _wardrop_equilibrium_affine_solve(graph_object, s, t, tol, maximum_iter, all
         allflows = np.sum(path_arrays * x.reshape(num_variables, 1, 1), axis=0)
         total_cost = allflows * affine_cost(allflows, a, a0)
         total_cost_sum = total_cost.sum()
-        
         # new gradients and stepsize
         gradients = we_affine_grad(allflows, a, a0, path_arrays, num_variables)
         
@@ -199,7 +207,8 @@ def _system_optimal_affine_solve(graph_object, s, t, tol, maximum_iter, allpaths
     # element (i, j) is the total flow on edge (i,j)
     allflows = np.sum(path_arrays * x.reshape(num_variables, 1, 1), axis=0)
     total_cost = allflows * affine_cost(allflows, a, a0)
-    obj_fun = affine_so_obj(allflows, a, a0).sum()  # objective function is the total cost function
+    # objective function is the total cost function
+    obj_fun = affine_so_obj(allflows, a, a0).sum()
 
     print('The initial flow (path formulation) is ', x)
     print('The initial cost is %f' % obj_fun)
