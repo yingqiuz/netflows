@@ -8,7 +8,9 @@ import numpy as np
 from tqdm import tqdm
 
 
-def wardrop_equilibrium_affine_solve(G, s, t, tol=1e-12, maximum_iter=100000, cutoff=None, a=None, a0=None):
+def wardrop_equilibrium_affine_solve(
+        G, s, t, tol=1e-12, maximum_iter=100000, cutoff=None, a=None, a0=None
+):
     """
     The function to solve Wardrop Equilibrium flow for a single source target pair under affine cost function setting.
     Usage:

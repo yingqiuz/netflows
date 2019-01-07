@@ -52,12 +52,12 @@ def bpr_integration(flow, weight, u):
     return quad(lambda x: bpr_cost(x, weight, u), 0, flow)[0]
 
 
-def bpr_we_obj(flow_mat, weight_mat, u_mat ):
+def bpr_we_obj(flow_mat, weight_mat, u_mat):
     my_vec_integration = np.vectorize(bpr_integration)
     return np.sum(my_vec_integration(flow_mat, weight_mat, u_mat))
 
 
-def bpr_so_obj(flow_mat, weight_mat, u_mat ):
+def bpr_so_obj(flow_mat, weight_mat, u_mat):
     return flow_mat * bpr_cost(flow_mat, weight_mat, u_mat)
 
 
@@ -67,7 +67,7 @@ def mm1_cost(flow, weight):
 
 
 def mm1_integration(flow, weight):
-    return quad(lambda x : mm1_cost(x, weight), 0, flow)[0]
+    return quad(lambda x: mm1_cost(x, weight), 0, flow)[0]
 
 
 def mm1_we_obj(flow_mat, weight_mat):
@@ -153,4 +153,3 @@ def so_bpr_grad(allflows, a, u, path_arrays, num_variables):
          for k in range(num_variables - 1)]
     )
     return gradients
-

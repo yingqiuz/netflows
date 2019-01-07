@@ -9,8 +9,9 @@ __email__ = 'contact@yingqiuzheng.me'
 __status__ = 'Prototype'
 __url__ = 'http://github.com/yingqiuz/netflows'
 __packagename__ = 'netflows'
-__description__ = ('netflows is a Python toolbox for system optimal/Wardrop Equilibrium '
-                   'traffic assignment on a network')
+__description__ = ('netflows is a Python toolbox for System Optimal or '
+                   'Wardrop Equilibrium'
+                   'flow assignment on a network')
 __longdesc__ = 'README.md'
 __longdesctype__ = 'text/markdown'
 
