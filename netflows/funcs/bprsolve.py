@@ -114,7 +114,7 @@ def _wardrop_equilibrium_bpr_solve(graph_object, s, t, tol, maximum_iter, allpat
         path_array_tmp[index_x, index_y] = 1
         path_arrays = np.append(path_arrays, path_array_tmp[np.newaxis, :], axis=0)
 
-    # element (i, j) is the total flow on edge (i,j)    
+    # element (i, j) is the total flow on edge (i,j)
     allflows = np.sum(path_arrays * x.reshape(num_variables, 1, 1), axis=0)
     allflows[graph_object.adj == 0] = 0
 
@@ -131,7 +131,7 @@ def _wardrop_equilibrium_bpr_solve(graph_object, s, t, tol, maximum_iter, allpat
         return x, allflows, total_cost_sum, total_cost
 
     gradients = we_bpr_grad(allflows, a, u, path_arrays, num_variables)
-    
+
     # initial step size determination
     gamma1 = np.min(np.abs(x[:-1] / gradients))
     gamma2 = np.min(np.abs((1 - x[:-1]) / gradients))
@@ -160,7 +160,7 @@ def _wardrop_equilibrium_bpr_solve(graph_object, s, t, tol, maximum_iter, allpat
                         gradients[gradients < 0] / gradients[gradients < 0].sum())
                 x[:-1] = prev_x[:-1] - gamma * gradients
                 x[-1] = 1 - np.sum(x[:-1])  # the flow in the last path
-                  
+
         # update allflows and costs
         allflows = np.sum(path_arrays * x.reshape(num_variables, 1, 1), axis=0)
 
@@ -169,7 +169,7 @@ def _wardrop_equilibrium_bpr_solve(graph_object, s, t, tol, maximum_iter, allpat
 
         # new gradients
         gradients = we_bpr_grad(allflows, a, u, path_arrays, num_variables)
-        
+
         if np.sum(np.where(np.abs(gradients-prev_gradients) < tol, 0, 1)) == 0:  # test convergence
             print('Wardrop Equilibrium flow found:', x)
             print('Iteration %d: the total travel time is %f' % (k, total_cost_sum))
@@ -195,7 +195,7 @@ def _system_optimal_bpr_solve(graph_object, s, t, tol, maximum_iter, allpaths, a
 
     # find equilibrium -- convex optimization
     # map to matrix
-    path_arrays = np.empty((0,   graph_object.adj.shape[0],   graph_object.adj.shape[1]))
+    path_arrays = np.empty((0, graph_object.adj.shape[0], graph_object.adj.shape[1]))
     print('constructing edge formulations...')
     for path in tqdm(allpaths, total=num_variables):
         path_array_tmp = np.zeros(graph_object.adj.shape)
@@ -204,7 +204,7 @@ def _system_optimal_bpr_solve(graph_object, s, t, tol, maximum_iter, allpaths, a
         path_array_tmp[index_x, index_y] = 1
         path_arrays = np.append(path_arrays, path_array_tmp[np.newaxis, :], axis=0)
 
-    # element (i, j) is the total flow on edge (i,j)    
+    # element (i, j) is the total flow on edge (i,j)
     allflows = np.sum(path_arrays * x.reshape(num_variables, 1, 1), axis=0)
     total_cost = allflows * bpr_cost(allflows, a, u)
     obj_fun = bpr_so_obj(allflows, a, u).sum()  # objective function is the total cost
@@ -226,7 +226,7 @@ def _system_optimal_bpr_solve(graph_object, s, t, tol, maximum_iter, allpaths, a
     gamma = min(gamma1, gamma2) * 2 / 3
 
     for k in range(maximum_iter):  # maximal iteration 10000
-                  
+
         prev_x = np.copy(x)
         prev_gradients = np.copy(gradients)
 
@@ -259,7 +259,7 @@ def _system_optimal_bpr_solve(graph_object, s, t, tol, maximum_iter, allpaths, a
             print('System Optimal flow found:', x)
             print('Iteration %d: the total travel time is %f' % (k, obj_fun))
             return x, allflows, obj_fun, total_cost
-                  
+
         # new step size
         gamma = np.inner(
             x[:-1] - prev_x[:-1], gradients - prev_gradients

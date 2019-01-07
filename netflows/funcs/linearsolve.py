@@ -39,7 +39,7 @@ def wardrop_equilibrium_linear_solve(
             return
 
     allpaths = graph_object.findallpaths(s, t, cutoff)
-    
+
     if a is None:
         a = graph_object.dist_weight_ratio
 
@@ -240,9 +240,9 @@ def _system_optimal_linear_solve(graph_object, s, t, tol, maximum_iter, allpaths
         total_cost = allflows * linear_cost(allflows, a)
         obj_fun = linear_so_obj(allflows, a).sum()
 
-        # new gradients and gamma 
+        # new gradients and gamma
         gradients = so_linear_grad(allflows, a, path_arrays, num_variables)
-        
+
         if np.sum(np.where(np.abs(gradients-prev_gradients) < tol, 0, 1)) == 0:
             print('System Optimal flow found:', x)
             print('Iteration %d: the total travel time is %f' % (k, obj_fun))

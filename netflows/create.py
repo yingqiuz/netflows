@@ -82,7 +82,7 @@ class CreateGraph:
 
         visited[v] = True
         path.append(v)
-        
+
         if len(path) < cutoff:
             if v == u:  # if the current vertice is the destination
                 allpaths.append(path[:])  # creat deep copy of path
@@ -93,14 +93,14 @@ class CreateGraph:
                         self._findallpath_recursive(
                             k, u, visited, path, allpaths, cutoff
                         )
-                        
+
         elif v == u:  # len(path == cutoff)
             allpaths.append(path[:])
-            
+
         # mark u as unvisited
         visited[v] = False
         path.pop()
-    
+
     def findallpaths(self, s, t, cutoff=None):
         """
         find all possible paths shorter than cutoff from source s to target t
@@ -121,7 +121,7 @@ class CreateGraph:
         # all vertices are unvisited at the beginning
         visited = [False] * num_vertices
         path = []  # temp path
-    
+
         self._findallpath_recursive(s, t, visited, path, allpaths, cutoff)
         self.allpaths[s][t] = allpaths
         return allpaths
@@ -138,6 +138,8 @@ class CreateGraph:
             # y index of the adj matrix
             index_y = [path[k] for k in range(1, len(path))]
             path_array_tmp[index_x, index_y] = 1
-            path_arrays = np.append(path_arrays, path_array_tmp[np.newaxis, :], axis=0)
+            path_arrays = np.append(
+                path_arrays, path_array_tmp[np.newaxis, :], axis=0
+            )
 
         return path_arrays

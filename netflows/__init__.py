@@ -9,7 +9,7 @@ Wardrop Equilibrium on brain or transportation networks.
 Source::
 
     https://github.com/yingqiuz/netflows
-    
+
 Simple example
 ---------------------
 TBC

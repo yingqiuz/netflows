@@ -40,7 +40,7 @@ def wardrop_equilibrium_affine_solve(
             return
     # find all paths
     allpaths = graph_object.findallpaths(s, t, cutoff)
-    
+
     if a is None:
         a = graph_object.rpl_weights
 
@@ -142,16 +142,16 @@ def _wardrop_equilibrium_affine_solve(
     for k in tqdm(range(maximum_iter)):  # maximal iteration 10000
         prev_x = np.copy(x)
         prev_gradients = np.copy(gradients)
-        
+
         # update x
         x[:-1] = prev_x[:-1] - gamma * gradients
         x[-1] = 1 - np.sum(x[:-1])  # the flow in the last path
-        
+
         # if at least one of the flows is negative, re-adapt the gradients
-        if np.sum(np.where(x < 0, 1, 0)) > 0:  
+        if np.sum(np.where(x < 0, 1, 0)) > 0:
             # reduce positive gradients
             gradients[x[:-1] < 0] = prev_x[:-1][x[:-1] < 0] / gamma
-            
+
             x[:-1] = prev_x[:-1] - gamma * gradients
             x[-1] = 1 - np.sum(x[:-1])  # the flow in the last path
             # if  the last one is still negative
@@ -159,7 +159,8 @@ def _wardrop_equilibrium_affine_solve(
                 # define new gradients, increase negative ones
                 # reduce the amount proportional to the original
                 gradients[gradients < 0] += (np.abs(x[-1]) / gamma) * (
-                            gradients[gradients < 0] / gradients[gradients < 0].sum())
+                        gradients[gradients < 0] / gradients[gradients < 0].sum()
+                )
                 x[:-1] = prev_x[:-1] - gamma * gradients
                 x[-1] = 1 - np.sum(x[:-1])  # the flow in the last path
 
@@ -169,7 +170,7 @@ def _wardrop_equilibrium_affine_solve(
         total_cost_sum = total_cost.sum()
         # new gradients and stepsize
         gradients = we_affine_grad(allflows, a, a0, path_arrays, num_variables)
-        
+
         if np.where(np.abs(gradients - prev_gradients) < tol, 0, 1).sum() == 0:  # convergence
             print('Wardrop Equilibrium flow found:', x)
             print('Iteration %d: the total travel time is %f' % (k, total_cost_sum))

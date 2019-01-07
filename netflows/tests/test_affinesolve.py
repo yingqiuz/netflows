@@ -2,11 +2,21 @@
 
 import numpy as np
 import pytest
-from netflows import CreateGraph, wardrop_equilibrium_affine_solve, system_optimal_affine_solve
+from netflows import (
+    CreateGraph,
+    wardrop_equilibrium_affine_solve,
+    system_optimal_affine_solve
+)
 
-ADJ_MAT = np.array([[0, 1, 1, 0], [0, 0, 1, 1], [0, 0, 0, 1], [0, 0, 0, 0]])
-DIST_MAT = np.array([[0, 0, 1, 0], [0, 0, 0, 2], [0, 0, 0, 0], [0, 0, 0, 0]])
-WEIGHT_MAT = np.array([[0, 1, 0, 0], [0, 0, 1, 0], [0, 0, 0, 1/2], [0, 0, 0, 0]])
+ADJ_MAT = np.array(
+    [[0, 1, 1, 0], [0, 0, 1, 1], [0, 0, 0, 1], [0, 0, 0, 0]]
+)
+DIST_MAT = np.array(
+    [[0, 0, 1, 0], [0, 0, 0, 2], [0, 0, 0, 0], [0, 0, 0, 0]]
+)
+WEIGHT_MAT = np.array(
+    [[0, 1, 0, 0], [0, 0, 1, 0], [0, 0, 0, 1/2], [0, 0, 0, 0]]
+)
 
 WE_FLOW = np.array([0.4, 0.2, 0.4])
 SO_FLOW = np.array([0, 0.5, 0.5])

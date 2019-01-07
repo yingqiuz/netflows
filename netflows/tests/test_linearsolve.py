@@ -1,10 +1,20 @@
 import numpy as np
 import pytest
-from netflows import CreateGraph, wardrop_equilibrium_linear_solve, system_optimal_linear_solve
+from netflows import (
+    CreateGraph,
+    wardrop_equilibrium_linear_solve,
+    system_optimal_linear_solve
+)
 
-ADJ_MAT = np.array([[0, 1, 0, 1, 0], [0, 0, 1, 1, 0], [0, 0, 0, 0, 1], [0, 0, 1, 0, 1], [0, 0, 0, 0, 0]])
-DIST_MAT = np.array([[0, 1, 0, 1, 0], [0, 0, 1, 1, 0], [0, 0, 0, 0, 1], [0, 0, 1, 0, 1], [0, 0, 0, 0, 0]])
-WEIGHT_MAT = np.array([[0, 1, 0, 1, 0], [0, 0, 1, 1, 0], [0, 0, 0, 0, 1], [0, 0, 1, 0, 1], [0, 0, 0, 0, 0]])
+ADJ_MAT = np.array(
+    [[0, 1, 0, 1, 0], [0, 0, 1, 1, 0], [0, 0, 0, 0, 1], [0, 0, 1, 0, 1], [0, 0, 0, 0, 0]]
+)
+DIST_MAT = np.array(
+    [[0, 1, 0, 1, 0], [0, 0, 1, 1, 0], [0, 0, 0, 0, 1], [0, 0, 1, 0, 1], [0, 0, 0, 0, 0]]
+)
+WEIGHT_MAT = np.array(
+    [[0, 1, 0, 1, 0], [0, 0, 1, 1, 0], [0, 0, 0, 0, 1], [0, 0, 1, 0, 1], [0, 0, 0, 0, 0]]
+)
 
 WE_FLOW = np.array([2/7, 1/7, 1/7, 3/7])
 SO_FLOW = np.array([2/7, 1/7, 1/7, 3/7])
