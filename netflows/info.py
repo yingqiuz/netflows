@@ -28,6 +28,10 @@ TESTS_REQUIRE = [
 ]
 
 EXTRAS_REQUIRE = {
+    'dev': [
+        'coverage',
+        'flake8',
+    ],
     'plotting': [
         'pandas',
         'seaborn'
