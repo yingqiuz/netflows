@@ -2,7 +2,7 @@
 
 import numpy as np
 import pytest
-from netflows import Graph, wardrop_equilibrium_affine_solve, system_optimal_affine_solve
+from netflows import create_graph, wardrop_equilibrium_affine_solve, system_optimal_affine_solve
 
 ADJ_MAT = np.array([[0, 1, 1, 0], [0, 0, 1, 1], [0, 0, 0, 1], [0, 0, 0, 0]])
 DIST_MAT = np.array([[0, 0, 1, 0], [0, 0, 0, 2], [0, 0, 0, 0], [0, 0, 0, 0]])
@@ -20,7 +20,7 @@ T = 3
 
 @pytest.fixture
 def test_graph():
-    G = Graph(adj=ADJ_MAT, dist=DIST_MAT, weights=WEIGHT_MAT)
+    G = create_graph(adj=ADJ_MAT, dist=DIST_MAT, weights=WEIGHT_MAT)
     return G
 
 
