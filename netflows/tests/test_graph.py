@@ -2,7 +2,7 @@
 
 import numpy as np
 import pytest
-from netflows import create_graph
+from netflows import CreateGraph
 
 ADJ_MAT = np.array([[0, 1, 1, 0], [0, 0, 1, 1], [0, 0, 0, 1], [0, 0, 0, 0]])
 DIST_MAT = np.array([[0, 0, 1, 0], [0, 0, 0, 2], [0, 0, 0, 0], [0, 0, 0, 0]])
@@ -11,8 +11,8 @@ WEIGHT_MAT = np.array([[0, 1, 0, 0], [0, 0, 1, 0], [0, 0, 0, 1/2], [0, 0, 0, 0]]
 
 @pytest.fixture
 def test_graph():
-    G = create_graph(adj=ADJ_MAT, dist=DIST_MAT, weights=WEIGHT_MAT)
-    return G
+    sample_graph = CreateGraph(adj=ADJ_MAT, dist=DIST_MAT, weights=WEIGHT_MAT)
+    return sample_graph
 
 
 def test_adj(test_graph):
@@ -35,4 +35,3 @@ def test_find_all_paths(test_graph):
 def test_dijkstra(test_graph):
     d = test_graph.dijkstra(0, 3)
     assert d == 2
-
