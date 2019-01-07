@@ -1,21 +1,19 @@
-# -*- coding: utf-8 -*-
-
 import numpy as np
 import pytest
-from netflows import create_graph, wardrop_equilibrium_affine_solve, system_optimal_affine_solve
+from netflows import create_graph, wardrop_equilibrium_linear_solve, system_optimal_linear_solve
 
-ADJ_MAT = np.array([[0, 1, 1, 0], [0, 0, 1, 1], [0, 0, 0, 1], [0, 0, 0, 0]])
-DIST_MAT = np.array([[0, 0, 1, 0], [0, 0, 0, 2], [0, 0, 0, 0], [0, 0, 0, 0]])
-WEIGHT_MAT = np.array([[0, 1, 0, 0], [0, 0, 1, 0], [0, 0, 0, 1/2], [0, 0, 0, 0]])
+ADJ_MAT = np.array([[0, 1, 0, 1, 0], [0, 0, 1, 1, 0], [0, 0, 0, 0, 1], [0, 0, 1, 0, 1], [0, 0, 0, 0, 0]])
+DIST_MAT = np.array([[0, 1, 0, 1, 0], [0, 0, 1, 1, 0], [0, 0, 0, 0, 1], [0, 0, 1, 0, 1], [0, 0, 0, 0, 0]])
+WEIGHT_MAT = np.array([[0, 1, 0, 1, 0], [0, 0, 1, 1, 0], [0, 0, 0, 0, 1], [0, 0, 1, 0, 1], [0, 0, 0, 0, 0]])
 
-WE_FLOW = np.array([0.4, 0.2, 0.4])
-SO_FLOW = np.array([0, 0.5, 0.5])
+WE_FLOW = np.array([2/7, 1/7, 1/7, 3/7])
+SO_FLOW = np.array([2/7, 1/7, 1/7, 3/7])
 
-WE_COST = 13 / 5
-SO_COST = 9 / 4
+WE_COST = 8 / 7
+SO_COST = 8 / 7
 
 S = 0
-T = 3
+T = 4
 
 
 @pytest.fixture
@@ -25,7 +23,7 @@ def test_graph():
 
 
 def test_we_affine(test_graph):
-    x, allflows, total_cost_sum, total_cost = wardrop_equilibrium_affine_solve(
+    x, allflows, total_cost_sum, total_cost = wardrop_equilibrium_linear_solve(
         test_graph, S, T, tol=1e-8, maximum_iter=10000
     )
     errors = []
@@ -40,7 +38,7 @@ def test_we_affine(test_graph):
 
 
 def test_so_affine(test_graph):
-    x, allflows, obj_fun, total_cost = system_optimal_affine_solve(
+    x, allflows, obj_fun, total_cost = system_optimal_linear_solve(
         test_graph, S, T, tol=1e-8, maximum_iter=10000
     )
     errors = []

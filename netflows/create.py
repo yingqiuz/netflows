@@ -4,7 +4,7 @@ import numpy as np
 from heapq import heappop, heappush
 
 
-class Graph:
+class create_graph:
     def __init__(self, adj=0, dist=0, weights=0):
         """
         adj: adjacency mat

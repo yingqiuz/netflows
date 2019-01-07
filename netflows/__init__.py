@@ -20,7 +20,7 @@ TBC
 
 __all__ = [
     '__author__', '__description__', '__email__', '__license__',
-    '__packagename__','__url__', '__version__', 'Graph',
+    '__packagename__','__url__', '__version__', 'create_graph',
     'wardrop_equilibrium_linear_solve', 'system_optimal_linear_solve',
     'wardrop_equilibrium_affine_solve', 'system_optimal_affine_solve',
     'wardrop_equilibrium_bpr_solve', 'system_optimal_bpr_solve'
@@ -36,7 +36,7 @@ from .info import (
     __url__
 )
 
-from .Graph import Graph
+from .create import create_graph
 from .funcs import (
     wardrop_equilibrium_linear_solve, system_optimal_linear_solve,
     wardrop_equilibrium_affine_solve, system_optimal_affine_solve,

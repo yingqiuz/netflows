@@ -3,7 +3,7 @@
 solve wardrop equilibrium or system optimal flow for affine cost functions a*t + a0
 """
 
-from netflows.utils import bpr_cost, bpr_so_obj
+from netflows.utils import bpr_cost, bpr_so_obj, we_bpr_grad, so_bpr_grad
 import numpy as np
 from tqdm import tqdm
 
@@ -124,12 +124,7 @@ def _wardrop_equilibrium_bpr_solve(G, s, t, tol, maximum_iter, allpaths, a, u):
         print('The total travel time is %f' % total_cost_sum)
         return x, allflows, total_cost_sum, total_cost
 
-    gradients = np.array(
-        [np.sum(bpr_cost(allflows, a, u) * (
-                    path_arrays[k] * np.where(path_arrays[-1] == 0, 1, 0) - np.where(path_arrays[k] == 0, 1, 0) *
-                    path_arrays[-1]))
-         for k in range(num_variables - 1)]
-    )
+    gradients = we_bpr_grad(allflows, a, u, path_arrays, num_variables)
     
     # initial step size determination
     gamma1 = np.min(np.abs(x[:-1] / gradients))
@@ -167,12 +162,7 @@ def _wardrop_equilibrium_bpr_solve(G, s, t, tol, maximum_iter, allpaths, a, u):
         total_cost_sum = total_cost.sum()
 
         # new gradients
-        gradients = np.array(
-            [np.sum(bpr_cost(allflows, a, u) * (
-                        path_arrays[k] * np.where(path_arrays[-1] == 0, 1, 0) - np.where(path_arrays[k] == 0, 1, 0) *
-                        path_arrays[-1]))
-             for k in range(num_variables - 1)]
-        )
+        gradients = we_bpr_grad(allflows, a, u, path_arrays, num_variables)
         
         if np.sum(np.where(np.abs(gradients-prev_gradients) < tol, 0, 1)) == 0:  # test convergence
             print('Wardrop Equilibrium flow found:', x)
@@ -222,17 +212,7 @@ def _system_optimal_bpr_solve(G, s, t, tol, maximum_iter, allpaths, a, u):
         print('The total travel time is %f' % obj_fun)
         return x, allflows, obj_fun, total_cost
 
-    gradients = np.array(
-        [np.sum(bpr_cost(allflows, a, u) * (
-                    path_arrays[k] * np.where(path_arrays[-1] == 0, 1, 0) - np.where(path_arrays[k] == 0, 1, 0) *
-                    path_arrays[-1]))
-         for k in range(num_variables - 1)]
-    ) + np.array(
-        [np.sum(allflows * a * (0.6 * (allflows * u) ** 3 * u) * (
-                    path_arrays[k] * np.where(path_arrays[-1] == 0, 1, 0) - np.where(path_arrays[k] == 0, 1, 0) *
-                    path_arrays[-1]))
-         for k in range(num_variables - 1)]
-    )
+    gradients = so_bpr_grad(allflows, a, u, path_arrays, num_variables)
 
     # initial step size
     gamma1 = np.min(np.abs(x[:-1] / gradients))
@@ -266,17 +246,7 @@ def _system_optimal_bpr_solve(G, s, t, tol, maximum_iter, allpaths, a, u):
         total_cost = allflows * bpr_cost(allflows, a, u)
 
         # update gradients
-        gradients = np.array(
-            [np.sum(bpr_cost(allflows, a, u) * (
-                        path_arrays[k] * np.where(path_arrays[-1] == 0, 1, 0) - np.where(path_arrays[k] == 0, 1, 0) *
-                        path_arrays[-1]))
-             for k in range(num_variables - 1)]
-        ) + np.array(
-            [np.sum(allflows * a * (0.6 * (allflows * u) ** 3 * u) * (
-                        path_arrays[k] * np.where(path_arrays[-1] == 0, 1, 0) - np.where(path_arrays[k] == 0, 1, 0) *
-                        path_arrays[-1]))
-             for k in range(num_variables - 1)]
-        )
+        gradients = so_bpr_grad(allflows, a, u, path_arrays, num_variables)
 
         # convergence?
         if np.sum(np.where(np.abs(gradients-prev_gradients) < tol, 0, 1)) == 0:

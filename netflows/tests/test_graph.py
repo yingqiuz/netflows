@@ -2,7 +2,7 @@
 
 import numpy as np
 import pytest
-from netflows import Graph
+from netflows import create_graph
 
 ADJ_MAT = np.array([[0, 1, 1, 0], [0, 0, 1, 1], [0, 0, 0, 1], [0, 0, 0, 0]])
 DIST_MAT = np.array([[0, 0, 1, 0], [0, 0, 0, 2], [0, 0, 0, 0], [0, 0, 0, 0]])
@@ -11,7 +11,7 @@ WEIGHT_MAT = np.array([[0, 1, 0, 0], [0, 0, 1, 0], [0, 0, 0, 1/2], [0, 0, 0, 0]]
 
 @pytest.fixture
 def test_graph():
-    G = Graph(adj=ADJ_MAT, dist=DIST_MAT, weights=WEIGHT_MAT)
+    G = create_graph(adj=ADJ_MAT, dist=DIST_MAT, weights=WEIGHT_MAT)
     return G
 
 
