@@ -144,12 +144,16 @@ def _wardrop_equilibrium_linear_solve(
                 x.reshape(num_variables, 1, 1),
                 obj=[kk, num_variables - 1], axis=0
             ).sum(axis=0) * c).sum()
-            b2 = -(np.delete(
-                (1 - path_arrays) *
-                (path_arrays[-1] * (1 - path_arrays[kk])) *
-                x.reshape(num_variables, 1, 1),
-                obj=[kk, num_variables-1], axis=0
-            ).sum(axis=0) * c).sum()
+            b2 = -(
+                    (np.delete(
+                        path_arrays * (path_arrays[-1] * (1 - path_arrays[kk])) *
+                        x.reshape(num_variables, 1, 1),
+                        obj=[kk, num_variables - 1], axis=0
+                    ).sum(axis=0) + (
+                            path_arrays[-1] * (1 - path_arrays[kk]) *
+                            (1 - x[:-1].sum() + x[kk]))
+                     ) * c
+            ).sum()
             b = b1 + b2
 
             # compare 4 values
@@ -225,12 +229,16 @@ def _system_optimal_linear_solve(
                 x.reshape(num_variables, 1, 1),
                 obj=[kk, num_variables - 1], axis=0
             ).sum(axis=0) * c).sum() * 2
-            b2 = -(np.delete(
-                (1 - path_arrays) *
-                (path_arrays[-1] * (1 - path_arrays[kk])) *
-                x.reshape(num_variables, 1, 1),
-                obj=[kk, num_variables - 1], axis=0
-            ).sum(axis=0) * c).sum() * 2
+            b2 = -(
+                    (np.delete(
+                        path_arrays * (path_arrays[-1] * (1 - path_arrays[kk])) *
+                        x.reshape(num_variables, 1, 1),
+                        obj=[kk, num_variables - 1], axis=0
+                    ).sum(axis=0) + (
+                             path_arrays[-1] * (1 - path_arrays[kk]) *
+                             (1 - x[:-1].sum() + x[kk]))
+                     ) * c
+            ).sum()
             b = b1 + b2
 
             # compare 4 values
