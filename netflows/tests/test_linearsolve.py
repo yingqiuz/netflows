@@ -32,7 +32,7 @@ def test_graph():
     return sample_graph
 
 
-def test_we_affine(test_graph):
+def test_we_linear(test_graph):
     x, allflows, total_cost_sum, total_cost = wardrop_equilibrium_linear_solve(
         test_graph, S, T, tol=1e-12, maximum_iter=10000
     )
@@ -47,7 +47,7 @@ def test_we_affine(test_graph):
     assert not errors, "errors occurred:\n{}".format("\n".join(errors))
 
 
-def test_so_affine(test_graph):
+def test_so_linear(test_graph):
     x, allflows, obj_fun, total_cost = system_optimal_linear_solve(
         test_graph, S, T, tol=1e-12, maximum_iter=10000
     )
