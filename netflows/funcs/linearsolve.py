@@ -12,7 +12,8 @@ from tqdm import tqdm
 
 
 def wardrop_equilibrium_linear_solve(
-        graph_object, s, t, tol=1e-8, maximum_iter=10000, cutoff=None, a=None
+        graph_object, s, t, tol=1e-8,
+        maximum_iter=10000, cutoff=None, c=None
 ):
     """
     The function to solve Wardrop Equilibrium flow for a single source target pair
@@ -26,7 +27,7 @@ def wardrop_equilibrium_linear_solve(
     :param maximum_iter: maximum iteration times
     :param cutoff: a scalar value that defines maximal (binary) path length, namely,
         flows can only use paths shorter than the cutoff value
-    :param a: the parameter of linear cost function, default is distance/weights
+    :param c: the parameter of linear cost function, default is distance/weights
     :return: a tuple (x, allflows, total_cost_sum, total_cost).
         x: the vector storing flows on each path (path formulation)
         allflows: the matrix storing flows on each edge (edge formulation)
@@ -43,16 +44,17 @@ def wardrop_equilibrium_linear_solve(
 
     allpaths = graph_object.findallpaths(s, t, cutoff)
 
-    if a is None:
-        a = graph_object.dist_weight_ratio
+    if c is None:
+        c = graph_object.dist_weight_ratio
 
     return _wardrop_equilibrium_linear_solve(
-        graph_object, s, t, tol, maximum_iter, allpaths, a
+        graph_object, s, t, tol, maximum_iter, allpaths, c
     )
 
 
 def system_optimal_linear_solve(
-        graph_object, s, t, tol=1e-8, maximum_iter=10000, cutoff=None, a=None
+        graph_object, s, t, tol=1e-8,
+        maximum_iter=10000, cutoff=None, c=None
 ):
     """
     The function to solve system optimal flow for a single source target pair
@@ -66,7 +68,7 @@ def system_optimal_linear_solve(
     :param maximum_iter: maximum iteration times
     :param cutoff: a scalar value that defines maximal (binary) path length, namely,
         flows can only use paths shorter than the cutoff value
-    :param a: the parameter of linear cost function, default is distance/weights
+    :param c: the parameter of linear cost function, default is distance/weights
     :return: a tuple (x, allflows, total_cost_sum, total_cost).
         x: the vector storing flows on each path (path formulation)
         allflows: the matrix storing flows on each edge (edge formulation)
@@ -83,15 +85,18 @@ def system_optimal_linear_solve(
 
     allpaths = graph_object.findallpaths(s, t, cutoff)
 
-    if a is None:
-        a = graph_object.dist_weight_ratio
+    if c is None:
+        c = graph_object.dist_weight_ratio
 
     return _system_optimal_linear_solve(
-        graph_object, s, t, tol, maximum_iter, allpaths, a
+        graph_object, s, t, tol, maximum_iter, allpaths, c
     )
 
 
-def _wardrop_equilibrium_linear_solve(graph_object, s, t, tol, maximum_iter, allpaths, a):
+def _wardrop_equilibrium_linear_solve(
+        graph_object, s, t, tol,
+        maximum_iter, allpaths, c
+):
 
     num_variables = len(allpaths)  # the number of paths from s to t
     print('A total of %d paths found from %d to %d' % (num_variables, int(s), int(t)))
@@ -112,8 +117,8 @@ def _wardrop_equilibrium_linear_solve(graph_object, s, t, tol, maximum_iter, all
 
     # element (i, j) is the total flow on edge (i,j)
     allflows = np.sum(path_arrays * x.reshape(num_variables, 1, 1), axis=0)
-    obj_fun = linear_we_obj(allflows, a)
-    total_cost = allflows * linear_cost(allflows, a)
+    obj_fun = linear_we_obj(allflows, c).sum()
+    total_cost = allflows * linear_cost(allflows, c)
     total_cost_sum = total_cost.sum()
     print('The initial flow is (path formulation) ', x)
     print('The initial cost is %f' % total_cost_sum)
@@ -128,7 +133,7 @@ def _wardrop_equilibrium_linear_solve(graph_object, s, t, tol, maximum_iter, all
     # get params for each parabola
     a = np.array(
         [((path_arrays[k] * (1 - path_arrays[-1]) +
-           path_arrays[-1] * (1 - path_arrays[k])) * a).sum() / 2
+           path_arrays[-1] * (1 - path_arrays[k])) * c).sum() / 2
          for k in range(num_variables - 1)]
     )
     for k in tqdm(range(maximum_iter)):
@@ -141,13 +146,13 @@ def _wardrop_equilibrium_linear_solve(graph_object, s, t, tol, maximum_iter, all
                 (path_arrays[kk] * (1 - path_arrays[-1])) *
                 x.reshape(num_variables, 1, 1),
                 obj=[kk, num_variables - 1], axis=0
-            ).sum(axis=0) * a).sum()
+            ).sum(axis=0) * c).sum()
             b2 = -(np.delete(
                 (1 - path_arrays) *
                 (path_arrays[-1] * (1 - path_arrays[kk])) *
                 x.reshape(num_variables, 1, 1),
                 obj=[kk, num_variables-1], axis=0
-            ).sum(axis=0) * a).sum()
+            ).sum(axis=0) * c).sum()
             b = b1 + b2
 
             # compare 4 values
@@ -157,9 +162,9 @@ def _wardrop_equilibrium_linear_solve(graph_object, s, t, tol, maximum_iter, all
             x[-1] -= np.sort(boundary)[1] - x[kk]
             x[kk] = np.sort(boundary)[1]
         allflows = np.sum(path_arrays * x.reshape(num_variables, 1, 1), axis=0)
-        obj_fun = linear_we_obj(allflows, a)
+        obj_fun = linear_we_obj(allflows, c).sum()
         if np.abs(obj_fun - prev_obj_fun) / prev_obj_fun < tol:
-            total_cost = allflows * linear_cost(allflows, a)
+            total_cost = allflows * linear_cost(allflows, c)
             total_cost_sum = total_cost.sum()
             print('Wardrop Equilibrium flow found:', x)
             print('Iteration %d: the total travel time is %f' % (k, total_cost_sum))
@@ -169,7 +174,10 @@ def _wardrop_equilibrium_linear_solve(graph_object, s, t, tol, maximum_iter, all
     return
 
 
-def _system_optimal_linear_solve(graph_object, s, t, tol, maximum_iter, allpaths, a):
+def _system_optimal_linear_solve(
+        graph_object, s, t, tol,
+        maximum_iter, allpaths, c
+):
 
     num_variables = len(allpaths)  # the number of paths from s to t
     print('A total of %d paths found from %d to %d' % (num_variables, int(s), int(t)))
@@ -190,8 +198,8 @@ def _system_optimal_linear_solve(graph_object, s, t, tol, maximum_iter, allpaths
 
     # element (i, j) is the total flow on edge (i,j)
     allflows = np.sum(path_arrays * x.reshape(num_variables, 1, 1), axis=0)
-    total_cost = allflows * linear_cost(allflows, a)
-    obj_fun = linear_so_obj(allflows, a).sum()
+    total_cost = allflows * linear_cost(allflows, c)
+    obj_fun = linear_so_obj(allflows, c).sum()
 
     print('The initial flow (path formulation) is ', x)
     print('The initial cost is %f' % obj_fun)
@@ -206,7 +214,7 @@ def _system_optimal_linear_solve(graph_object, s, t, tol, maximum_iter, allpaths
         # get params for each parabola
     a = np.array(
         [((path_arrays[k] * (1 - path_arrays[-1]) +
-           path_arrays[-1] * (1 - path_arrays[k])) * a).sum()
+           path_arrays[-1] * (1 - path_arrays[k])) * c).sum()
          for k in range(num_variables - 1)]
     )
     for k in tqdm(range(maximum_iter)):
@@ -219,13 +227,13 @@ def _system_optimal_linear_solve(graph_object, s, t, tol, maximum_iter, allpaths
                 (path_arrays[kk] * (1 - path_arrays[-1])) *
                 x.reshape(num_variables, 1, 1),
                 obj=[kk, num_variables - 1], axis=0
-            ).sum(axis=0) * a).sum() * 2
+            ).sum(axis=0) * c).sum() * 2
             b2 = -(np.delete(
                 (1 - path_arrays) *
                 (path_arrays[-1] * (1 - path_arrays[kk])) *
                 x.reshape(num_variables, 1, 1),
                 obj=[kk, num_variables - 1], axis=0
-            ).sum(axis=0) * a).sum() * 2
+            ).sum(axis=0) * c).sum() * 2
             b = b1 + b2
 
             # compare 4 values
@@ -235,9 +243,9 @@ def _system_optimal_linear_solve(graph_object, s, t, tol, maximum_iter, allpaths
             x[-1] -= np.sort(boundary)[1] - x[kk]
             x[kk] = np.sort(boundary)[1]
         allflows = np.sum(path_arrays * x.reshape(num_variables, 1, 1), axis=0)
-        obj_fun = linear_so_obj(allflows, a).sum()
+        obj_fun = linear_so_obj(allflows, c).sum()
         if np.abs(obj_fun - prev_obj_fun) / prev_obj_fun < tol:
-            total_cost = allflows * linear_cost(allflows, a)
+            total_cost = allflows * linear_cost(allflows, c)
             print('Wardrop Equilibrium flow found:', x)
             print('Iteration %d: the total travel time is %f' % (k, obj_fun))
             return x, allflows, obj_fun, total_cost
