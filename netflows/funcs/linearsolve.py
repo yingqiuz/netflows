@@ -238,7 +238,7 @@ def _system_optimal_linear_solve(
                              path_arrays[-1] * (1 - path_arrays[kk]) *
                              (1 - x[:-1].sum() + x[kk]))
                      ) * c
-            ).sum()
+            ).sum() * 2
             b = b1 + b2
 
             # compare 4 values
