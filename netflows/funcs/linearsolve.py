@@ -154,7 +154,7 @@ def _wardrop_equilibrium_linear_solve(
 
             # compare 4 values
             boundary = np.array(
-                [0, 1, -b / (2 * a), 1 - x[1:-1].sum()]
+                [0, 1, -b / (2 * a[kk]), 1 - x[1:-1].sum()]
             )
             x[-1] -= np.sort(boundary)[1] - x[kk]
             x[kk] = np.sort(boundary)[1]
@@ -235,7 +235,7 @@ def _system_optimal_linear_solve(
 
             # compare 4 values
             boundary = np.array(
-                [0, 1, -b / (2 * a), 1 - x[1:-1].sum()]
+                [0, 1, -b / (2 * a[kk]), 1 - x[1:-1].sum()]
             )
             x[-1] -= np.sort(boundary)[1] - x[kk]
             x[kk] = np.sort(boundary)[1]
