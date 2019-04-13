@@ -167,7 +167,7 @@ def _wardrop_equilibrium_affine_solve(
                             (1 - x[:-1].sum() + x[kk]))
                      ) * c
             ).sum()
-            b = b1 + b2 + b0
+            b = b1 + b2 + b0[kk]
 
             # compare 4 values
             boundary = np.array(
@@ -256,7 +256,7 @@ def _system_optimal_affine_solve(
                             (1 - x[:-1].sum() + x[kk]))
                      ) * c
             ).sum() * 2
-            b = b1 + b2 + b0
+            b = b1 + b2 + b0[kk]
 
             # compare 4 values
             boundary = np.array(
