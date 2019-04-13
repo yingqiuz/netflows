@@ -3,10 +3,7 @@
 solve wardrop equilibrium or system optimal flow for linear cost functions a*t
 """
 
-from netflows.utils import (
-    linear_cost, linear_so_obj, linear_we_obj,
-    we_linear_grad, so_linear_grad
-)
+from netflows.utils import linear_cost, linear_so_obj, linear_we_obj
 import numpy as np
 from tqdm import tqdm
 
