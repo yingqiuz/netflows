@@ -147,6 +147,7 @@ def _wardrop_equilibrium_affine_solve(
          for k in range(num_variables - 1)]
     )
     for k in tqdm(range(maximum_iter)):
+        prev_obj_fun = np.copy(obj_fun)
         prev_x = np.copy(x)
         # coordinates descent
         for kk in range(num_variables - 1):
@@ -237,6 +238,7 @@ def _system_optimal_affine_solve(
 
     for k in tqdm(range(maximum_iter)):
         prev_x = np.copy(x)
+        prev_obj_fun = np.copy(obj_fun)
         # coordinates descent
         for kk in range(num_variables - 1):
             # get b
@@ -266,7 +268,7 @@ def _system_optimal_affine_solve(
             x[kk] = np.sort(boundary)[1]
         allflows = np.sum(path_arrays * x.reshape(num_variables, 1, 1), axis=0)
         obj_fun = affine_so_obj(allflows, c, c0).sum()
-        if np.where(np.abs(x - prev_x) < tol * prev_x, 0, 1).sum() == 0:
+        if np.abs(obj_fun - prev_obj_fun) < tol * prev_obj_fun:
             total_cost = allflows * affine_cost(allflows, c, c0)
             print('Wardrop Equilibrium flow found:', x)
             print('Iteration %d: the total travel time is %f' % (k, obj_fun))

@@ -51,7 +51,7 @@ def test_we_affine(test_graph):
 
 def test_so_affine(test_graph):
     x, allflows, obj_fun, total_cost = system_optimal_affine_solve(
-        test_graph, S, T, tol=1e-8, maximum_iter=500000
+        test_graph, S, T, tol=1e-8, maximum_iter=100000
     )
     errors = []
 
