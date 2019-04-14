@@ -36,7 +36,7 @@ def test_graph():
 
 def test_we_affine(test_graph):
     x, allflows, total_cost_sum, total_cost = wardrop_equilibrium_affine_solve(
-        test_graph, S, T, tol=1e-12, maximum_iter=10000
+        test_graph, S, T, tol=1e-8, maximum_iter=10000
     )
     errors = []
 
@@ -51,7 +51,7 @@ def test_we_affine(test_graph):
 
 def test_so_affine(test_graph):
     x, allflows, obj_fun, total_cost = system_optimal_affine_solve(
-        test_graph, S, T, tol=1e-12, maximum_iter=10000
+        test_graph, S, T, tol=1e-8, maximum_iter=10000
     )
     errors = []
 
