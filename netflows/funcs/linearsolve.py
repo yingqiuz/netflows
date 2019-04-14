@@ -133,6 +133,7 @@ def _wardrop_equilibrium_linear_solve(
            path_arrays[-1] * (1 - path_arrays[k])) * c).sum() / 2
          for k in range(num_variables - 1)]
     )
+
     for k in tqdm(range(maximum_iter)):
         prev_obj_fun = np.copy(obj_fun)
         prev_x = np.copy(x)
@@ -153,7 +154,7 @@ def _wardrop_equilibrium_linear_solve(
                     ).sum(axis=0) + (
                             path_arrays[-1] * (1 - path_arrays[kk]) *
                             (1 - x[:-1].sum() + x[kk]))
-                     ) * c
+                    ) * c
             ).sum()
             b = b1 + b2
 
