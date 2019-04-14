@@ -179,7 +179,7 @@ def _wardrop_equilibrium_affine_solve(
 
         allflows = np.sum(path_arrays * x.reshape(num_variables, 1, 1), axis=0)
         obj_fun = affine_we_obj(allflows, c, c0).sum()
-        if np.where(np.abs(x - prev_x) < tol * prev_x, 0, 1).sum() == 0:
+        if np.where(np.abs(x - prev_x) <= tol * prev_x, 0, 1).sum() == 0:
             total_cost = allflows * affine_cost(allflows, c, c0)
             total_cost_sum = total_cost.sum()
             print('Wardrop Equilibrium flow found:', x)
@@ -268,7 +268,7 @@ def _system_optimal_affine_solve(
             x[kk] = np.sort(boundary)[1]
         allflows = np.sum(path_arrays * x.reshape(num_variables, 1, 1), axis=0)
         obj_fun = affine_so_obj(allflows, c, c0).sum()
-        if np.abs(obj_fun - prev_obj_fun) < tol * prev_obj_fun:
+        if np.where(np.abs(x - prev_x) <= tol * prev_x, 0, 1).sum() == 0:
             total_cost = allflows * affine_cost(allflows, c, c0)
             print('Wardrop Equilibrium flow found:', x)
             print('Iteration %d: the total travel time is %f' % (k, obj_fun))

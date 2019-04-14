@@ -165,7 +165,7 @@ def _wardrop_equilibrium_linear_solve(
             x[kk] = np.sort(boundary)[1]
         allflows = np.sum(path_arrays * x.reshape(num_variables, 1, 1), axis=0)
         obj_fun = linear_we_obj(allflows, c).sum()
-        if np.where(np.abs(x - prev_x) < tol * prev_x, 0, 1).sum() == 0:
+        if np.where(np.abs(x - prev_x) <= tol * prev_x, 0, 1).sum() == 0:
             total_cost = allflows * linear_cost(allflows, c)
             total_cost_sum = total_cost.sum()
             print('Wardrop Equilibrium flow found:', x)
@@ -251,7 +251,7 @@ def _system_optimal_linear_solve(
             x[kk] = np.sort(boundary)[1]
         allflows = np.sum(path_arrays * x.reshape(num_variables, 1, 1), axis=0)
         obj_fun = linear_so_obj(allflows, c).sum()
-        if np.where(np.abs(x - prev_x) < tol * prev_x, 0, 1).sum() == 0:
+        if np.where(np.abs(x - prev_x) <= tol * prev_x, 0, 1).sum() == 0:
             total_cost = allflows * linear_cost(allflows, c)
             print('Wardrop Equilibrium flow found:', x)
             print('Iteration %d: the total travel time is %f' % (k, obj_fun))
